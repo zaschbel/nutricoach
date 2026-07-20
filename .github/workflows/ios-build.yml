@@ -20,10 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select latest available Xcode
+      # Die .NET-iOS-Workload pinnt eine exakte Xcode-Version (siehe Fehlermeldung bei
+      # abweichender Version: "This version of .NET for iOS requires Xcode X.Y").
+      # "latest-stable" ist hier zu neu - explizit auf die vom Workload verlangte Version setzen.
+      - name: Select required Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: "26.5"
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
