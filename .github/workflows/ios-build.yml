@@ -29,7 +29,7 @@ jobs:
         run: dotnet workload install maui-ios ios
 
       - name: Restore
-        run: dotnet restore src/NutriCoach.Maui/NutriCoach.Maui.csproj -f net9.0-ios
+        run: dotnet restore src/NutriCoach.Maui/NutriCoach.Maui.csproj
 
       # Debug + leerer CodesignKey loest den "fakesign"-Fallback des .NET-iOS-Buildsystems aus:
       # es entsteht ein lauffaehiges .app-Bundle fuer echte Geraete (arm64), nur eben ohne
