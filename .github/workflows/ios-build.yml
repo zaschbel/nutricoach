@@ -37,7 +37,7 @@ jobs:
       - name: Build unsigned iOS app bundle
         run: >
           dotnet build src/NutriCoach.Maui/NutriCoach.Maui.csproj
-          -f net9.0-ios
+          -p:TargetFrameworks=net9.0-ios
           -c Debug
           -p:RuntimeIdentifier=ios-arm64
           -p:CodesignKey=
