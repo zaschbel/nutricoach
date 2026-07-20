@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.AddFoodPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             x:Name="Root">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="ResultTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurface}" CornerRadius="12" Padding="10" Margin="0,0,0,6" HasShadow="False" BorderColor="Transparent">
+                <Grid ColumnDefinitions="Auto,*" BackgroundColor="Transparent">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.SelectResultCommand, Source={x:Reference Root}}"
+                                               CommandParameter="{Binding}"/>
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="{Binding Icon}" FontSize="20" Margin="0,0,10,0"/>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="13"/>
+                        <Label FontSize="10" TextColor="{StaticResource ColorTextSecondary}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding KcalPer100, StringFormat='{0:0} kcal/100g · '}"/>
+                                    <Span Text="{Binding ProteinPer100, StringFormat='{0:0.0}g E'}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+        <DataTemplate x:Key="RecentTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurface}" CornerRadius="12" Padding="10" Margin="0,0,0,6" HasShadow="False" BorderColor="Transparent">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Label Grid.Column="0" Text="{Binding Icon}" FontSize="20" Margin="0,0,10,0"/>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="{Binding Food.Name}" FontFamily="InterSemiBold" FontSize="13"/>
+                        <Label Text="{Binding LastAmountGrams, StringFormat='zuletzt {0:0}g'}" FontSize="10" TextColor="{StaticResource ColorTextSecondary}"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="2" Text="+" Style="{StaticResource PrimaryButtonStyle}" Padding="14,4" FontSize="16"
+                            Command="{Binding BindingContext.QuickAddCommand, Source={x:Reference Root}}"
+                            CommandParameter="{Binding}"/>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Text="{Binding MealLabel, StringFormat='Zu {0} hinzufügen'}" Style="{StaticResource HeadlineLabelStyle}"/>
+                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCancelTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <!-- Modus -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="🔍 Suche" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeSearch"/>
+                    <Button Text="📷 Barcode" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeBarcode"/>
+                    <Button Text="📸 Foto" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModePhoto"/>
+                    <Button Text="✏️ Manuell" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeManual"/>
+                </HorizontalStackLayout>
+            </ScrollView>
+
+            <!-- Suche -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSearchMode}">
+                <VerticalStackLayout Spacing="6" IsVisible="{Binding HasRecentFoods}">
+                    <Label Text="Zuletzt verwendet" FontFamily="InterSemiBold" FontSize="14"/>
+                    <CollectionView ItemsSource="{Binding RecentFoods}" ItemTemplate="{StaticResource RecentTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+                </VerticalStackLayout>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry Grid.Column="0" Text="{Binding SearchText}" Placeholder="Lebensmittel suchen..."/>
+                    <Button Grid.Column="1" Text="Suchen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SearchCommand}"/>
+                </Grid>
+                <Label Text="{Binding SearchStatusText}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasSearchStatus}"/>
+                <CollectionView ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource ResultTemplate}" ItemSizingStrategy="MeasureAllItems">
+                    <CollectionView.EmptyView>
+                        <Label Text="Tipp einen Namen ein und tippe auf Suchen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </VerticalStackLayout>
+
+            <!-- Barcode -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsBarcodeMode}">
+                <Button Text="📷 Barcode mit Kamera scannen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnScanBarcodeClicked"/>
+                <Label Text="Oder Nummer manuell eintippen:" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,8,0,0"/>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry Grid.Column="0" Text="{Binding BarcodeText}" Keyboard="Numeric"/>
+                    <Button Grid.Column="1" Text="Suchen" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding LookupBarcodeCommand}"/>
+                </Grid>
+                <Label Text="{Binding BarcodeStatusText}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasBarcodeStatus}"/>
+            </VerticalStackLayout>
+
+            <!-- Foto -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsPhotoMode}">
+                <Label Text="Mach ein Foto vom Essen, die KI schätzt Name und Nährwerte." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                    <Button Grid.Column="0" Text="📷 Foto aufnehmen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnTakePhotoClicked"/>
+                    <Button Grid.Column="1" Text="🖼️ Aus Galerie" Style="{StaticResource SecondaryButtonStyle}" Clicked="OnPickPhotoClicked"/>
+                </Grid>
+
+                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsAnalyzingPhoto}">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="18" HeightRequest="18"/>
+                    <Label Text="KI erkennt das Essen..." FontSize="12" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+
+                <Label Text="{Binding PhotoErrorMessage}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasPhotoError}"/>
+
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding HasPhotoResult}">
+                    <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="14" Padding="12" HasShadow="False" BorderColor="Transparent">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="{Binding ManualName}" FontFamily="InterSemiBold" FontSize="15"/>
+                            <Label Text="{Binding PhotoNutritionSummary}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Label Text="Passt das? Menge festlegen und hinzufügen (Werte oben lassen sich auch anpassen, falls die Schätzung daneben liegt):"
+                           FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Text="{Binding ManualAmountGrams}" Keyboard="Numeric" Placeholder="Menge in Gramm"/>
+                        <Button Grid.Column="1" Text="Hinzufügen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CreateManualCommand}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Manuell -->
+            <VerticalStackLayout Spacing="8" IsVisible="{Binding IsManualMode}">
+                <Label Text="Name" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualName}"/>
+                <Label Text="Menge (g)" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualAmountGrams}" Keyboard="Numeric"/>
+                <Label Text="Kalorien (kcal)" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualKcal}" Keyboard="Numeric"/>
+                <Label Text="Eiweiß (g)" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualProtein}" Keyboard="Numeric"/>
+                <Label Text="Kohlenhydrate (g)" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualCarbs}" Keyboard="Numeric"/>
+                <Label Text="Fett (g)" Style="{StaticResource SectionLabelStyle}"/>
+                <Entry Text="{Binding ManualFat}" Keyboard="Numeric"/>
+                <Button Text="Zum Tagebuch hinzufügen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding CreateManualCommand}" Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

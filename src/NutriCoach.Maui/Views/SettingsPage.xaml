@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.SettingsPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             x:Name="Root">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                <Label Grid.Column="0" Text="Einstellungen" Style="{StaticResource HeadlineLabelStyle}"/>
+                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <Frame Style="{StaticResource CardStyle}" Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="🔔 Erinnerungen" FontFamily="InterSemiBold" FontSize="16"/>
+                    <Label FontSize="12" TextColor="{StaticResource ColorTextSecondary}"
+                           Text="Tägliche Erinnerungen zu festen Uhrzeiten, einzeln an-/abschaltbar."/>
+
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                        <Label Grid.Column="0" Text="🍳 Frühstück (9:00 Uhr)" VerticalOptions="Center" FontSize="13"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding BreakfastReminder}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="🥗 Mittagessen (13:30 Uhr)" VerticalOptions="Center" FontSize="13"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding LunchReminder}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="🍽️ Abendessen (19:30 Uhr)" VerticalOptions="Center" FontSize="13"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding DinnerReminder}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="💧 Wasser (15:00 Uhr)" VerticalOptions="Center" FontSize="13"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding WaterReminder}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="🏋️ Training (18:00 Uhr)" VerticalOptions="Center" FontSize="13"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding TrainingReminder}"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardStyle}" Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="👤 Profil" FontFamily="InterSemiBold" FontSize="16"/>
+                    <Label FontSize="12" TextColor="{StaticResource ColorTextSecondary}"
+                           Text="Name, Ziel, Größe und weitere Angaben aus der Ersteinrichtung nachträglich ändern."/>
+                    <Button Text="Profil bearbeiten" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start" Clicked="OnEditProfileClicked"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardStyle}" Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="🎨 Design" FontFamily="InterSemiBold" FontSize="16"/>
+                    <Picker ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding SelectedTheme}"/>
+                    <Label Text="{Binding ThemeChangeHint}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardStyle}" Margin="0,10,0,0">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="✨ KI-Optimierung" FontFamily="InterSemiBold" FontSize="16"/>
+                    <Label FontSize="12" TextColor="{StaticResource ColorTextSecondary}"
+                           Text="Für die Essens-Tausch-Vorschläge auf dem Dashboard braucht die App einen Google-Gemini-API-Key. Kostenlos erstellbar unter aistudio.google.com - keine Kreditkarte nötig, kein Guthaben-Problem wie bei Anthropic."/>
+
+                    <Label Text="API-Key" Style="{StaticResource SectionLabelStyle}" Margin="0,10,0,0"/>
+                    <Entry Text="{Binding ApiKey}" Placeholder="AIza..." IsPassword="True"/>
+
+                    <Label Text="{Binding StatusText}" FontSize="12" TextColor="{StaticResource ColorAccent}" IsVisible="{Binding HasStatus}"/>
+
+                    <HorizontalStackLayout Spacing="10" Margin="0,10,0,0">
+                        <Button Text="Speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}"/>
+                        <Button Text="Entfernen" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding RemoveCommand}" IsVisible="{Binding HasKeyStored}"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

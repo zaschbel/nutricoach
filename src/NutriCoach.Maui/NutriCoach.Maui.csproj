@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-ios;net9.0-android;net9.0-windows10.0.19041.0</TargetFrameworks>
+    <!-- net9.0-maccatalyst könnt ihr bei Bedarf ergänzen (Mac-Vorschau).
+         net9.0-windows10.0.19041.0 ist zum Testen am eigenen PC drin, bevor's aufs iPhone geht -
+         läuft dann als ganz normales Windows-Fenster, mit exakt der gleichen Oberfläche.
+         Hinweis: falls dein Visual Studio auch kein .NET 9 Mobile-Workload hat, in der
+         "Fehlerliste" nachsehen, welche Version explizit verlangt wird, und hier anpassen. -->
+    <OutputType>Exe</OutputType>
+    <RootNamespace>NutriCoach.Maui</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- App-Identität -->
+    <ApplicationTitle>NutriCoach</ApplicationTitle>
+    <ApplicationId>com.nutricoach.app</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+
+    <!-- iOS: Mindestversion, iPhone 15 läuft mit iOS 17+ problemlos -->
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net9.0-ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net9.0-android'">21.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</TargetPlatformMinVersion>
+    <!-- "Unpackaged" = läuft als normale .exe, ohne MSIX-Installation - einfacher zum schnellen
+         Testen am PC während der Entwicklung. -->
+    <WindowsPackageType Condition="$(TargetFramework.Contains('-windows'))">None</WindowsPackageType>
+    <UseWinUI Condition="$(TargetFramework.Contains('-windows'))">true</UseWinUI>
+
+    <!-- Ohne diese Zeile wird die HealthKit-Berechtigung aus Entitlements.plist beim Signieren
+         nicht mit reinverpackt - zusätzlich muss "HealthKit" auch als Capability im Apple Developer
+         Portal für die App-ID UND als Capability im Xcode-Projekt/der Provisioning aktiviert werden,
+         das kann kein Code allein erledigen. -->
+    <CodesignEntitlements Condition="'$(TargetFramework)' == 'net9.0-ios'">Platforms/iOS/Entitlements.plist</CodesignEntitlements>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- App-Icon und Splash-Screen: Platzhalter, später durch eigenes Icon ersetzbar -->
+    <MauiIcon Include="Resources\appicon.png" />
+    <MauiSplashScreen Include="Resources\appicon.png" Color="#1A1A1A" BaseSize="200,200" />
+
+    <!-- Inter-Schriftart, wie im Stitch-Design -->
+    <MauiFont Include="Resources\Fonts\Inter-Regular.ttf" />
+    <MauiFont Include="Resources\Fonts\Inter-Medium.ttf" />
+    <MauiFont Include="Resources\Fonts\Inter-SemiBold.ttf" />
+    <MauiFont Include="Resources\Fonts\Inter-Bold.ttf" />
+
+    <MauiImage Include="Resources\Images\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
+    <PackageReference Include="ZXing.Net.Maui" Version="0.5.0" />
+    <PackageReference Include="ZXing.Net.Maui.Controls" Version="0.5.0" />
+    <PackageReference Include="Plugin.LocalNotification" Version="11.1.4" />
+    <!-- Windows wird vom Barcode-Scannen nicht unterstützt (nur Android/iOS) - für Windows-Tests
+         bleibt die manuelle Zifferneingabe als Rückfalloption erhalten. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <!-- Ohne dieses Paket meldet SQLite unter MAUI beim ersten Datenbankzugriff einen Laufzeitfehler
+         ("You need to call SQLitePCL.raw.SetProvider()") - unter reinem WPF war das nicht nötig,
+         weil die Windows-eigene SQLite-Variante das automatisch mitgebracht hat. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" />
+  </ItemGroup>
+
+</Project>

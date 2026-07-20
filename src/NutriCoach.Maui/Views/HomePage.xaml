@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.HomePage"
+             BackgroundColor="{StaticResource ColorBackground}">
+
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="16">
+
+            <!-- Kopfzeile -->
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="{StaticResource ColorSurfaceElevated}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="18"/>
+                    </Border.StrokeShape>
+                    <Grid>
+                        <Image Source="{Binding ProfilePicturePath}" Aspect="AspectFill" IsVisible="{Binding HasProfilePicture}"/>
+                        <Label Text="👤" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
+                    </Grid>
+                </Border>
+                <Label Grid.Column="1" Text="NutriCoach" FontFamily="InterBold" FontSize="22"
+                       TextColor="{StaticResource ColorAccent}" VerticalOptions="Center"/>
+                <Label Grid.Column="2" Text="⚙️" FontSize="20" VerticalOptions="Center" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSettingsTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <!-- Datum + Streak -->
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
+                    <Label Text="Tagesübersicht" Style="{StaticResource HeadlineLabelStyle}"/>
+                </VerticalStackLayout>
+                <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="999"
+                       Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="Center">
+                    <HorizontalStackLayout Spacing="4">
+                        <Label Text="🔥" FontSize="14"/>
+                        <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorAccent}" FontFamily="InterBold" FontSize="13"/>
+                        <Label Text="Tage" TextColor="{StaticResource ColorAccent}" FontFamily="InterMedium" FontSize="13"/>
+                    </HorizontalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Bento: Schritte + Kalorien -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnStepsCardTapped"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="🚶" FontSize="18" BackgroundColor="#0058BC1A"
+                                   WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='Ziel: {0}'}" FontSize="10"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </Grid>
+                        <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="26"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
+                        <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
+                        <Label Text="🍎 Mit Health verbinden" FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
+                               BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ConnectHealthKitCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="🍎 Verbunden mit Health" FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
+                               IsVisible="{Binding IsHealthKitConnected}"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCaloriesCardTapped"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="🍽️" FontSize="18" BackgroundColor="#8F6E531A"
+                                   WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                            <Label Grid.Column="1" Text="{Binding RemainingKcal, StringFormat='Rest: {0:0}'}" FontSize="10"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </Grid>
+                        <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
+                        <Label Text="kcal gegessen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorTertiary}" Margin="0,6,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- KI-Optimierung: rein dekorativ, keine echte KI-Anbindung (das wäre ein eigenes Feature) -->
+            <Frame Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="8">
+                    <HorizontalStackLayout Spacing="6">
+                        <Label Text="✨" FontSize="14"/>
+                        <Label Text="KI-OPTIMIERUNG" FontFamily="InterBold" FontSize="11" TextColor="{StaticResource ColorAccent}"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Kein API-Key hinterlegt -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiApiKey, Converter={StaticResource InverseBoolConverter}}">
+                        <Label Text="Für Ernährungs-Tipps von der KI wird ein eigener Google-Gemini-API-Key benötigt (kostenlos, keine Kreditkarte nötig)." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Button Text="In Einstellungen einrichten" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start" Clicked="OnOpenSettingsClicked"/>
+                    </VerticalStackLayout>
+
+                    <!-- Key vorhanden, aber noch kein Vorschlag geladen -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowAiGetSuggestionButton}">
+                        <Label Text="Lass dir einen konkreten Tausch-Vorschlag für heute geben." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Button Text="Vorschlag holen" Style="{StaticResource PrimaryButtonStyle}" HorizontalOptions="Start" Command="{Binding LoadAiSuggestionCommand}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Lädt gerade -->
+                    <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsLoadingAiSuggestion}">
+                        <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="18" HeightRequest="18"/>
+                        <Label Text="Frage die KI..." FontSize="12" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <!-- Echter Vorschlag -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiSuggestion}">
+                        <Label Text="{Binding AiSuggestionIntro}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="14" Padding="12" HasShadow="False" BorderColor="Transparent">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,*">
+                                <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
+                                    <Label Text="🍽️" FontSize="22" HorizontalTextAlignment="Center"/>
+                                    <Label Text="{Binding AiSuggestionOriginal}" FontSize="13" FontFamily="InterSemiBold" TextColor="#BA1A1A" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="→" FontSize="18" VerticalOptions="Center" Margin="10,0" TextColor="{StaticResource ColorTextSecondary}"/>
+                                <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
+                                    <Label Text="🍽️" FontSize="22" HorizontalTextAlignment="Center"/>
+                                    <Label Text="{Binding AiSuggestionAlternative}" FontSize="13" FontFamily="InterSemiBold" TextColor="{StaticResource ColorAccent}" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="3" HorizontalOptions="End">
+                                    <Label Text="{Binding AiSuggestionKcalSaved}" FontFamily="InterBold" FontSize="18" TextColor="{StaticResource ColorAccent}" HorizontalTextAlignment="End"/>
+                                    <Label Text="KCAL GESPART" FontSize="8" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="End"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                        <Label Text="{Binding AiSuggestionReason}" FontSize="14" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Button Text="Neuen Vorschlag holen" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" HorizontalOptions="Start" Command="{Binding LoadAiSuggestionCommand}"/>
+                    </VerticalStackLayout>
+
+                    <!-- KI hat nichts zu verbessern gefunden -->
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiOptimalMessage}">
+                        <HorizontalStackLayout Spacing="8">
+                            <Label Text="✅" FontSize="20"/>
+                            <Label Text="Läuft gut, weiter so!" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding AiSuggestionReason}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Button Text="Nochmal prüfen" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" HorizontalOptions="Start" Command="{Binding LoadAiSuggestionCommand}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Freie Frage an die KI -->
+                    <BoxView HeightRequest="1" Color="{StaticResource ColorBorder}" Margin="0,6,0,6" IsVisible="{Binding HasAiApiKey}"/>
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiApiKey}">
+                        <Label Text="Oder frag was Eigenes:" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Entry Grid.Column="0" Text="{Binding AiQuestionText}" Placeholder="z. B. Ist Skyr gut für mein Ziel?"/>
+                            <Button Grid.Column="1" Text="Fragen" Style="{StaticResource PrimaryButtonStyle}" FontSize="12" Padding="14,8"
+                                    Command="{Binding AskAiQuestionCommand}"/>
+                        </Grid>
+                        <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsAskingAiQuestion}">
+                            <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="16" HeightRequest="16"/>
+                            <Label Text="Frage die KI..." FontSize="12" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="14" Padding="12" HasShadow="False"
+                               BorderColor="Transparent" IsVisible="{Binding HasAiAnswer}">
+                            <Label Text="{Binding AiAnswerText}" FontSize="13" TextColor="{StaticResource ColorTextPrimary}"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Fehler (z. B. Netzwerk, ungültiger Key oder zu wenig Guthaben) -->
+                    <Label Text="{Binding AiErrorMessage}" FontSize="11"
+                           TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasAiError}"/>
+                    <Button Text="Erneut versuchen" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" HorizontalOptions="Start"
+                            Command="{Binding LoadAiSuggestionCommand}" IsVisible="{Binding HasAiError}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Heutiges Training laut Plan -->
+            <Frame Style="{StaticResource CardStyle}" IsVisible="{Binding HasNoTodayTraining}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="{Binding TodayPlanLabel}" TextColor="{StaticResource ColorAccent}" FontFamily="InterSemiBold" FontSize="12"
+                           IsVisible="{Binding HasTodayPlan}"/>
+                    <Label Text="Kein Training heute" FontFamily="InterSemiBold" FontSize="18" TextColor="{StaticResource ColorTextPrimary}"/>
+                    <Label Text="Für heute ist noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                    <Button Text="STARTEN" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                            Command="{Binding StartTodayPlannedTrainingCommand}" IsVisible="{Binding HasTodayPlan}"/>
+                    <Button Text="+ EINTRAGEN" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                            Command="{Binding AddTodayTrainingCommand}" IsVisible="{Binding HasNoTodayPlan}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Wöchentliche Aktivität -->
+            <Frame Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Wöchentliche Aktivität" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" Margin="0,0,0,8"/>
+                    <GraphicsView Drawable="{Binding WeeklyActivityDrawable}" HeightRequest="120"/>
+                    <Label Text="{Binding AverageStepsThisWeek, StringFormat='Durchschnittliche Aktivität: {0:N0} Schritte/Tag'}"
+                           FontSize="12" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,8,0,0"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

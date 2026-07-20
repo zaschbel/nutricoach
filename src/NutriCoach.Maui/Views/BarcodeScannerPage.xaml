@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="NutriCoach.Maui.Views.BarcodeScannerPage"
+             BackgroundColor="Black">
+
+    <Grid>
+        <zxing:CameraBarcodeReaderView x:Name="BarcodeReader" BarcodesDetected="OnBarcodesDetected"/>
+
+        <!-- Sucher-Rahmen zur Orientierung -->
+        <Border Stroke="White" StrokeThickness="2" BackgroundColor="Transparent"
+                WidthRequest="260" HeightRequest="140" HorizontalOptions="Center" VerticalOptions="Center"
+                InputTransparent="True">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16"/>
+            </Border.StrokeShape>
+        </Border>
+
+        <VerticalStackLayout VerticalOptions="Start" Padding="20,50,20,0" Spacing="8">
+            <Label Text="Barcode scannen" TextColor="White" FontFamily="InterSemiBold" FontSize="20"/>
+            <Label Text="Halte den Barcode in den Rahmen" TextColor="#CCCCCC" FontSize="13"/>
+        </VerticalStackLayout>
+
+        <Button Text="✕ Abbrechen" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,40"
+                Style="{StaticResource SecondaryButtonStyle}" Clicked="OnCancelClicked"/>
+    </Grid>
+</ContentPage>

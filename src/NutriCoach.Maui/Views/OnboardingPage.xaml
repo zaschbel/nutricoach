@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.OnboardingPage"
+             x:Name="RootPage"
+             BackgroundColor="{StaticResource ColorBackground}">
+
+    <ContentPage.Resources>
+        <Style x:Key="StepLabelStyle" TargetType="Label">
+            <Setter Property="FontFamily" Value="InterBold"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style x:Key="HintStyle" TargetType="Label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+        <Style x:Key="DateEntryStyle" TargetType="Entry">
+            <Setter Property="Keyboard" Value="Numeric"/>
+            <Setter Property="WidthRequest" Value="70"/>
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20,16">
+
+        <!-- Fortschritt -->
+        <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+            <Label Text="{Binding StepLabel}" FontSize="12" FontFamily="InterSemiBold" TextColor="{StaticResource ColorAccent}"/>
+            <ProgressBar Progress="{Binding StepProgress}" ProgressColor="{StaticResource ColorAccent}"/>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- ===== Schritt 0: Stammdaten ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+                    <Label Text="Wie heißt du?" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Damit wir dich persönlich ansprechen können." Style="{StaticResource HintStyle}"/>
+                    <Entry Text="{Binding Name}" Placeholder="Dein Name"/>
+
+                    <Label Text="Geburtsdatum" FontFamily="InterSemiBold" FontSize="15" Margin="0,16,0,4"/>
+                    <HorizontalStackLayout Spacing="10">
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Tag" Text="{Binding BirthDateParts.Day, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Monat" Text="{Binding BirthDateParts.Month, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" WidthRequest="90" Placeholder="Jahr" Text="{Binding BirthDateParts.Year, Converter={StaticResource NullableIntConverter}}"/>
+                    </HorizontalStackLayout>
+
+                    <Label Text="Geschlecht" FontFamily="InterSemiBold" FontSize="15" Margin="0,16,0,4"/>
+                    <Picker ItemsSource="{Binding GenderOptions}" SelectedItem="{Binding Gender}"/>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 1: Körperdaten ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}">
+                    <Label Text="Deine Körperdaten" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Grundlage für Kalorien- und Makro-Berechnung." Style="{StaticResource HintStyle}"/>
+
+                    <Label Text="Größe (cm)" FontFamily="InterSemiBold" FontSize="15"/>
+                    <Entry Text="{Binding HeightCm}" Keyboard="Numeric"/>
+
+                    <Label Text="Aktuelles Gewicht (kg)" FontFamily="InterSemiBold" FontSize="15" Margin="0,12,0,0"/>
+                    <Entry Text="{Binding CurrentWeightKg}" Keyboard="Numeric"/>
+
+                    <Label Text="Körperfettanteil in % (optional)" FontFamily="InterSemiBold" FontSize="15" Margin="0,12,0,0"/>
+                    <Entry Text="{Binding InitialBodyFatPercent}" Keyboard="Numeric" Placeholder="Falls bekannt"/>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 2: Ziel ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}">
+                    <Label Text="Was ist dein Ziel?" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Bestimmt, wie wir deine Kalorien- und Makro-Ziele berechnen." Style="{StaticResource HintStyle}"/>
+                    <Picker ItemsSource="{Binding GoalOptions}" SelectedItem="{Binding Goal}"/>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 3: Zeitrahmen / Zielgewicht ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=3}">
+                    <Label Text="Dein Zeitrahmen" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Optional - hilft uns, realistische Etappenziele vorzuschlagen." Style="{StaticResource HintStyle}"/>
+
+                    <Label Text="Zielgewicht (kg, optional)" FontFamily="InterSemiBold" FontSize="15"/>
+                    <Entry Text="{Binding TargetWeightKg}" Keyboard="Numeric" Placeholder="z. B. 75"/>
+
+                    <Label Text="Bis wann? (optional)" FontFamily="InterSemiBold" FontSize="15" Margin="0,12,0,4"/>
+                    <HorizontalStackLayout Spacing="10">
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Tag" Text="{Binding TargetDateParts.Day, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Monat" Text="{Binding TargetDateParts.Month, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" WidthRequest="90" Placeholder="Jahr" Text="{Binding TargetDateParts.Year, Converter={StaticResource NullableIntConverter}}"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 4: Erfahrung ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=4}">
+                    <Label Text="Deine Trainingserfahrung" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Damit die Übungsauswahl zu deinem Niveau passt." Style="{StaticResource HintStyle}"/>
+                    <Picker ItemsSource="{Binding ExperienceOptions}" SelectedItem="{Binding Experience}"/>
+
+                    <Label Text="Seit wann trainierst du? (optional)" FontFamily="InterSemiBold" FontSize="15" Margin="0,16,0,4"/>
+                    <HorizontalStackLayout Spacing="10">
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Tag" Text="{Binding TrainingSinceParts.Day, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" Placeholder="Monat" Text="{Binding TrainingSinceParts.Month, Converter={StaticResource NullableIntConverter}}"/>
+                        <Entry Style="{StaticResource DateEntryStyle}" WidthRequest="90" Placeholder="Jahr" Text="{Binding TrainingSinceParts.Year, Converter={StaticResource NullableIntConverter}}"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 5: Letzte Entwicklung ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=5}">
+                    <Label Text="Wie war's zuletzt?" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Hilft uns, besser einzuschätzen, wo du gerade stehst." Style="{StaticResource HintStyle}"/>
+                    <Picker ItemsSource="{Binding RecentTrendOptions}" SelectedItem="{Binding RecentTrend}"/>
+
+                    <Label Text="Andere Aktivitäten (optional)" FontFamily="InterSemiBold" FontSize="15" Margin="0,16,0,4"/>
+                    <Entry Text="{Binding OtherActivities}" Placeholder="z. B. Fußball, Klettern, Yoga..."/>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 6: Verletzungen ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=6}">
+                    <Label Text="Verletzungen oder Einschränkungen?" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Damit der Trainingsplan Rücksicht darauf nimmt." Style="{StaticResource HintStyle}"/>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                        <Button Grid.Column="0" Text="Nein, alles gut" Clicked="OnNoInjuriesClicked"
+                                Style="{StaticResource PrimaryButtonStyle}"/>
+                        <Button Grid.Column="1" Text="Ja, es gibt was" Clicked="OnHasInjuriesClicked"
+                                Style="{StaticResource SecondaryButtonStyle}"/>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasInjuries}" Margin="0,16,0,0">
+                        <CollectionView ItemsSource="{Binding Injuries}" ItemSizingStrategy="MeasureAllItems">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Frame Style="{StaticResource CardStyle}" Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <VerticalStackLayout Grid.Column="0">
+                                                <Label Text="{Binding BodyArea}" FontFamily="InterSemiBold" FontSize="14"/>
+                                                <Label Text="{Binding Severity}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="1" Text="✕" BackgroundColor="Transparent" VerticalOptions="Center">
+                                                <Label.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding BindingContext.RemoveInjuryCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding}"/>
+                                                </Label.GestureRecognizers>
+                                            </Label>
+                                        </Grid>
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Label Text="Bereich" FontFamily="InterSemiBold" FontSize="13"/>
+                        <Entry Text="{Binding NewInjuryArea}" Placeholder="z. B. Rechtes Knie"/>
+
+                        <Label Text="Schweregrad" FontFamily="InterSemiBold" FontSize="13" Margin="0,8,0,0"/>
+                        <Picker ItemsSource="{Binding InjurySeverityOptions}" SelectedItem="{Binding NewInjurySeverity}"/>
+
+                        <Label Text="Beschreibung (optional)" FontFamily="InterSemiBold" FontSize="13" Margin="0,8,0,0"/>
+                        <Entry Text="{Binding NewInjuryDescription}" Placeholder="Details"/>
+
+                        <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                                Command="{Binding AddInjuryCommand}" Margin="0,8,0,0"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 7: Alltag ===== -->
+                <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=7}">
+                    <Label Text="Dein Alltag" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Fließt in die Berechnung deines Kalorienbedarfs ein." Style="{StaticResource HintStyle}"/>
+
+                    <Label Text="Beruf / Alltagsaktivität" FontFamily="InterSemiBold" FontSize="15"/>
+                    <Picker ItemsSource="{Binding JobActivityOptions}" SelectedItem="{Binding JobActivity}"/>
+
+                    <Label Text="Allgemeines Aktivitätslevel" FontFamily="InterSemiBold" FontSize="15" Margin="0,16,0,0"/>
+                    <Picker ItemsSource="{Binding ActivityOptions}" SelectedItem="{Binding ActivityLevel}"/>
+                </VerticalStackLayout>
+
+                <!-- ===== Schritt 8: Zusammenfassung ===== -->
+                <VerticalStackLayout Spacing="10" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=8}">
+                    <Label Text="{Binding Name, StringFormat='Alles bereit, {0}!'}" Style="{StaticResource StepLabelStyle}"/>
+                    <Label Text="Kurzer Überblick, bevor's losgeht:" Style="{StaticResource HintStyle}"/>
+
+                    <Frame Style="{StaticResource CardStyle}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="{Binding SummaryText}" FontSize="13" LineBreakMode="WordWrap"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Navigation -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,16,0,0">
+            <Button Grid.Column="0" Text="Zurück" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding BackCommand}"/>
+            <Button Grid.Column="2" Text="Weiter" Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding NextCommand}" IsVisible="{Binding IsNotLastStep}"/>
+            <Button Grid.Column="2" Text="Los geht's!" Style="{StaticResource PrimaryButtonStyle}"
+                    Command="{Binding FinishCommand}" IsVisible="{Binding IsLastStep}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

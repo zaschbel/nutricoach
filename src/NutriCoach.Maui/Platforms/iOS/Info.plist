@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>XSAppIconAssets</key>
+	<string>Assets.xcassets/appicon.appiconset</string>
+
+	<!-- Pflichttexte für Apple Health / HealthKit - werden dem Nutzer beim ersten Anfragen der
+	     Berechtigung angezeigt. Ohne diese beiden Einträge stürzt die App ab, sobald sie versucht,
+	     nach HealthKit-Zugriff zu fragen. -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>NutriCoach liest deine Schrittzahl aus Health, um sie automatisch in der App anzuzeigen.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>NutriCoach möchte aktuell keine Daten in Health schreiben, nur lesen.</string>
+
+	<!-- Pflichttext für den Kamera-Zugriff beim Barcode-Scannen -->
+	<key>NSCameraUsageDescription</key>
+	<string>NutriCoach nutzt die Kamera, um Lebensmittel-Barcodes zu scannen.</string>
+</dict>
+</plist>

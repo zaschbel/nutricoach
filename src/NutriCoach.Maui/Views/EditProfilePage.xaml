@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.EditProfilePage"
+             BackgroundColor="{StaticResource ColorBackground}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,4">
+                <Label Grid.Column="0" Text="Profil bearbeiten" Style="{StaticResource HeadlineLabelStyle}"/>
+                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <VerticalStackLayout Spacing="8" HorizontalOptions="Center" Margin="0,4,0,10">
+                <Border WidthRequest="90" HeightRequest="90" StrokeThickness="0" BackgroundColor="{StaticResource ColorSurfaceElevated}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="45"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnChangePictureTapped"/>
+                    </Border.GestureRecognizers>
+                    <Grid>
+                        <Image Source="{Binding ProfilePicturePath}" Aspect="AspectFill" IsVisible="{Binding HasProfilePicture}"/>
+                        <Label Text="👤" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
+                    </Grid>
+                </Border>
+                <Label Text="Foto ändern" FontSize="12" TextColor="{StaticResource ColorAccent}" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnChangePictureTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </VerticalStackLayout>
+
+            <Label Text="Name" Style="{StaticResource SectionLabelStyle}"/>
+            <Entry Text="{Binding Name}"/>
+
+            <Label Text="Geburtsdatum" Style="{StaticResource SectionLabelStyle}"/>
+            <DatePicker Date="{Binding BirthDate}"/>
+
+            <Label Text="Geschlecht" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding GenderOptions}" SelectedItem="{Binding Gender}"/>
+
+            <Label Text="Größe (cm)" Style="{StaticResource SectionLabelStyle}"/>
+            <Entry Text="{Binding HeightCm}" Keyboard="Numeric"/>
+
+            <Label Text="Ziel" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding GoalOptions}" SelectedItem="{Binding Goal}"/>
+
+            <Label Text="Trainingserfahrung" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding ExperienceOptions}" SelectedItem="{Binding Experience}"/>
+
+            <Label Text="Alltag / Beruf" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding JobActivityOptions}" SelectedItem="{Binding JobActivity}"/>
+
+            <Label Text="Allgemeines Aktivitätslevel" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding ActivityOptions}" SelectedItem="{Binding ActivityLevel}"/>
+
+            <Label Text="Hinweis: Dein Gewicht änderst du direkt unten im Ernährungs-Reiter, nicht hier."
+                   FontSize="11" TextColor="{StaticResource ColorTextSecondary}" Margin="0,4,0,0"/>
+
+            <Label Text="{Binding StatusText}" FontSize="12" TextColor="{StaticResource ColorAccent}" IsVisible="{Binding HasStatus}"/>
+
+            <Button Text="Speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}" Margin="0,10,0,30"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

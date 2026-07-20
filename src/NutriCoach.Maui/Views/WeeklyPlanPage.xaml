@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.WeeklyPlanPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             x:Name="Root">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="PlanDayTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="12" Padding="12" Margin="0,0,0,8" HasShadow="False" BorderColor="Transparent">
+                <Grid ColumnDefinitions="90,*">
+                    <Label Grid.Column="0" Text="{Binding DayLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                    <Grid Grid.Column="1" ColumnDefinitions="*,110">
+                        <Entry Grid.Column="0" Text="{Binding PlanName}"/>
+                        <Picker Grid.Column="1" Margin="6,0,0,0"
+                                ItemsSource="{Binding BindingContext.Suggestions, Source={x:Reference Root}}"
+                                SelectedItem="{Binding PlanName, Mode=OneWayToSource}"/>
+                    </Grid>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,0,0,16">
+            <Label Text="Wochenplan erstellen" Style="{StaticResource HeadlineLabelStyle}"/>
+            <Label Text="Leg für jeden Wochentag einen Fokus fest (z. B. Push, Beine, Ruhetag)." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <CollectionView ItemsSource="{Binding Days}" ItemTemplate="{StaticResource PlanDayTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+        </ScrollView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,16,0,0">
+            <Button Grid.Column="0" Text="Abbrechen" Style="{StaticResource SecondaryButtonStyle}" Clicked="OnCancelClicked"/>
+            <Button Grid.Column="1" Text="Plan speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

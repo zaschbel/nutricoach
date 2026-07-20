@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.StatistikenPage"
+             BackgroundColor="{StaticResource ColorBackground}">
+
+    <ContentView.Resources>
+        <Style x:Key="SubTabLabelStyle" TargetType="Label">
+            <Setter Property="FontFamily" Value="InterSemiBold"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="SubTabUnderlineStyle" TargetType="BoxView">
+            <Setter Property="HeightRequest" Value="3"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Color" Value="Transparent"/>
+        </Style>
+    </ContentView.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+
+            <!-- Unterreiter -->
+            <Grid ColumnDefinitions="*,*">
+                <VerticalStackLayout Grid.Column="0" Spacing="6">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectSubTabCommand}" CommandParameter="Ernährung"/>
+                    </VerticalStackLayout.GestureRecognizers>
+                    <Label Text="Ernährung" Style="{StaticResource SubTabLabelStyle}"
+                           TextColor="{Binding IsErnaehrungTab, Converter={StaticResource BoolToAccentConverter}}"/>
+                    <BoxView Style="{StaticResource SubTabUnderlineStyle}"
+                             Color="{Binding IsErnaehrungTab, Converter={StaticResource BoolToAccentOrTransparentConverter}}"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="6">
+                    <VerticalStackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectSubTabCommand}" CommandParameter="Cardio"/>
+                    </VerticalStackLayout.GestureRecognizers>
+                    <Label Text="Cardio" Style="{StaticResource SubTabLabelStyle}"
+                           TextColor="{Binding IsCardioTab, Converter={StaticResource BoolToAccentConverter}}"/>
+                    <BoxView Style="{StaticResource SubTabUnderlineStyle}"
+                             Color="{Binding IsCardioTab, Converter={StaticResource BoolToAccentOrTransparentConverter}}"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- ================= ERNÄHRUNG ================= -->
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding IsErnaehrungTab}">
+
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Körpergewicht" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                <Label Text="{Binding WeightCurrentLabel}" FontFamily="InterBold" FontSize="16"/>
+                                <Label Text="{Binding WeightChangeLabel}" FontSize="13" TextColor="{StaticResource ColorSuccess}"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding WeightChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Kalorien" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding CalorieAverageLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding CalorieChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Proteine" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding ProteinAverageLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding ProteinChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Kohlenhydrate" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding CarbsAverageLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding CarbsChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Fette" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding FatAverageLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding FatChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+
+            <!-- ================= CARDIO ================= -->
+            <VerticalStackLayout Spacing="14" IsVisible="{Binding IsCardioTab}">
+                <Frame Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Cardio-Minuten" FontFamily="InterSemiBold" FontSize="17"/>
+                                <Label Text="Letzte 7 Tage" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding CardioAverageLabel}" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
+                        </Grid>
+                        <GraphicsView Drawable="{Binding CardioChartDrawable}" HeightRequest="150" Margin="0,10,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.QuickSetupPage"
+             BackgroundColor="{StaticResource ColorBackground}">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="14">
+            <Label Text="Willkommen bei NutriCoach" Style="{StaticResource HeadlineLabelStyle}" Margin="0,20,0,4"/>
+            <Label Text="Ein paar Angaben, dann kann's losgehen." TextColor="{StaticResource ColorTextSecondary}" Margin="0,0,0,10"/>
+
+            <Label Text="Name" Style="{StaticResource SectionLabelStyle}"/>
+            <Entry Text="{Binding Name}" Placeholder="Dein Name"/>
+
+            <Label Text="Geburtsdatum" Style="{StaticResource SectionLabelStyle}"/>
+            <DatePicker Date="{Binding BirthDate}"/>
+
+            <Label Text="Geschlecht" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding GenderOptions}" SelectedItem="{Binding Gender}"/>
+
+            <Label Text="Größe (cm)" Style="{StaticResource SectionLabelStyle}"/>
+            <Entry Text="{Binding HeightCm}" Keyboard="Numeric"/>
+
+            <Label Text="Gewicht (kg)" Style="{StaticResource SectionLabelStyle}"/>
+            <Entry Text="{Binding WeightKg}" Keyboard="Numeric"/>
+
+            <Label Text="Ziel" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding GoalOptions}" SelectedItem="{Binding Goal}"/>
+
+            <Label Text="Trainingserfahrung" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding ExperienceOptions}" SelectedItem="{Binding Experience}"/>
+
+            <Label Text="Alltag / Beruf" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding JobActivityOptions}" SelectedItem="{Binding JobActivity}"/>
+
+            <Label Text="Allgemeines Aktivitätslevel" Style="{StaticResource SectionLabelStyle}"/>
+            <Picker ItemsSource="{Binding ActivityOptions}" SelectedItem="{Binding ActivityLevel}"/>
+
+            <Button Text="Los geht's" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveCommand}" Margin="0,20,0,30"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

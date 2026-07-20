@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:NutriCoach.Maui"
+             x:Class="NutriCoach.Maui.Views.TrainingPage"
+             BackgroundColor="{StaticResource ColorBackground}">
+
+    <ContentView.Resources>
+        <DataTemplate x:Key="SessionTemplate">
+            <Frame Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding EditTrainingCommand, Source={x:Static local:AppState.MainViewModel}}"
+                                           CommandParameter="{Binding}"/>
+                </Frame.GestureRecognizers>
+                <VerticalStackLayout Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="16"/>
+                        <Label Grid.Column="1" Text="✕" TextColor="{StaticResource ColorTextSecondary}" BackgroundColor="Transparent">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding RemoveTrainingCommand, Source={x:Static local:AppState.MainViewModel}}"
+                                                       CommandParameter="{Binding}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+                    <Label FontSize="11" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding TotalSets, StringFormat='{0} Sätze · '}"/>
+                                <Span Text="{Binding TotalVolumeKg, StringFormat='{0:0} kg · '}"/>
+                                <Span Text="{Binding EstimatedKcal, StringFormat='{0:0} kcal'}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <CollectionView ItemsSource="{Binding Groups}" ItemSizingStrategy="MeasureAllItems">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="10" Padding="10" Margin="0,4,0,0" HasShadow="False" BorderColor="Transparent">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding Title}" FontFamily="InterSemiBold" FontSize="12"/>
+                                        <CollectionView ItemsSource="{Binding Lines}" ItemSizingStrategy="MeasureAllItems">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Label Text="{Binding .}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                        <Label Text="{Binding Assessment}" FontSize="11" TextColor="{StaticResource ColorAccent}" Margin="0,4,0,0"/>
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </DataTemplate>
+    </ContentView.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+
+            <Label Text="TRAINING" FontFamily="InterBold" FontSize="13" TextColor="{StaticResource ColorAccent}"/>
+
+            <!-- Schritte (übergangsweise per Regler, bis eine echte Schrittzähler-Anbindung existiert) -->
+            <Frame Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="4">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="🚶 Schritte" FontFamily="InterSemiBold" FontSize="14"/>
+                        <Label Grid.Column="1" Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="16"
+                               TextColor="{StaticResource ColorAccent}"/>
+                    </Grid>
+                    <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
+                    <HorizontalStackLayout Spacing="8" Margin="0,6,0,0">
+                        <Button Text="+ 500" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12"
+                                Command="{Binding AddStepsQuickCommand}" CommandParameter="500"/>
+                        <Button Text="+ 1000" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12"
+                                Command="{Binding AddStepsQuickCommand}" CommandParameter="1000"/>
+                        <Button Text="+ 2000" Style="{StaticResource PrimaryButtonStyle}" Padding="12,6" FontSize="12"
+                                Command="{Binding AddStepsQuickCommand}" CommandParameter="2000"/>
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding StepsRemainingLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Aktiver Plan -->
+            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasTodayPlan}">
+                <VerticalStackLayout Grid.Column="0">
+                    <Label Text="AKTIVER PLAN" Style="{StaticResource SectionLabelStyle}"/>
+                    <Label Text="{Binding TodayPlanName}" Style="{StaticResource HeadlineLabelStyle}"/>
+                </VerticalStackLayout>
+                <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="999"
+                       Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="End">
+                    <Label Text="{Binding SelectedDateLabel}" FontSize="12" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
+                </Frame>
+            </Grid>
+
+            <!-- Letzte Einheit -->
+            <Frame Style="{StaticResource CardStyle}" IsVisible="{Binding HasLastSession}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="VERLAUF DER LETZTEN EINHEIT" Style="{StaticResource SectionLabelStyle}"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{Binding LastSessionDateLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Label Grid.Column="1" Text="Erfolgreich" FontSize="12" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTertiary}"/>
+                    </Grid>
+                    <Label Text="{Binding LastSession.Name}" FontFamily="InterSemiBold" FontSize="15"/>
+                    <HorizontalStackLayout Spacing="16">
+                        <Label FontSize="12" FontFamily="InterSemiBold">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="🔥 "/>
+                                    <Span Text="{Binding LastSession.EstimatedKcal, StringFormat='{0:0} kcal'}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label FontSize="12" FontFamily="InterSemiBold">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="🏋️ "/>
+                                    <Span Text="{Binding LastSession.TotalSets, StringFormat='{0} Sätze'}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Wochennavigation -->
+            <Frame Style="{StaticResource CardStyle}" Padding="12,10">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+                            Command="{Binding PreviousWeekCommand}"/>
+                    <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="4"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="6,8" WidthRequest="42">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorAccent}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDayCommand, Source={x:Static local:AppState.MainViewModel}}"
+                                                               CommandParameter="{Binding}"/>
+                                    </Grid.GestureRecognizers>
+                                    <VerticalStackLayout HorizontalOptions="Center">
+                                        <Label Text="{Binding DayAbbrev}" FontSize="10" HorizontalTextAlignment="Center">
+                                            <Label.Style>
+                                                <Style TargetType="Label">
+                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="TextColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <Label Text="{Binding DayNumber}" FontSize="14" FontFamily="InterSemiBold" HorizontalTextAlignment="Center">
+                                            <Label.Style>
+                                                <Style TargetType="Label">
+                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextPrimary}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="TextColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <Label Text="😴" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
+                                        <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
+                                                 Color="{StaticResource ColorAccent}" IsVisible="{Binding HasEntries}"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+                            Command="{Binding NextWeekCommand}"/>
+                </Grid>
+            </Frame>
+
+            <!-- Wochenziel / Plan-Auswahl / Fortschritt -->
+            <Frame Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="10">
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowTrainingProgress}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="{Binding TrainingProgressLabel}" FontFamily="InterSemiBold" FontSize="15"/>
+                            <Button Grid.Column="1" Text="⚙️ Plan bearbeiten" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" Padding="10,6"
+                                    Command="{Binding OpenPlanEditorCommand}"/>
+                        </Grid>
+                        <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="{StaticResource ColorAccent}"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding HasNoWeeklyGoal}">
+                        <Label Text="Wie oft pro Woche möchtest du trainieren?" FontFamily="InterSemiBold" FontSize="14"/>
+                        <HorizontalStackLayout Spacing="6">
+                            <Button Text="2x" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8" Command="{Binding SetWeeklyGoalCommand}" CommandParameter="2"/>
+                            <Button Text="3x" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8" Command="{Binding SetWeeklyGoalCommand}" CommandParameter="3"/>
+                            <Button Text="4x" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8" Command="{Binding SetWeeklyGoalCommand}" CommandParameter="4"/>
+                            <Button Text="5x" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8" Command="{Binding SetWeeklyGoalCommand}" CommandParameter="5"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8" IsVisible="{Binding NeedsPlanTypeChoice}">
+                        <Label Text="Wie soll dein Trainingsplan entstehen?" FontFamily="InterSemiBold" FontSize="14"/>
+                        <Button Text="📝 Selbst erstellen" Style="{StaticResource PrimaryButtonStyle}" HorizontalOptions="Fill"
+                                Command="{Binding OpenPlanEditorCommand}"/>
+                        <Button Text="✨ Für mich vorschlagen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Fill"
+                                Command="{Binding GenerateAutoPlanCommand}"/>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Aktionen -->
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <Label Grid.Column="0" Text="{Binding SelectedDateLabel}" FontFamily="InterSemiBold" FontSize="16" VerticalOptions="Center"/>
+                <Button Grid.Column="1" Text="😴" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
+                        Command="{Binding ToggleRestDayCommand}"/>
+                <Button Grid.Column="2" Text="+ Training" Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding AddTrainingCommand}"/>
+            </Grid>
+
+            <CollectionView ItemsSource="{Binding TrainingSessions}" ItemTemplate="{StaticResource SessionTemplate}" ItemSizingStrategy="MeasureAllItems">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Spacing="6" Padding="0,20" HorizontalOptions="Center">
+                        <Label Text="🏋️" FontSize="28" HorizontalTextAlignment="Center"/>
+                        <Label Text="Für diesen Tag noch kein Training eingetragen" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>
