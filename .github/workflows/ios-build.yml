@@ -39,17 +39,17 @@ jobs:
       - name: Restore
         run: dotnet restore src/NutriCoach.Maui/NutriCoach.Maui.csproj -p:TargetFrameworks=net9.0-ios
 
-      # Debug + leerer CodesignKey loest den "fakesign"-Fallback des .NET-iOS-Buildsystems aus:
-      # es entsteht ein lauffaehiges .app-Bundle fuer echte Geraete (arm64), nur eben ohne
-      # gueltige Apple-Signatur. Genau das braucht AltStore als Eingabe.
-      - name: Build unsigned iOS app bundle
+      # "-" als CodesignKey ist Apples eigene Ad-hoc-Signierung (codesign --sign -):
+      # kein Zertifikat, kein Account noetig, erzeugt ein laufendes arm64-App-Bundle mit
+      # einer minimalen, nicht-Apple-vertrauten Signatur. AltStore signiert es beim Sideload
+      # ohnehin komplett neu mit der echten Apple-ID, das hier muss nur den .NET-Build durchlassen.
+      - name: Build unsigned (ad-hoc signed) iOS app bundle
         run: >
           dotnet build src/NutriCoach.Maui/NutriCoach.Maui.csproj
           -p:TargetFrameworks=net9.0-ios
           -c Debug
           -p:RuntimeIdentifier=ios-arm64
-          -p:CodesignKey=
-          -p:CodesignProvision=
+          -p:CodesignKey=-
 
       - name: Package .ipa
         run: |
