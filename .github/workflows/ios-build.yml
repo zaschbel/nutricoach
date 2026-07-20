@@ -1,0 +1,65 @@
+name: iOS Unsigned Build
+
+# Baut NutriCoach.Maui fuer ein echtes iPhone (arm64), ohne Apple-Signatur (Debug/"fakesign").
+# AltStore/AltServer signiert die .ipa anschliessend selbst mit einer kostenlosen Apple-ID neu.
+# Kein Apple Developer Program noetig - dafuer laeuft die Installation auf dem iPhone nur 7 Tage,
+# danach in AltStore auf "Refresh" tippen oder diesen Workflow erneut laufen lassen.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "src/NutriCoach.Maui/**"
+      - ".github/workflows/ios-build.yml"
+
+jobs:
+  build-ios:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install MAUI/iOS workloads
+        run: dotnet workload install maui-ios ios
+
+      - name: Restore
+        run: dotnet restore src/NutriCoach.Maui/NutriCoach.Maui.csproj -f net9.0-ios
+
+      # Debug + leerer CodesignKey loest den "fakesign"-Fallback des .NET-iOS-Buildsystems aus:
+      # es entsteht ein lauffaehiges .app-Bundle fuer echte Geraete (arm64), nur eben ohne
+      # gueltige Apple-Signatur. Genau das braucht AltStore als Eingabe.
+      - name: Build unsigned iOS app bundle
+        run: >
+          dotnet build src/NutriCoach.Maui/NutriCoach.Maui.csproj
+          -f net9.0-ios
+          -c Debug
+          -p:RuntimeIdentifier=ios-arm64
+          -p:CodesignKey=
+          -p:CodesignProvision=
+
+      - name: Package .ipa
+        run: |
+          set -euo pipefail
+          APP_DIR=$(find src/NutriCoach.Maui/bin/Debug/net9.0-ios/ios-arm64 -maxdepth 1 -iname "*.app" | head -n1)
+          if [ -z "$APP_DIR" ]; then
+            echo "Kein .app-Bundle gefunden - Build-Output:"
+            find src/NutriCoach.Maui/bin -maxdepth 4
+            exit 1
+          fi
+          echo "Gefundenes App-Bundle: $APP_DIR"
+          mkdir -p ipa-out/Payload
+          cp -R "$APP_DIR" ipa-out/Payload/
+          (cd ipa-out && zip -r ../NutriCoach-unsigned.ipa Payload)
+
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: NutriCoach-unsigned-ipa
+          path: NutriCoach-unsigned.ipa
+          retention-days: 14
