@@ -64,13 +64,13 @@
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
                         <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
-                        <Label Text="🍎 Mit Health verbinden" FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
+                        <Label Text="🚶 Schrittzähler aktivieren" FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
                                BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding ConnectHealthKitCommand}"/>
                             </Label.GestureRecognizers>
                         </Label>
-                        <Label Text="🍎 Verbunden mit Health" FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
+                        <Label Text="🚶 Schrittzähler aktiv" FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
                                IsVisible="{Binding IsHealthKitConnected}"/>
                     </VerticalStackLayout>
                 </Frame>

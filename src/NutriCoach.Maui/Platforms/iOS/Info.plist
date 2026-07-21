@@ -18,13 +18,10 @@
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 
-	<!-- Pflichttexte für Apple Health / HealthKit - werden dem Nutzer beim ersten Anfragen der
-	     Berechtigung angezeigt. Ohne diese beiden Einträge stürzt die App ab, sobald sie versucht,
-	     nach HealthKit-Zugriff zu fragen. -->
-	<key>NSHealthShareUsageDescription</key>
-	<string>NutriCoach liest deine Schrittzahl aus Health, um sie automatisch in der App anzuzeigen.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>NutriCoach möchte aktuell keine Daten in Health schreiben, nur lesen.</string>
+	<!-- Pflichttext für den Schrittzähler (Core Motion / CMPedometer). Ohne diesen Eintrag stürzt
+	     die App ab, sobald sie versucht, die Schrittzahl abzufragen. -->
+	<key>NSMotionUsageDescription</key>
+	<string>NutriCoach liest deine Schrittzahl über die Bewegungssensoren, um sie automatisch in der App anzuzeigen.</string>
 
 	<!-- Pflichttext für den Kamera-Zugriff beim Barcode-Scannen -->
 	<key>NSCameraUsageDescription</key>

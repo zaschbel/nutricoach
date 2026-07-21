@@ -1,15 +1,51 @@
+using CoreMotion;
+using Foundation;
+
 namespace NutriCoach.Maui.Services;
 
 /// <summary>
-/// Platzhalter für iOS ohne Apple Developer Program: HealthKit-Entitlement kann mit einer
-/// kostenlosen Apple-ID (Personal Team) nicht signiert werden, daher fällt die App auf die
-/// manuelle Eingabe zurück, genau wie unter Android/Windows. Sobald ein zahlendes Developer-Konto
-/// vorhanden ist, kann diese Datei durch die echte HealthKit-Anbindung ersetzt und das
-/// com.apple.developer.healthkit-Entitlement in Platforms/iOS/Entitlements.plist wieder aktiviert werden.
+/// Schrittzahl über Core Motion (CMPedometer) statt HealthKit: HealthKit braucht ein
+/// kostenpflichtiges Apple-Developer-Konto für das entsprechende Entitlement, Core Motion
+/// dagegen funktioniert auch mit einer kostenlosen Apple-ID (Personal Team) - es braucht nur den
+/// NSMotionUsageDescription-Eintrag im Info.plist, sonst keine besonderen Rechte.
 /// </summary>
 public class HealthDataService : IHealthDataService
 {
-    public bool IsSupported => false;
-    public Task<bool> RequestAuthorizationAsync() => Task.FromResult(false);
-    public Task<int?> GetStepsForDateAsync(DateOnly date) => Task.FromResult<int?>(null);
+    private readonly CMPedometer _pedometer = new();
+
+    public bool IsSupported => CMPedometer.IsStepCountingAvailable;
+
+    public Task<bool> RequestAuthorizationAsync()
+    {
+        if (!IsSupported) return Task.FromResult(false);
+
+        // CMPedometer hat keine explizite "Request"-API wie HealthKit - die iOS-Berechtigungsabfrage
+        // erscheint automatisch beim ersten QueryPedometerData-Aufruf. Eine kurze Testabfrage stößt
+        // also gleichzeitig den Systemdialog an und liefert das Ergebnis (erlaubt/abgelehnt).
+        var tcs = new TaskCompletionSource<bool>();
+        var now = NSDate.Now;
+        var from = now.AddSeconds(-60);
+        _pedometer.QueryPedometerData(from, now, (data, error) => tcs.TrySetResult(error is null));
+        return tcs.Task;
+    }
+
+    public Task<int?> GetStepsForDateAsync(DateOnly date)
+    {
+        if (!IsSupported) return Task.FromResult<int?>(null);
+
+        var startOfDay = date.ToDateTime(TimeOnly.MinValue);
+        var now = DateTime.Now;
+        if (startOfDay > now) return Task.FromResult<int?>(null);
+
+        var endExclusive = startOfDay.AddDays(1);
+        var end = endExclusive < now ? endExclusive : now;
+
+        var tcs = new TaskCompletionSource<int?>();
+        _pedometer.QueryPedometerData((NSDate)startOfDay, (NSDate)end, (data, error) =>
+        {
+            if (error is not null || data is null) tcs.TrySetResult(null);
+            else tcs.TrySetResult(data.NumberOfSteps.Int32Value);
+        });
+        return tcs.Task;
+    }
 }
