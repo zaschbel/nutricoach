@@ -12,7 +12,20 @@ public partial class AddFoodPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
-        Loaded += async (_, _) => await _viewModel.LoadRecentFoodsAsync();
+        Loaded += async (_, _) =>
+        {
+            try
+            {
+                await _viewModel.LoadRecentFoodsAsync();
+            }
+            catch (Exception ex)
+            {
+                // Unbehandelte Exceptions in async-void Event-Handlern stuerzen die ganze App ab,
+                // ohne dass ein try/catch an der Aufrufstelle (z.B. AddFoodCommand) das je sieht -
+                // deshalb hier separat absichern und den echten Fehler sichtbar machen.
+                await DisplayAlert("Fehler beim Laden", ex.ToString(), "OK");
+            }
+        };
     }
 
     private void OnCancelTapped(object? sender, EventArgs e) => CancelRequested?.Invoke();
