@@ -124,15 +124,13 @@
             </Frame>
 
             <!-- Wochennavigation -->
-            <Frame Style="{StaticResource CardStyle}" Padding="12,10">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+            <Frame Style="{StaticResource CardStyle}" Padding="12,10" HeightRequest="76" VerticalOptions="Start">
+                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56">
+                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
                             Command="{Binding PreviousWeekCommand}"/>
-                    <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center">
-                        <CollectionView.ItemsLayout>
-                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="4"/>
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56" Spacing="4"
+                                           BindableLayout.ItemsSource="{Binding WeekDays}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="6,8" WidthRequest="42">
                                     <Grid.Style>
@@ -180,9 +178,9 @@
                                     </VerticalStackLayout>
                                 </Grid>
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
                             Command="{Binding NextWeekCommand}"/>
                 </Grid>
             </Frame>
