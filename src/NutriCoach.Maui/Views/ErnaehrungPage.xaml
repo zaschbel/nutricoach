@@ -156,11 +156,11 @@
             </Frame>
 
             <!-- Wochennavigation -->
-            <Frame Style="{StaticResource CardStyle}" Padding="12,10">
-                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center">
-                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+            <Frame Style="{StaticResource CardStyle}" Padding="12,10" HeightRequest="76" VerticalOptions="Start">
+                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56">
+                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
                             Command="{Binding PreviousWeekCommand}"/>
-                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="4"
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56" Spacing="4"
                                            BindableLayout.ItemsSource="{Binding WeekDays}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
@@ -212,7 +212,7 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </HorizontalStackLayout>
-                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
+                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
                             Command="{Binding NextWeekCommand}"/>
                 </Grid>
             </Frame>
