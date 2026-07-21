@@ -25,6 +25,10 @@
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20,16">
 
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnPageTapped"/>
+        </Grid.GestureRecognizers>
+
         <!-- Fortschritt -->
         <VerticalStackLayout Grid.Row="0" Spacing="6" Margin="0,0,0,10">
             <Label Text="{Binding StepLabel}" FontSize="12" FontFamily="InterSemiBold" TextColor="{StaticResource ColorAccent}"/>

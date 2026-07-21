@@ -20,4 +20,21 @@ public partial class OnboardingPage : ContentPage
 
     private void OnNoInjuriesClicked(object? sender, EventArgs e) => _viewModel.HasNoInjuries = true;
     private void OnHasInjuriesClicked(object? sender, EventArgs e) => _viewModel.HasInjuries = true;
+
+    private void OnPageTapped(object? sender, TappedEventArgs e) => DismissKeyboard(this);
+
+    private static void DismissKeyboard(Element element)
+    {
+        if (element is Entry { IsFocused: true } entry)
+        {
+            entry.Unfocus();
+            return;
+        }
+
+        foreach (var child in element.LogicalChildren)
+        {
+            if (child is Element childElement)
+                DismissKeyboard(childElement);
+        }
+    }
 }
