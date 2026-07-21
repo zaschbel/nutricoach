@@ -159,7 +159,7 @@
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
                             Command="{Binding PreviousWeekCommand}"/>
-                    <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center">
+                    <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center" WidthRequest="320">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout Orientation="Horizontal" ItemSpacing="4"/>
                         </CollectionView.ItemsLayout>
@@ -246,11 +246,8 @@
                     <Label Grid.Column="0" Text="🌅 Frühstück" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
                     <Label Grid.Column="1" Text="{Binding HasBreakfastEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
                 </Grid>
-                <CollectionView ItemsSource="{Binding Breakfast}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems">
-                    <CollectionView.EmptyView>
-                        <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                <CollectionView ItemsSource="{Binding Breakfast}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasBreakfastEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasBreakfastEntries, Converter={StaticResource InverseBoolConverter}}"/>
                 <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Frühstück}"/>
             </VerticalStackLayout>
@@ -260,11 +257,8 @@
                     <Label Grid.Column="0" Text="☀️ Mittagessen" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
                     <Label Grid.Column="1" Text="{Binding HasLunchEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
                 </Grid>
-                <CollectionView ItemsSource="{Binding Lunch}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems">
-                    <CollectionView.EmptyView>
-                        <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                <CollectionView ItemsSource="{Binding Lunch}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasLunchEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasLunchEntries, Converter={StaticResource InverseBoolConverter}}"/>
                 <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Mittagessen}"/>
             </VerticalStackLayout>
@@ -274,11 +268,8 @@
                     <Label Grid.Column="0" Text="🌙 Abendessen" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
                     <Label Grid.Column="1" Text="{Binding HasDinnerEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
                 </Grid>
-                <CollectionView ItemsSource="{Binding Dinner}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems">
-                    <CollectionView.EmptyView>
-                        <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                <CollectionView ItemsSource="{Binding Dinner}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasDinnerEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasDinnerEntries, Converter={StaticResource InverseBoolConverter}}"/>
                 <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Abendessen}"/>
             </VerticalStackLayout>
@@ -288,11 +279,8 @@
                     <Label Grid.Column="0" Text="🍎 Snacks" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
                     <Label Grid.Column="1" Text="{Binding HasSnackEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
                 </Grid>
-                <CollectionView ItemsSource="{Binding Snacks}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems">
-                    <CollectionView.EmptyView>
-                        <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                <CollectionView ItemsSource="{Binding Snacks}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasSnackEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasSnackEntries, Converter={StaticResource InverseBoolConverter}}"/>
                 <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Snack}"/>
             </VerticalStackLayout>

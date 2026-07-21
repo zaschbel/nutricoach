@@ -38,7 +38,7 @@
 
   <ItemGroup>
     <!-- App-Icon und Splash-Screen: Platzhalter, später durch eigenes Icon ersetzbar -->
-    <MauiIcon Include="Resources\appicon.png" />
+    <MauiIcon Include="Resources\appicon.png" Color="#1A1A1A" />
     <MauiSplashScreen Include="Resources\appicon.png" Color="#1A1A1A" BaseSize="200,200" />
 
     <!-- Inter-Schriftart, wie im Stitch-Design -->
