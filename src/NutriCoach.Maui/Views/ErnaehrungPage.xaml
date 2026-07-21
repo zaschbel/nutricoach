@@ -78,7 +78,7 @@
                         <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}"/>
                         <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="14"
                                LineBreakMode="NoWrap" Margin="0,4,0,8"/>
-                        <ProgressBar Progress="0.3" ProgressColor="{StaticResource ColorTertiary}"/>
+                        <ProgressBar Progress="{Binding TrainingKcalProgressRatio}" ProgressColor="{StaticResource ColorTertiary}"/>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>

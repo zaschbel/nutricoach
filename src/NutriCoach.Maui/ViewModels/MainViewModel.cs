@@ -121,6 +121,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             OnPropertyChanged(nameof(TrainingKcalBurnedToday));
             OnPropertyChanged(nameof(HasTrainingKcalToday));
+            OnPropertyChanged(nameof(TrainingKcalProgressRatio));
             OnPropertyChanged(nameof(AdjustedCalorieTarget));
             OnPropertyChanged(nameof(GaugeForegroundPath));
             OnPropertyChanged(nameof(RemainingKcal));
@@ -515,6 +516,10 @@ public class MainViewModel : INotifyPropertyChanged
     public double TrainingKcalBurnedToday => TrainingSessions.Sum(s => s.EstimatedKcal);
     public bool HasTrainingKcalToday => TrainingKcalBurnedToday > 0;
 
+    /// <summary>Grober Fortschrittsbalken-Wert fuer die Trainings-Kachel (kein festes Tagesziel im
+    /// Domainmodell vorhanden, daher 500 kcal als plausible Referenz fuer "viel trainiert").</summary>
+    public double TrainingKcalProgressRatio => Math.Clamp(TrainingKcalBurnedToday / 500.0, 0, 1);
+
     /// <summary>Das tatsächlich angezeigte Tagesziel: Basis-Kalorienziel plus heute verbrannte Trainings-Kalorien.</summary>
     public double AdjustedCalorieTarget => Math.Round(CalorieTarget + TrainingKcalBurnedToday, 0);
 
@@ -826,6 +831,7 @@ public class MainViewModel : INotifyPropertyChanged
         _stepsForSelectedDate = await _diaryService.GetStepsForDateAsync(_profile.Id, SelectedDate);
         OnPropertyChanged(nameof(StepsForSelectedDate));
         OnPropertyChanged(nameof(StepsRemainingLabel));
+        OnPropertyChanged(nameof(StepsProgressRatio));
 
         if (IsHealthKitConnected) await SyncStepsFromHealthKitAsync();
 
