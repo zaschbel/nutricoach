@@ -8,7 +8,7 @@
 
             <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,4">
                 <Label Grid.Column="0" Text="Profil bearbeiten" Style="{StaticResource HeadlineLabelStyle}"/>
-                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCloseTapped"/>
                     </Label.GestureRecognizers>
@@ -25,7 +25,7 @@
                     </Border.GestureRecognizers>
                     <Grid>
                         <Image Source="{Binding ProfilePicturePath}" Aspect="AspectFill" IsVisible="{Binding HasProfilePicture}"/>
-                        <Label Text="👤" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
+                        <Label Text="&#xf007;" FontFamily="FontAwesomeSolid" FontSize="36" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
                     </Grid>
                 </Border>
                 <Label Text="Foto ändern" FontSize="12" TextColor="{StaticResource ColorAccent}" BackgroundColor="Transparent">

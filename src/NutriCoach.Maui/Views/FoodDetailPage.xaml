@@ -19,7 +19,7 @@
                     <Label Text="{Binding Name}" Style="{StaticResource HeadlineLabelStyle}"/>
                     <Label Text="{Binding Brand}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasBrand}"/>
                 </VerticalStackLayout>
-                <Label Grid.Column="2" Text="✕" FontSize="18" VerticalOptions="Start" BackgroundColor="Transparent">
+                <Label Grid.Column="2" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" VerticalOptions="Start" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCancelTapped"/>
                     </Label.GestureRecognizers>

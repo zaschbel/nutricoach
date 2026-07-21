@@ -15,7 +15,7 @@
                 <VerticalStackLayout Spacing="6">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="16"/>
-                        <Label Grid.Column="1" Text="✕" TextColor="{StaticResource ColorTextSecondary}" BackgroundColor="Transparent">
+                        <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" TextColor="{StaticResource ColorTextSecondary}" BackgroundColor="Transparent">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding RemoveTrainingCommand, Source={x:Static local:AppState.MainViewModel}}"
                                                        CommandParameter="{Binding}"/>
@@ -64,7 +64,14 @@
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="4">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="🚶 Schritte" FontFamily="InterSemiBold" FontSize="14"/>
+                        <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="14">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;"/>
+                                    <Span Text=" Schritte" FontFamily="InterSemiBold"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
                         <Label Grid.Column="1" Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="16"
                                TextColor="{StaticResource ColorAccent}"/>
                     </Grid>
@@ -106,7 +113,8 @@
                         <Label FontSize="12" FontFamily="InterSemiBold">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="🔥 "/>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf06d;"/>
+                                    <Span Text=" "/>
                                     <Span Text="{Binding LastSession.EstimatedKcal, StringFormat='{0:0} kcal'}"/>
                                 </FormattedString>
                             </Label.FormattedText>
@@ -114,7 +122,8 @@
                         <Label FontSize="12" FontFamily="InterSemiBold">
                             <Label.FormattedText>
                                 <FormattedString>
-                                    <Span Text="🏋️ "/>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf44b;"/>
+                                    <Span Text=" "/>
                                     <Span Text="{Binding LastSession.TotalSets, StringFormat='{0} Sätze'}"/>
                                 </FormattedString>
                             </Label.FormattedText>
@@ -172,7 +181,7 @@
                                                 </Style>
                                             </Label.Style>
                                         </Label>
-                                        <Label Text="😴" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
+                                        <Label Text="&#xf236;" FontFamily="FontAwesomeSolid" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
                                         <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
                                                  Color="{StaticResource ColorAccent}" IsVisible="{Binding HasEntries}"/>
                                     </VerticalStackLayout>
@@ -192,8 +201,12 @@
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding ShowTrainingProgress}">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0" Text="{Binding TrainingProgressLabel}" FontFamily="InterSemiBold" FontSize="15"/>
-                            <Button Grid.Column="1" Text="⚙️ Plan bearbeiten" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" Padding="10,6"
-                                    Command="{Binding OpenPlanEditorCommand}"/>
+                            <Button Grid.Column="1" Text="Plan bearbeiten" Style="{StaticResource SecondaryButtonStyle}" FontSize="11" Padding="10,6"
+                                    Command="{Binding OpenPlanEditorCommand}" ContentLayout="Left,6">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf013;" Color="{DynamicResource ColorTextPrimary}" Size="12"/>
+                                </Button.ImageSource>
+                            </Button>
                         </Grid>
                         <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="{StaticResource ColorAccent}"/>
                     </VerticalStackLayout>
@@ -210,10 +223,18 @@
 
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding NeedsPlanTypeChoice}">
                         <Label Text="Wie soll dein Trainingsplan entstehen?" FontFamily="InterSemiBold" FontSize="14"/>
-                        <Button Text="📝 Selbst erstellen" Style="{StaticResource PrimaryButtonStyle}" HorizontalOptions="Fill"
-                                Command="{Binding OpenPlanEditorCommand}"/>
-                        <Button Text="✨ Für mich vorschlagen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Fill"
-                                Command="{Binding GenerateAutoPlanCommand}"/>
+                        <Button Text="Selbst erstellen" Style="{StaticResource PrimaryButtonStyle}" HorizontalOptions="Fill"
+                                Command="{Binding OpenPlanEditorCommand}" ContentLayout="Left,6">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf044;" Color="White" Size="14"/>
+                            </Button.ImageSource>
+                        </Button>
+                        <Button Text="Für mich vorschlagen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Fill"
+                                Command="{Binding GenerateAutoPlanCommand}" ContentLayout="Left,6">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xe2ca;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                            </Button.ImageSource>
+                        </Button>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
@@ -222,8 +243,12 @@
             <!-- Aktionen -->
             <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                 <Label Grid.Column="0" Text="{Binding SelectedDateLabel}" FontFamily="InterSemiBold" FontSize="16" VerticalOptions="Center"/>
-                <Button Grid.Column="1" Text="😴" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
-                        Command="{Binding ToggleRestDayCommand}"/>
+                <Button Grid.Column="1" Text="" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
+                        Command="{Binding ToggleRestDayCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf236;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                    </Button.ImageSource>
+                </Button>
                 <Button Grid.Column="2" Text="+ Training" Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding AddTrainingCommand}"/>
             </Grid>
@@ -231,7 +256,7 @@
             <CollectionView ItemsSource="{Binding TrainingSessions}" ItemTemplate="{StaticResource SessionTemplate}" ItemSizingStrategy="MeasureAllItems">
                 <CollectionView.EmptyView>
                     <VerticalStackLayout Spacing="6" Padding="0,20" HorizontalOptions="Center">
-                        <Label Text="🏋️" FontSize="28" HorizontalTextAlignment="Center"/>
+                        <Label Text="&#xf44b;" FontFamily="FontAwesomeSolid" FontSize="28" HorizontalTextAlignment="Center"/>
                         <Label Text="Für diesen Tag noch kein Training eingetragen" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>

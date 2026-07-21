@@ -19,12 +19,12 @@
                     </Border.GestureRecognizers>
                     <Grid>
                         <Image Source="{Binding ProfilePicturePath}" Aspect="AspectFill" IsVisible="{Binding HasProfilePicture}"/>
-                        <Label Text="👤" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
+                        <Label Text="&#xf007;" FontFamily="FontAwesomeSolid" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
                     </Grid>
                 </Border>
                 <Label Grid.Column="1" Text="NutriCoach" FontFamily="InterBold" FontSize="22"
                        TextColor="{StaticResource ColorAccent}" VerticalOptions="Center"/>
-                <Label Grid.Column="2" Text="⚙️" FontSize="20" VerticalOptions="Center" BackgroundColor="Transparent">
+                <Label Grid.Column="2" Text="&#xf013;" FontFamily="FontAwesomeSolid" FontSize="20" VerticalOptions="Center" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSettingsTapped"/>
                     </Label.GestureRecognizers>
@@ -40,7 +40,7 @@
                 <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="999"
                        Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="Center">
                     <HorizontalStackLayout Spacing="4">
-                        <Label Text="🔥" FontSize="14"/>
+                        <Label Text="&#xf06d;" FontFamily="FontAwesomeSolid" FontSize="14"/>
                         <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorAccent}" FontFamily="InterBold" FontSize="13"/>
                         <Label Text="Tage" TextColor="{StaticResource ColorAccent}" FontFamily="InterMedium" FontSize="13"/>
                     </HorizontalStackLayout>
@@ -55,7 +55,7 @@
                     </Frame.GestureRecognizers>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="🚶" FontSize="18" BackgroundColor="#0058BC1A"
+                            <Label Grid.Column="0" Text="&#xf554;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="#0058BC1A"
                                    WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                             <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='Ziel: {0}'}" FontSize="10"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
@@ -64,14 +64,27 @@
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
                         <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
-                        <Label Text="🚶 Schrittzähler aktivieren" FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
+                        <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
                                BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorAccent}"/>
+                                    <Span Text=" Schrittzähler aktivieren" TextColor="{StaticResource ColorAccent}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding ConnectHealthKitCommand}"/>
                             </Label.GestureRecognizers>
                         </Label>
-                        <Label Text="🚶 Schrittzähler aktiv" FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
-                               IsVisible="{Binding IsHealthKitConnected}"/>
+                        <Label FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
+                               IsVisible="{Binding IsHealthKitConnected}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorSuccess}"/>
+                                    <Span Text=" Schrittzähler aktiv" TextColor="{StaticResource ColorSuccess}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
                     </VerticalStackLayout>
                 </Frame>
 
@@ -81,7 +94,7 @@
                     </Frame.GestureRecognizers>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="🍽️" FontSize="18" BackgroundColor="#8F6E531A"
+                            <Label Grid.Column="0" Text="&#xf2e7;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="#8F6E531A"
                                    WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
                             <Label Grid.Column="1" Text="{Binding RemainingKcal, StringFormat='Rest: {0:0}'}" FontSize="10"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
@@ -98,7 +111,7 @@
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="8">
                     <HorizontalStackLayout Spacing="6">
-                        <Label Text="✨" FontSize="14"/>
+                        <Label Text="&#xe2ca;" FontFamily="FontAwesomeSolid" FontSize="14"/>
                         <Label Text="KI-OPTIMIERUNG" FontFamily="InterBold" FontSize="11" TextColor="{StaticResource ColorAccent}"/>
                     </HorizontalStackLayout>
 
@@ -126,12 +139,12 @@
                         <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="14" Padding="12" HasShadow="False" BorderColor="Transparent">
                             <Grid ColumnDefinitions="Auto,Auto,Auto,*">
                                 <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center">
-                                    <Label Text="🍽️" FontSize="22" HorizontalTextAlignment="Center"/>
+                                    <Label Text="&#xf2e7;" FontFamily="FontAwesomeSolid" FontSize="22" HorizontalTextAlignment="Center"/>
                                     <Label Text="{Binding AiSuggestionOriginal}" FontSize="13" FontFamily="InterSemiBold" TextColor="#BA1A1A" HorizontalTextAlignment="Center"/>
                                 </VerticalStackLayout>
                                 <Label Grid.Column="1" Text="→" FontSize="18" VerticalOptions="Center" Margin="10,0" TextColor="{StaticResource ColorTextSecondary}"/>
                                 <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center">
-                                    <Label Text="🍽️" FontSize="22" HorizontalTextAlignment="Center"/>
+                                    <Label Text="&#xf2e7;" FontFamily="FontAwesomeSolid" FontSize="22" HorizontalTextAlignment="Center"/>
                                     <Label Text="{Binding AiSuggestionAlternative}" FontSize="13" FontFamily="InterSemiBold" TextColor="{StaticResource ColorAccent}" HorizontalTextAlignment="Center"/>
                                 </VerticalStackLayout>
                                 <VerticalStackLayout Grid.Column="3" HorizontalOptions="End">
@@ -147,7 +160,7 @@
                     <!-- KI hat nichts zu verbessern gefunden -->
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiOptimalMessage}">
                         <HorizontalStackLayout Spacing="8">
-                            <Label Text="✅" FontSize="20"/>
+                            <Label Text="&#xf00c;" FontFamily="FontAwesomeSolid" FontSize="20"/>
                             <Label Text="Läuft gut, weiter so!" FontFamily="InterSemiBold" FontSize="14" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
                         <Label Text="{Binding AiSuggestionReason}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>

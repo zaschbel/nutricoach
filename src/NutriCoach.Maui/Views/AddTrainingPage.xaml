@@ -11,7 +11,7 @@
                 <VerticalStackLayout Spacing="6">
                     <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
                         <Label Grid.Column="0" Text="{Binding ExerciseName}" FontFamily="InterSemiBold" FontSize="14"/>
-                        <Label Grid.Column="1" Text="✕" FontSize="14" BackgroundColor="Transparent" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="14" BackgroundColor="Transparent" TextColor="{StaticResource ColorTextSecondary}">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding BindingContext.RemoveExerciseCommand, Source={x:Reference Root}}"
                                                        CommandParameter="{Binding}"/>
@@ -84,7 +84,7 @@
 
             <Grid ColumnDefinitions="*,Auto">
                 <Label Grid.Column="0" Text="{Binding WindowHeadline}" Style="{StaticResource HeadlineLabelStyle}"/>
-                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCancelTapped"/>
                     </Label.GestureRecognizers>

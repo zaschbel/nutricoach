@@ -139,7 +139,7 @@
                                                 <Label Text="{Binding BodyArea}" FontFamily="InterSemiBold" FontSize="14"/>
                                                 <Label Text="{Binding Severity}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
                                             </VerticalStackLayout>
-                                            <Label Grid.Column="1" Text="✕" BackgroundColor="Transparent" VerticalOptions="Center">
+                                            <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" BackgroundColor="Transparent" VerticalOptions="Center">
                                                 <Label.GestureRecognizers>
                                                     <TapGestureRecognizer Command="{Binding BindingContext.RemoveInjuryCommand, Source={x:Reference RootPage}}" CommandParameter="{Binding}"/>
                                                 </Label.GestureRecognizers>

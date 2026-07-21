@@ -49,7 +49,7 @@
 
             <Grid ColumnDefinitions="*,Auto">
                 <Label Grid.Column="0" Text="{Binding MealLabel, StringFormat='Zu {0} hinzufügen'}" Style="{StaticResource HeadlineLabelStyle}"/>
-                <Label Grid.Column="1" Text="✕" FontSize="18" BackgroundColor="Transparent">
+                <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnCancelTapped"/>
                     </Label.GestureRecognizers>
@@ -59,10 +59,26 @@
             <!-- Modus -->
             <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
                 <HorizontalStackLayout Spacing="8">
-                    <Button Text="🔍 Suche" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeSearch"/>
-                    <Button Text="📷 Barcode" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeBarcode"/>
-                    <Button Text="📸 Foto" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModePhoto"/>
-                    <Button Text="✏️ Manuell" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeManual"/>
+                    <Button Text="Suche" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeSearch" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf002;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Text="Barcode" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeBarcode" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf030;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Text="Foto" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModePhoto" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf083;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Text="Manuell" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeManual" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf304;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
                 </HorizontalStackLayout>
             </ScrollView>
 
@@ -84,7 +100,11 @@
 
             <!-- Barcode -->
             <VerticalStackLayout Spacing="10" IsVisible="{Binding IsBarcodeMode}">
-                <Button Text="📷 Barcode mit Kamera scannen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnScanBarcodeClicked"/>
+                <Button Text="Barcode mit Kamera scannen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnScanBarcodeClicked" ContentLayout="Left,6">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf030;" Color="White" Size="14"/>
+                    </Button.ImageSource>
+                </Button>
                 <Label Text="Oder Nummer manuell eintippen:" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,8,0,0"/>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Entry Grid.Column="0" Text="{Binding BarcodeText}" Keyboard="Numeric"/>
@@ -97,8 +117,16 @@
             <VerticalStackLayout Spacing="10" IsVisible="{Binding IsPhotoMode}">
                 <Label Text="Mach ein Foto vom Essen, die KI schätzt Name und Nährwerte." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                    <Button Grid.Column="0" Text="📷 Foto aufnehmen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnTakePhotoClicked"/>
-                    <Button Grid.Column="1" Text="🖼️ Aus Galerie" Style="{StaticResource SecondaryButtonStyle}" Clicked="OnPickPhotoClicked"/>
+                    <Button Grid.Column="0" Text="Foto aufnehmen" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnTakePhotoClicked" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf083;" Color="White" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Grid.Column="1" Text="Aus Galerie" Style="{StaticResource SecondaryButtonStyle}" Clicked="OnPickPhotoClicked" ContentLayout="Left,6">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf03e;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                        </Button.ImageSource>
+                    </Button>
                 </Grid>
 
                 <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsAnalyzingPhoto}">
