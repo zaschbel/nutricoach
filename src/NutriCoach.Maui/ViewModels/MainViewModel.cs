@@ -67,7 +67,17 @@ public class MainViewModel : INotifyPropertyChanged
 
         AddFoodCommand = new RelayCommand(async param =>
         {
-            if (param is MealType meal) await AddFoodAsync(meal);
+            try
+            {
+                if (param is MealType meal) await AddFoodAsync(meal);
+            }
+            catch (Exception ex)
+            {
+                // Vorruebergehende Diagnose-Absicherung: zeigt den echten Fehler an, statt die App
+                // stillschweigend abstuerzen zu lassen (App.MainPage kann in .NET 9 MAUI noch direkt
+                // verwendet werden, auch wenn als obsolet markiert).
+                await Application.Current!.MainPage!.DisplayAlert("Fehler beim Hinzufügen", ex.ToString(), "OK");
+            }
         });
         RemoveEntryCommand = new RelayCommand(async param =>
         {
