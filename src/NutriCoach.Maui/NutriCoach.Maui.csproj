@@ -47,6 +47,9 @@
     <MauiFont Include="Resources\Fonts\Inter-SemiBold.ttf" />
     <MauiFont Include="Resources\Fonts\Inter-Bold.ttf" />
 
+    <!-- Font Awesome Solid: ersetzt die Emoji-Icons app-weit (monochrome Icon-Glyphen) -->
+    <MauiFont Include="Resources\Fonts\fa-solid-900.ttf" />
+
     <MauiImage Include="Resources\Images\*" />
   </ItemGroup>
 
