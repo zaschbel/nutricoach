@@ -15,7 +15,7 @@ public class EditProfileViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action? Saved;
 
-    public EditProfileViewModel(UserProfileService profileService, UserProfile profile)
+    public EditProfileViewModel(UserProfileService profileService, UserProfile profile, double currentWeightKg)
     {
         _profileService = profileService;
         _profileId = profile.Id;
@@ -29,8 +29,23 @@ public class EditProfileViewModel : INotifyPropertyChanged
         _jobActivity = profile.JobActivity;
         _experience = profile.Experience;
         _profilePicturePath = profile.ProfilePicturePath;
+        _currentWeightKg = currentWeightKg;
 
         SaveCommand = new RelayCommand(async _ => await SaveAsync(), _ => CanSave());
+    }
+
+    /// <summary>Wie in MainViewModel: sofort speichern, damit's mit dem Ernährungs-Reiter synchron bleibt.</summary>
+    private double _currentWeightKg;
+    public double CurrentWeightKg
+    {
+        get => _currentWeightKg;
+        set
+        {
+            if (_currentWeightKg == value) return;
+            _currentWeightKg = value;
+            OnPropertyChanged();
+            _ = _profileService.SetWeightForDateAsync(_profileId, DateOnly.FromDateTime(DateTime.Today), value);
+        }
     }
 
     private string? _profilePicturePath;

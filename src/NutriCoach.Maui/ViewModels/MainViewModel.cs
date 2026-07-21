@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Storage;
 using NutriCoach.App.Models;
@@ -1006,6 +1007,19 @@ public class MainViewModel : INotifyPropertyChanged
         await _diaryService.SetWaterForDateAsync(_profile.Id, SelectedDate, amountMl);
     }
 
-    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
+    {
+        // HealthKit-Callbacks (u.a. SyncStepsFromHealthKitAsync) laufen auf einem Hintergrund-Thread;
+        // ohne MainThread-Dispatch aktualisieren manche Bindings (z.B. Label.Text) auf iOS lautlos
+        // nicht, waehrend andere (z.B. ProgressBar) trotzdem durchkommen - daher hier immer ueber
+        // MainThread.BeginInvokeOnMainThread schicken statt PropertyChanged direkt aufzurufen.
+        if (MainThread.IsMainThread)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        else
+        {
+            MainThread.BeginInvokeOnMainThread(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+        }
+    }
 }

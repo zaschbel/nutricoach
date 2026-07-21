@@ -76,7 +76,8 @@
                 <Frame Grid.Column="1" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="2">
                         <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="16" Margin="0,4,0,8"/>
+                        <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="16"
+                               LineBreakMode="WordWrap" Margin="0,4,0,8"/>
                         <ProgressBar Progress="0.3" ProgressColor="{StaticResource ColorTertiary}"/>
                     </VerticalStackLayout>
                 </Frame>
@@ -97,8 +98,8 @@
                 <VerticalStackLayout Spacing="14">
 
                     <!-- Kalorien-Bogen -->
-                    <Grid HeightRequest="130">
-                        <GraphicsView Drawable="{Binding CalorieGaugeDrawable}" HeightRequest="130" HorizontalOptions="Fill"/>
+                    <Grid HeightRequest="160">
+                        <GraphicsView Drawable="{Binding CalorieGaugeDrawable}" HeightRequest="130" HorizontalOptions="Fill" VerticalOptions="Start"/>
 
                         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,40,0,0">
                             <Label Text="{Binding RemainingKcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="30"
@@ -156,7 +157,7 @@
 
             <!-- Wochennavigation -->
             <Frame Style="{StaticResource CardStyle}" Padding="12,10">
-                <Grid ColumnDefinitions="Auto,*,Auto">
+                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center">
                     <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
                             Command="{Binding PreviousWeekCommand}"/>
                     <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center" WidthRequest="320">

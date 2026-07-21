@@ -15,13 +15,15 @@ public class LineChartDrawable : IDrawable
     private readonly Color _lineColor;
     private readonly string _valueFormat;
     private readonly bool _useTrendColors;
+    private readonly double? _targetValue;
 
-    public LineChartDrawable(List<LinePoint> points, Color lineColor, Color labelColor, string valueFormat = "{0:0.0}", bool useTrendColors = false)
+    public LineChartDrawable(List<LinePoint> points, Color lineColor, Color labelColor, string valueFormat = "{0:0.0}", bool useTrendColors = false, double? targetValue = null)
     {
         _points = points;
         _lineColor = lineColor;
         _valueFormat = valueFormat;
         _useTrendColors = useTrendColors;
+        _targetValue = targetValue;
     }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -38,11 +40,33 @@ public class LineChartDrawable : IDrawable
         if (known.Count == 0) known.Add(0);
         var minValue = known.Min();
         var maxValue = known.Max();
+        if (_targetValue.HasValue)
+        {
+            minValue = Math.Min(minValue, _targetValue.Value);
+            maxValue = Math.Max(maxValue, _targetValue.Value);
+        }
         if (Math.Abs(maxValue - minValue) < 0.01) { maxValue += 1; minValue -= 1; }
 
         var stepX = _points.Count > 1 ? dirtyRect.Width / (_points.Count - 1) : 0;
         float YFor(double value) => (float)(chartBottom - (value - minValue) / (maxValue - minValue) * chartHeight);
         float XFor(int i) => i * stepX;
+
+        // Ziel-Linie: dezent gestrichelt, ganz unten gezeichnet, damit Balken/Durchschnittsfläche
+        // und die eigentliche Datenlinie unveraendert obenauf bleiben und nichts verdeckt wird.
+        if (_targetValue.HasValue)
+        {
+            canvas.SaveState();
+            var targetY = YFor(_targetValue.Value);
+            canvas.StrokeColor = Color.FromArgb("#717786");
+            canvas.StrokeSize = 1.5f;
+            canvas.StrokeDashPattern = new float[] { 4, 4 };
+            canvas.DrawLine(0, targetY, dirtyRect.Width, targetY);
+            canvas.FontColor = Color.FromArgb("#717786");
+            canvas.FontSize = 10;
+            canvas.DrawString(string.Format(_valueFormat, _targetValue.Value) + " Ziel", dirtyRect.Width - 64, targetY - 16, 64, 14,
+                HorizontalAlignment.Right, VerticalAlignment.Bottom);
+            canvas.RestoreState();
+        }
 
         // Weiche Flächenfüllung unter der Linie, pro zusammenhängendem Abschnitt (überspringt Lücken)
         canvas.SaveState();

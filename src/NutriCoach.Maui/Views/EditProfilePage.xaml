@@ -59,8 +59,12 @@
             <Label Text="Allgemeines Aktivitätslevel" Style="{StaticResource SectionLabelStyle}"/>
             <Picker ItemsSource="{Binding ActivityOptions}" SelectedItem="{Binding ActivityLevel}"/>
 
-            <Label Text="Hinweis: Dein Gewicht änderst du direkt unten im Ernährungs-Reiter, nicht hier."
-                   FontSize="11" TextColor="{StaticResource ColorTextSecondary}" Margin="0,4,0,0"/>
+            <Label Text="Aktuelles Gewicht (kg)" Style="{StaticResource SectionLabelStyle}" Margin="0,4,0,0"/>
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Label Grid.Column="0" Text="{Binding CurrentWeightKg, StringFormat='{0:0.0} kg'}" FontFamily="InterBold" FontSize="20"
+                       VerticalOptions="Center" WidthRequest="90"/>
+                <Stepper Grid.Column="1" Minimum="30" Maximum="300" Increment="0.1" Value="{Binding CurrentWeightKg}" HorizontalOptions="Start"/>
+            </Grid>
 
             <Label Text="{Binding StatusText}" FontSize="12" TextColor="{StaticResource ColorAccent}" IsVisible="{Binding HasStatus}"/>
 

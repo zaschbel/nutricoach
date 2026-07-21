@@ -12,7 +12,8 @@ public partial class EditProfilePage : ContentPage
             var profile = await AppState.ProfileService.GetActiveProfileAsync();
             if (profile is null) return;
 
-            var viewModel = new EditProfileViewModel(AppState.ProfileService, profile);
+            var currentWeightKg = await AppState.ProfileService.GetWeightForDateAsync(profile.Id, DateOnly.FromDateTime(DateTime.Today));
+            var viewModel = new EditProfileViewModel(AppState.ProfileService, profile, currentWeightKg);
             viewModel.Saved += async () => await AppState.MainViewModel.LoadAsync();
             BindingContext = viewModel;
         };
