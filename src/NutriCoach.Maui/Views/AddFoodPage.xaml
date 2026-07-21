@@ -70,14 +70,14 @@
             <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSearchMode}">
                 <VerticalStackLayout Spacing="6" IsVisible="{Binding HasRecentFoods}">
                     <Label Text="Zuletzt verwendet" FontFamily="InterSemiBold" FontSize="14"/>
-                    <CollectionView ItemsSource="{Binding RecentFoods}" ItemTemplate="{StaticResource RecentTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+                    <CollectionView ItemsSource="{Binding RecentFoods}" ItemTemplate="{StaticResource RecentTemplate}"/>
                 </VerticalStackLayout>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Entry Grid.Column="0" Text="{Binding SearchText}" Placeholder="Lebensmittel suchen..."/>
                     <Button Grid.Column="1" Text="Suchen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SearchCommand}"/>
                 </Grid>
                 <Label Text="{Binding SearchStatusText}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasSearchStatus}"/>
-                <CollectionView ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource ResultTemplate}" ItemSizingStrategy="MeasureAllItems">
+                <CollectionView ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource ResultTemplate}">
                     <CollectionView.EmptyView>
                         <Label Text="Tipp einen Namen ein und tippe auf Suchen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0"/>
                     </CollectionView.EmptyView>

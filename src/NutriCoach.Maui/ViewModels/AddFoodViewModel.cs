@@ -67,6 +67,12 @@ public class AddFoodViewModel : INotifyPropertyChanged
     public async Task LoadRecentFoodsAsync()
     {
         var recent = await _diaryService.GetRecentlyUsedFoodsAsync(_userProfileId);
+
+        // Kurze Verzoegerung, damit die CollectionView beim allerersten Anzeigen der Seite (noch mit
+        // Frame 0x0) ihr natives Layout abschliessen kann, bevor ItemsSource sich aendert - sonst
+        // wirft iOS eine NSInvalidArgumentException in invalidateLayoutWithContext: und die App stuerzt ab.
+        await Task.Delay(60);
+
         RecentFoods.Clear();
         foreach (var item in recent) RecentFoods.Add(item);
         OnPropertyChanged(nameof(HasRecentFoods));
