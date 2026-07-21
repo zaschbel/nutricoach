@@ -37,11 +37,33 @@ public class FoodLookupService
 
         await using var context = new AppDbContext();
         var q = query.Trim().ToLower();
-        return await context.FoodItems
+        var results = await context.FoodItems
             .Where(f => f.Name.ToLower().Contains(q))
             .OrderBy(f => f.Name)
             .Take(25)
             .ToListAsync();
+
+        // Tippfehler-Korrektur: kein Teilstring-Treffer? Dann den ähnlichsten bekannten Namen per
+        // Levenshtein-Distanz vorschlagen, statt eine leere Liste zurückzugeben.
+        if (results.Count == 0)
+        {
+            try
+            {
+                var allNames = await context.FoodItems.Select(f => f.Name).ToListAsync();
+                var closest = FuzzyMatch.FindClosest(query, allNames);
+                if (closest is not null)
+                {
+                    var match = await context.FoodItems.FirstOrDefaultAsync(f => f.Name == closest);
+                    if (match is not null) results.Add(match);
+                }
+            }
+            catch
+            {
+                // Fehler bei der Tippfehler-Korrektur darf die normale Suche nicht beeinträchtigen.
+            }
+        }
+
+        return results;
     }
 
     /// <summary>
@@ -54,8 +76,13 @@ public class FoodLookupService
 
         try
         {
+            // sort_by=unique_scans_n: rankt nach echten Nutzer-Scans/Bestätigungen statt beliebiger
+            // Teilstring-Reihenfolge - starkes Signal für Datenqualität/Relevanz, bekannte/korrekte
+            // Einträge kommen so zuerst. cc=de&lc=de: Länder-/Sprach-Hinweis für bessere Relevanz bei
+            // deutschsprachigen Suchbegriffen, ohne andere Treffer komplett auszuschließen.
             var url = $"/cgi/search.pl?search_terms={Uri.EscapeDataString(query)}" +
                       "&search_simple=1&action=process&json=1&page_size=20" +
+                      "&sort_by=unique_scans_n&cc=de&lc=de" +
                       "&fields=product_name,brands,code,nutriments";
 
             var response = await Http.GetFromJsonAsync<OffSearchResponse>(url);
@@ -64,7 +91,10 @@ public class FoodLookupService
             var items = response.Products
                 .Where(p => !string.IsNullOrWhiteSpace(p.ProductName))
                 .Select(MapToFoodItem)
-                .Where(f => f is not null)
+                // KcalPer100 <= 0 ist ein starkes Signal für einen unvollständigen/kaputten OFF-Eintrag
+                // ohne echte Nährwerte - solche Einträge sind fast immer Rauschen und verschlechtern
+                // die Trefferqualität ("schlechte Trefferqualität" war die konkrete Beschwerde).
+                .Where(f => f is not null && f.KcalPer100 > 0)
                 .Cast<FoodItem>()
                 .ToList();
 

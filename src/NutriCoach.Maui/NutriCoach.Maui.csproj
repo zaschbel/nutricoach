@@ -15,7 +15,7 @@
     <Nullable>enable</Nullable>
 
     <!-- App-Identität -->
-    <ApplicationTitle>NutriCoach</ApplicationTitle>
+    <ApplicationTitle>Nitrocoach</ApplicationTitle>
     <ApplicationId>com.nutricoach.app</ApplicationId>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>

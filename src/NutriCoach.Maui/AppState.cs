@@ -22,8 +22,9 @@ public static class AppState
         var lookupService = new FoodLookupService();
         var trainingService = new TrainingDiaryService();
         var planService = new TrainingPlanService();
+        var templateService = new WorkoutTemplateService();
         var dialogService = new Services.DialogService();
 
-        MainViewModel = new MainViewModel(ProfileService, diaryService, lookupService, trainingService, planService, dialogService);
+        MainViewModel = new MainViewModel(ProfileService, diaryService, lookupService, trainingService, planService, dialogService, templateService);
     }
 }

@@ -123,6 +123,7 @@ public class AddTrainingViewModel : INotifyPropertyChanged
     private readonly int _userProfileId;
     private readonly DateOnly _date;
     private readonly int? _existingSessionId;
+    private readonly List<string>? _prefilledExerciseNames;
 
     public event PropertyChangedEventHandler? PropertyChanged;
     public event Action? Saved;
@@ -133,12 +134,14 @@ public class AddTrainingViewModel : INotifyPropertyChanged
     public string SaveButtonText => "Speichern";
 
     public AddTrainingViewModel(TrainingDiaryService trainingService, int userProfileId, DateOnly date,
-        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null)
+        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null,
+        List<string>? prefilledExerciseNames = null)
     {
         _trainingService = trainingService;
         _userProfileId = userProfileId;
         _date = date;
         _existingSessionId = existingSessionId;
+        _prefilledExerciseNames = prefilledExerciseNames;
         if (existingSessionName is not null) _sessionName = existingSessionName;
         else if (suggestedName is not null) _sessionName = suggestedName;
 
@@ -163,20 +166,47 @@ public class AddTrainingViewModel : INotifyPropertyChanged
     private bool _isLoading;
     public bool IsLoading { get => _isLoading; set { _isLoading = value; OnPropertyChanged(); } }
 
-    /// <summary>Lädt im Bearbeiten-Modus die bereits gespeicherten Übungen der Trainingseinheit als editierbare Blöcke.</summary>
+    /// <summary>
+    /// Lädt im Bearbeiten-Modus die bereits gespeicherten Übungen der Trainingseinheit als editierbare
+    /// Blöcke - oder, wenn stattdessen eine Trainingsvorlage ausgewählt wurde, deren Übungen als neue,
+    /// noch leere Blöcke (Sätze/Gewicht/Wiederholungen bleiben vom Nutzer manuell auszufüllen).
+    /// </summary>
     public async Task LoadExistingExercisesAsync()
     {
-        if (_existingSessionId is null) return;
+        if (_existingSessionId is not null)
+        {
+            IsLoading = true;
+            var (name, existingExercises) = await _trainingService.GetSessionDetailAsync(_existingSessionId.Value);
+            SessionName = name;
 
-        IsLoading = true;
-        var (name, existingExercises) = await _trainingService.GetSessionDetailAsync(_existingSessionId.Value);
-        SessionName = name;
+            foreach (var data in existingExercises)
+                Exercises.Add(new ExerciseBlockViewModel(data.Exercise, data));
 
-        foreach (var data in existingExercises)
-            Exercises.Add(new ExerciseBlockViewModel(data.Exercise, data));
+            IsLoading = false;
+            OnPropertyChanged(nameof(WindowHeadline));
+            return;
+        }
 
-        IsLoading = false;
-        OnPropertyChanged(nameof(WindowHeadline));
+        if (_prefilledExerciseNames is { Count: > 0 })
+        {
+            IsLoading = true;
+            try
+            {
+                var exercises = await _trainingService.GetExercisesByNamesAsync(_prefilledExerciseNames);
+                var byName = exercises.ToDictionary(e => e.Name, e => e, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var exerciseName in _prefilledExerciseNames)
+                {
+                    if (byName.TryGetValue(exerciseName, out var exercise))
+                        Exercises.Add(new ExerciseBlockViewModel(exercise));
+                }
+            }
+            catch
+            {
+                // Vorbefüllung fehlgeschlagen - Nutzer kann Übungen weiterhin manuell über die Suche hinzufügen.
+            }
+            IsLoading = false;
+        }
     }
 
     private string _sessionName = string.Empty;

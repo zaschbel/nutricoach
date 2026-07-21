@@ -22,7 +22,7 @@
                         <Label Text="&#xf007;" FontFamily="FontAwesomeSolid" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
                     </Grid>
                 </Border>
-                <Label Grid.Column="1" Text="NutriCoach" FontFamily="InterBold" FontSize="22"
+                <Label Grid.Column="1" Text="Nitrocoach" FontFamily="InterBold" FontSize="22"
                        TextColor="{StaticResource ColorAccent}" VerticalOptions="Center"/>
                 <Label Grid.Column="2" Text="&#xf013;" FontFamily="FontAwesomeSolid" FontSize="20" VerticalOptions="Center" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>

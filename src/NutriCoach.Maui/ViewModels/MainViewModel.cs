@@ -23,6 +23,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly FoodLookupService _lookupService;
     private readonly TrainingDiaryService _trainingService;
     private readonly TrainingPlanService _planService;
+    private readonly WorkoutTemplateService _templateService;
     private readonly IDialogService _dialogService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -56,7 +57,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public MainViewModel(UserProfileService profileService, NutritionDiaryService diaryService,
         FoodLookupService lookupService, TrainingDiaryService trainingService, TrainingPlanService planService,
-        IDialogService dialogService)
+        IDialogService dialogService, WorkoutTemplateService? templateService = null)
     {
         _profileService = profileService;
         _diaryService = diaryService;
@@ -64,6 +65,7 @@ public class MainViewModel : INotifyPropertyChanged
         _trainingService = trainingService;
         _planService = planService;
         _dialogService = dialogService;
+        _templateService = templateService ?? new WorkoutTemplateService();
 
         AddFoodCommand = new RelayCommand(async param =>
         {
@@ -116,6 +118,7 @@ public class MainViewModel : INotifyPropertyChanged
         OpenPlanEditorCommand = new RelayCommand(async _ => await OpenPlanEditorAsync());
         GenerateAutoPlanCommand = new RelayCommand(async _ => await GenerateAutoPlanAsync());
         StartTodayPlannedTrainingCommand = new RelayCommand(async _ => await StartTodayPlannedTrainingAsync());
+        ManageTemplatesCommand = new RelayCommand(async _ => await ManageTemplatesAsync());
 
         TrainingSessions.CollectionChanged += (_, _) =>
         {
@@ -147,7 +150,9 @@ public class MainViewModel : INotifyPropertyChanged
         });
 
         SelectedDate = DateOnly.FromDateTime(DateTime.Today);
-        _currentWeekStart = GetMonday(SelectedDate);
+        // Rollierendes 7-Tage-Fenster, das immer mit SelectedDate (normalerweise heute) ganz rechts endet -
+        // NICHT mehr an feste Mo-So-Kalenderwochen gekoppelt (siehe ShiftWeekAsync/GoToDateAsync unten).
+        _currentWeekStart = SelectedDate.AddDays(-6);
     }
 
     // ---------------- Tab-Navigation ----------------
@@ -204,11 +209,9 @@ public class MainViewModel : INotifyPropertyChanged
     public RelayCommand NextWeekCommand { get; }
     public RelayCommand SelectDayCommand { get; }
 
-    private static DateOnly GetMonday(DateOnly date)
-    {
-        var diff = ((int)date.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
-        return date.AddDays(-diff);
-    }
+    /// <summary>Wochentags-Kürzel für ein Datum, unabhängig davon, an welchem Wochentag das rollierende Fenster beginnt.</summary>
+    private static readonly string[] DayAbbrevsMondayFirst = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
+    private static string DayAbbrevFor(DateOnly date) => DayAbbrevsMondayFirst[((int)date.DayOfWeek + 6) % 7];
 
     private async Task ShiftWeekAsync(int days)
     {
@@ -220,7 +223,9 @@ public class MainViewModel : INotifyPropertyChanged
     private async Task GoToDateAsync(DateOnly date)
     {
         SelectedDate = date;
-        _currentWeekStart = GetMonday(date);
+        // Rollierendes Fenster: endet immer mit dem neu ausgewählten Tag ganz rechts (nicht mehr an
+        // feste Mo-So-Kalenderwochen gekoppelt).
+        _currentWeekStart = date.AddDays(-6);
         OnPropertyChanged(nameof(WeekRangeLabel));
         await RefreshDiaryAsync();
         await RefreshWeekAsync();
@@ -238,11 +243,10 @@ public class MainViewModel : INotifyPropertyChanged
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         WeekDays.Clear();
-        string[] abbrevs = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };
         for (var i = 0; i < 7; i++)
         {
             var date = _currentWeekStart.AddDays(i);
-            WeekDays.Add(new DayInfo(date, abbrevs[i], date.Day, date == SelectedDate, date == today,
+            WeekDays.Add(new DayInfo(date, DayAbbrevFor(date), date.Day, date == SelectedDate, date == today,
                 datesWithEntries.Contains(date), restDays.Contains(date)));
         }
 
@@ -255,7 +259,7 @@ public class MainViewModel : INotifyPropertyChanged
             var date = _currentWeekStart.AddDays(i);
             var steps = stepsForWeek.TryGetValue(date, out var s) ? s : 0;
             var heightPx = Math.Max(4, (double)steps / maxSteps * 80);
-            WeeklyActivity.Add(new WeeklyActivityBar(abbrevs[i], steps, heightPx, date == today));
+            WeeklyActivity.Add(new WeeklyActivityBar(DayAbbrevFor(date), steps, heightPx, date == today));
         }
 
         AverageStepsThisWeek = stepsForWeek.Count > 0 ? (int)stepsForWeek.Values.Average() : 0;
@@ -764,6 +768,7 @@ public class MainViewModel : INotifyPropertyChanged
     public RelayCommand OpenPlanEditorCommand { get; }
     public RelayCommand GenerateAutoPlanCommand { get; }
     public RelayCommand StartTodayPlannedTrainingCommand { get; }
+    public RelayCommand ManageTemplatesCommand { get; }
 
     private string _todayPlanName = "Frei";
     public string TodayPlanName { get => _todayPlanName; set { _todayPlanName = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasTodayPlan)); OnPropertyChanged(nameof(HasNoTodayPlan)); OnPropertyChanged(nameof(TodayPlanLabel)); } }
@@ -979,6 +984,29 @@ public class MainViewModel : INotifyPropertyChanged
         await _planService.SavePlanAsync(_profile.Id, autoPlan);
         HasWeeklyPlan = true;
         await RefreshTodayAsync();
+    }
+
+    /// <summary>
+    /// Öffnet die Vorlagen-Verwaltung ("Vorlage verwenden"): Nutzer kann dort eine bestehende
+    /// Trainingsvorlage anlegen/löschen oder eine auswählen, um direkt eine neue Trainingseinheit
+    /// mit deren Übungen vorbefüllt zu starten (nur Übungsnamen, Sätze/Gewicht bleiben manuell).
+    /// </summary>
+    private async Task ManageTemplatesAsync()
+    {
+        if (_profile is null) return;
+
+        var exerciseNames = await _dialogService.ShowManageTemplatesAsync(_templateService, _trainingService, _profile.Id);
+        if (exerciseNames is not { Count: > 0 }) return;
+
+        var wasSaved = await _dialogService.ShowAddTrainingAsync(_trainingService, _profile.Id, SelectedDate,
+            prefilledExerciseNames: exerciseNames);
+
+        if (wasSaved)
+        {
+            await RefreshTrainingAsync();
+            await RefreshWeekAsync();
+            await RefreshTodayAsync();
+        }
     }
 
     private async Task StartTodayPlannedTrainingAsync()

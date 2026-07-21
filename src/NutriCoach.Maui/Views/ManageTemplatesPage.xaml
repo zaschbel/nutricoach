@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.ManageTemplatesPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             x:Name="Root">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="TemplateRowTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="12" Padding="12" Margin="0,0,0,8" HasShadow="False" BorderColor="Transparent">
+                <VerticalStackLayout Spacing="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="15"/>
+                        <Label Grid.Column="1" Text="&#xf2ed;" FontFamily="FontAwesomeSolid" FontSize="14" TextColor="{StaticResource ColorTextSecondary}" BackgroundColor="Transparent">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BindingContext.DeleteTemplateCommand, Source={x:Reference Root}}"
+                                                       CommandParameter="{Binding}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+                    <Label Text="{Binding ExerciseNamesLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    <Button Text="Vorlage verwenden" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Padding="10,6" HorizontalOptions="Start"
+                            Command="{Binding BindingContext.UseTemplateCommand, Source={x:Reference Root}}"
+                            CommandParameter="{Binding}"/>
+                </VerticalStackLayout>
+            </Frame>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ExerciseResultRowTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurface}" CornerRadius="10" Padding="10" Margin="0,0,0,6" HasShadow="False" BorderColor="Transparent">
+                <Grid ColumnDefinitions="*" BackgroundColor="Transparent">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.AddExerciseNameCommand, Source={x:Reference Root}}"
+                                               CommandParameter="{Binding}"/>
+                    </Grid.GestureRecognizers>
+                    <Label Text="{Binding Name}" FontSize="13"/>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SelectedExerciseNameTemplate">
+            <Grid ColumnDefinitions="*,Auto" Padding="0,3">
+                <Label Grid.Column="0" Text="{Binding .}" FontSize="12"/>
+                <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.RemoveExerciseNameCommand, Source={x:Reference Root}}"
+                                               CommandParameter="{Binding}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*" Padding="20">
+
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <VerticalStackLayout Grid.Column="0" Spacing="6">
+                <Label Text="Trainingsvorlagen" Style="{StaticResource HeadlineLabelStyle}"/>
+                <Label Text="Feste Übungslisten, damit du sie nicht jedes Mal neu zusammenstellen musst." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
+            </VerticalStackLayout>
+            <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="Transparent" VerticalOptions="Start">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="14">
+
+                <CollectionView ItemsSource="{Binding Templates}" ItemTemplate="{StaticResource TemplateRowTemplate}" ItemSizingStrategy="MeasureAllItems">
+                    <CollectionView.EmptyView>
+                        <Label Text="Noch keine Vorlagen angelegt" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,10"/>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+                <Button Text="+ Neue Vorlage" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                        Command="{Binding ToggleCreatePanelCommand}" IsVisible="{Binding ShowCreatePanel, Converter={StaticResource InverseBoolConverter}}"/>
+
+                <Frame Style="{StaticResource CardStyle}" IsVisible="{Binding ShowCreatePanel}">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Name der Vorlage (z. B. Push Day)" Style="{StaticResource SectionLabelStyle}"/>
+                        <Entry Text="{Binding NewTemplateName}"/>
+
+                        <Label Text="Übung suchen und hinzufügen" Style="{StaticResource SectionLabelStyle}" Margin="0,8,0,0"/>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Entry Grid.Column="0" Text="{Binding ExerciseSearchText}" Placeholder="z. B. Bankdrücken"/>
+                            <Button Grid.Column="1" Text="Suchen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SearchExercisesCommand}"/>
+                        </Grid>
+                        <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsSearchingExercises}">
+                            <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="16" HeightRequest="16"/>
+                            <Label Text="Suche..." FontSize="11" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <CollectionView ItemsSource="{Binding ExerciseSearchResults}" ItemTemplate="{StaticResource ExerciseResultRowTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+
+                        <Label Text="Ausgewählte Übungen" FontFamily="InterSemiBold" FontSize="13" Margin="0,8,0,0" IsVisible="{Binding HasSelectedExercises}"/>
+                        <CollectionView ItemsSource="{Binding SelectedExerciseNames}" ItemTemplate="{StaticResource SelectedExerciseNameTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                            <Button Grid.Column="0" Text="Abbrechen" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleCreatePanelCommand}"/>
+                            <Button Grid.Column="1" Text="Vorlage speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveTemplateCommand}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

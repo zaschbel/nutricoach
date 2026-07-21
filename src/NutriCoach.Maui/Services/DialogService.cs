@@ -47,14 +47,30 @@ public class DialogService : IDialogService
     }
 
     public async Task<bool> ShowAddTrainingAsync(TrainingDiaryService trainingService, int userProfileId, DateOnly date,
-        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null)
+        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null,
+        List<string>? prefilledExerciseNames = null)
     {
-        var viewModel = new AddTrainingViewModel(trainingService, userProfileId, date, existingSessionId, existingSessionName, suggestedName);
+        var viewModel = new AddTrainingViewModel(trainingService, userProfileId, date, existingSessionId, existingSessionName, suggestedName, prefilledExerciseNames);
         var page = new Maui.Views.AddTrainingPage(viewModel);
         var tcs = new TaskCompletionSource<bool>();
 
         viewModel.Saved += () => tcs.TrySetResult(true);
         page.CancelRequested += () => tcs.TrySetResult(false);
+
+        await Navigation.PushModalAsync(page);
+        var result = await tcs.Task;
+        await Navigation.PopModalAsync();
+        return result;
+    }
+
+    public async Task<List<string>?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId)
+    {
+        var viewModel = new ManageTemplatesViewModel(templateService, trainingService, userProfileId);
+        var page = new Maui.Views.ManageTemplatesPage(viewModel);
+        var tcs = new TaskCompletionSource<List<string>?>();
+
+        viewModel.TemplateSelected += names => tcs.TrySetResult(names);
+        page.CancelRequested += () => tcs.TrySetResult(null);
 
         await Navigation.PushModalAsync(page);
         var result = await tcs.Task;

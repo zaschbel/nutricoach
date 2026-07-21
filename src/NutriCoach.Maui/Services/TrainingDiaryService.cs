@@ -498,11 +498,49 @@ public class TrainingDiaryService
             return await context.Exercises.OrderBy(e => e.Name).Take(30).ToListAsync();
 
         var q = query.Trim().ToLower();
-        return await context.Exercises
+        var results = await context.Exercises
             .Where(e => e.Name.ToLower().Contains(q) || e.PrimaryMuscleGroup.ToLower().Contains(q))
             .OrderBy(e => e.Name)
             .Take(30)
             .ToListAsync();
+
+        // Tippfehler-Korrektur: liefert die Teilstring-Suche nichts (z. B. "Banddrücken" statt
+        // "Bankdrücken" eingetippt), den ähnlichsten bekannten Übungsnamen per Levenshtein-Distanz
+        // vorschlagen, statt den Nutzer mit einer leeren Trefferliste dastehen zu lassen.
+        if (results.Count == 0)
+        {
+            try
+            {
+                var allNames = await context.Exercises.Select(e => e.Name).ToListAsync();
+                var closest = FuzzyMatch.FindClosest(query, allNames);
+                if (closest is not null)
+                {
+                    var match = await context.Exercises.FirstOrDefaultAsync(e => e.Name == closest);
+                    if (match is not null) results.Add(match);
+                }
+            }
+            catch
+            {
+                // Fehler bei der Tippfehler-Korrektur darf die normale Suche nicht beeinträchtigen.
+            }
+        }
+
+        return results;
+    }
+
+    /// <summary>Lädt mehrere Übungen anhand ihrer exakten Namen (z. B. um eine Trainingsvorlage in Übungs-Blöcke umzuwandeln).</summary>
+    public async Task<List<Exercise>> GetExercisesByNamesAsync(List<string> names)
+    {
+        try
+        {
+            await using var context = new AppDbContext();
+            var lowered = names.Select(n => n.ToLower()).ToHashSet();
+            return await context.Exercises.Where(e => lowered.Contains(e.Name.ToLower())).ToListAsync();
+        }
+        catch
+        {
+            return new List<Exercise>();
+        }
     }
 
     /// <summary>Speichert eine aus wger.de importierte Übung lokal - danach funktioniert sie wie jede selbst angelegte.</summary>

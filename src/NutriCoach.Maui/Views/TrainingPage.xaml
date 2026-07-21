@@ -241,7 +241,7 @@
             </Frame>
 
             <!-- Aktionen -->
-            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
                 <Label Grid.Column="0" Text="{Binding SelectedDateLabel}" FontFamily="InterSemiBold" FontSize="16" VerticalOptions="Center"/>
                 <Button Grid.Column="1" Text="" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
                         Command="{Binding ToggleRestDayCommand}">
@@ -249,7 +249,9 @@
                         <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf236;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
                     </Button.ImageSource>
                 </Button>
-                <Button Grid.Column="2" Text="+ Training" Style="{StaticResource PrimaryButtonStyle}"
+                <Button Grid.Column="2" Text="Vorlage" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
+                        Command="{Binding ManageTemplatesCommand}"/>
+                <Button Grid.Column="3" Text="+ Training" Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding AddTrainingCommand}"/>
             </Grid>
 

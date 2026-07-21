@@ -16,9 +16,17 @@ public record FoodDetailDialogResult(bool Confirmed, FoodItem? Food, double Amou
 public interface IDialogService
 {
     Task<bool> ShowAddTrainingAsync(TrainingDiaryService trainingService, int userProfileId, DateOnly date,
-        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null);
+        int? existingSessionId = null, string? existingSessionName = null, string? suggestedName = null,
+        List<string>? prefilledExerciseNames = null);
 
     Task<bool> ShowWeeklyPlanAsync(TrainingPlanService planService, int userProfileId, Dictionary<DayOfWeek, string> currentPlan);
+
+    /// <summary>
+    /// Zeigt die Trainingsvorlagen-Verwaltung (anlegen/löschen/auswählen). Liefert die Übungsnamen
+    /// der ausgewählten Vorlage zurück (für die anschließende Vorbefüllung von AddTrainingPage),
+    /// oder null, wenn der Nutzer nur verwaltet hat oder abgebrochen ist.
+    /// </summary>
+    Task<List<string>?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId);
 
     Task<AddFoodDialogResult> ShowAddFoodAsync(FoodLookupService lookupService, NutritionDiaryService diaryService,
         int userProfileId, MealType meal, FitnessGoal goal);

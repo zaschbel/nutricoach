@@ -25,6 +25,8 @@ public class AppDbContext : DbContext
     public DbSet<Exercise> Exercises => Set<Exercise>();
     public DbSet<RestDay> RestDays => Set<RestDay>();
     public DbSet<TrainingPlanDay> TrainingPlanDays => Set<TrainingPlanDay>();
+    public DbSet<WorkoutTemplate> WorkoutTemplates => Set<WorkoutTemplate>();
+    public DbSet<WorkoutTemplateExercise> WorkoutTemplateExercises => Set<WorkoutTemplateExercise>();
 
     /// <summary>
     /// Plattformunabhängiger App-Datenordner: auf iOS liegt das im sandboxed Documents-Bereich der App,
@@ -77,6 +79,12 @@ public class AppDbContext : DbContext
             .HasMany(t => t.CardioEntries)
             .WithOne()
             .HasForeignKey(c => c.TrainingSessionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkoutTemplate>()
+            .HasMany(t => t.Exercises)
+            .WithOne()
+            .HasForeignKey(e => e.WorkoutTemplateId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<NutritionEntry>()
