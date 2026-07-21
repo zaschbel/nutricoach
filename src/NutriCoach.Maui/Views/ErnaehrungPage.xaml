@@ -67,7 +67,7 @@
                 <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="2">
                         <Label Text="KALORIEN" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding Totals.Kcal, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="16" Margin="0,4,0,8"/>
+                        <Label Text="{Binding Totals.Kcal, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="14" LineBreakMode="NoWrap" Margin="0,4,0,8"/>
                         <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
                         <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='🏋️ +{0:0} durchs Training'}" FontSize="10"
                                TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0" IsVisible="{Binding HasTrainingKcalToday}"/>
@@ -76,8 +76,8 @@
                 <Frame Grid.Column="1" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="2">
                         <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="16"
-                               LineBreakMode="WordWrap" Margin="0,4,0,8"/>
+                        <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="14"
+                               LineBreakMode="NoWrap" Margin="0,4,0,8"/>
                         <ProgressBar Progress="0.3" ProgressColor="{StaticResource ColorTertiary}"/>
                     </VerticalStackLayout>
                 </Frame>
@@ -98,7 +98,7 @@
                 <VerticalStackLayout Spacing="14">
 
                     <!-- Kalorien-Bogen -->
-                    <Grid HeightRequest="160">
+                    <Grid HeightRequest="185">
                         <GraphicsView Drawable="{Binding CalorieGaugeDrawable}" HeightRequest="130" HorizontalOptions="Fill" VerticalOptions="Start"/>
 
                         <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,40,0,0">
@@ -118,7 +118,7 @@
                             </Label>
                         </VerticalStackLayout>
 
-                        <Grid ColumnDefinitions="*,*" VerticalOptions="End" Margin="4,0,4,4">
+                        <Grid ColumnDefinitions="*,*" VerticalOptions="End" Margin="4,0,4,12">
                             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Start">
                                 <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterSemiBold" FontSize="16"/>
                                 <Label Text="Gegessen" FontSize="10" TextColor="{StaticResource ColorTextSecondary}"/>
@@ -160,11 +160,9 @@
                 <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center">
                     <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
                             Command="{Binding PreviousWeekCommand}"/>
-                    <CollectionView Grid.Column="1" ItemsSource="{Binding WeekDays}" HorizontalOptions="Center" WidthRequest="320">
-                        <CollectionView.ItemsLayout>
-                            <LinearItemsLayout Orientation="Horizontal" ItemSpacing="4"/>
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="4"
+                                           BindableLayout.ItemsSource="{Binding WeekDays}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="6,8" WidthRequest="42">
                                     <Grid.Style>
@@ -212,8 +210,8 @@
                                     </VerticalStackLayout>
                                 </Grid>
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
                     <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6"
                             Command="{Binding NextWeekCommand}"/>
                 </Grid>

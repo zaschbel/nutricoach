@@ -36,13 +36,10 @@ public partial class App : Application
     /// </summary>
     private void LoadThemeResources()
     {
-        var preference = Preferences.Default.Get(ThemePreferenceKey, "System");
-        var useDark = preference switch
-        {
-            "Dunkel" => true,
-            "Hell" => false,
-            _ => Application.Current!.RequestedTheme == AppTheme.Dark
-        };
+        // Nur Dark Mode - der Light-Mode-Zweig war fehlerhaft (Styles.xaml/StaticResource-Timing) und
+        // wird auf Nutzerwunsch nicht weiter verfolgt; die App bleibt unabhaengig von System-Einstellung
+        // oder gespeicherter Praeferenz immer im Dunkelmodus.
+        var useDark = true;
 
         if (useDark)
         {
