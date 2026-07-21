@@ -312,18 +312,38 @@ public class MainViewModel : INotifyPropertyChanged
         set { _isHealthKitConnected = value; OnPropertyChanged(); OnPropertyChanged(nameof(ShowHealthKitConnectButton)); }
     }
 
-    /// <summary>Zeigt den "Mit Apple Health verbinden"-Button nur dort, wo es überhaupt geht und noch nicht verbunden ist.</summary>
-    public bool ShowHealthKitConnectButton => IsHealthKitSupported && !IsHealthKitConnected;
+    /// <summary>
+    /// Zeigt den Verbinden-Button immer, solange noch nicht verbunden - auch wenn IsHealthKitSupported
+    /// false liefert. Der Button war zuvor komplett unsichtbar, wenn IsSupported (fälschlich oder aus
+    /// unbekanntem Grund) false war, ohne jede Rückmeldung. Jetzt bekommt man beim Tippen in jedem Fall
+    /// eine klare Meldung statt eines Buttons, der einfach nie auftaucht.
+    /// </summary>
+    public bool ShowHealthKitConnectButton => !IsHealthKitConnected;
 
     public RelayCommand ConnectHealthKitCommand { get; }
 
     private async Task ConnectHealthKitAsync()
     {
+        if (!IsHealthKitSupported)
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Schrittzähler nicht verfügbar",
+                "Dieses Gerät unterstützt keine automatische Schrittzählung über die Bewegungssensoren.", "OK");
+            return;
+        }
+
         var granted = await _healthService.RequestAuthorizationAsync();
         IsHealthKitConnected = granted;
         Preferences.Default.Set("healthkit_connected", granted);
 
-        if (granted) await SyncStepsFromHealthKitAsync();
+        if (granted)
+        {
+            await SyncStepsFromHealthKitAsync();
+        }
+        else
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Zugriff nicht erlaubt",
+                "Ohne Erlaubnis für Bewegung & Fitness kann NutriCoach die Schritte nicht automatisch auslesen. Du kannst sie weiterhin manuell eintragen.", "OK");
+        }
     }
 
     /// <summary>Holt die Schrittzahl aus Apple Health für den aktuell ausgewählten Tag und übernimmt sie (überschreibt die manuelle Eingabe).</summary>
