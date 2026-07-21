@@ -351,14 +351,24 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (!IsHealthKitConnected) return;
 
-        var steps = await _healthService.GetStepsForDateAsync(SelectedDate);
-        if (steps is null) return; // z. B. keine Daten für den Tag - dann bleibt der bisherige Wert stehen
+        try
+        {
+            // Läuft automatisch bei jedem App-Start (siehe RefreshDiaryAsync) - ein Fehler hier darf
+            // die App unter keinen Umständen abstürzen lassen, sonst kann man die App nach einer
+            // fehlgeschlagenen Verbindung nie wieder öffnen (Absturzschleife).
+            var steps = await _healthService.GetStepsForDateAsync(SelectedDate);
+            if (steps is null) return; // z. B. keine Daten für den Tag - dann bleibt der bisherige Wert stehen
 
-        _stepsForSelectedDate = steps.Value;
-        OnPropertyChanged(nameof(StepsForSelectedDate));
-        OnPropertyChanged(nameof(StepsRemainingLabel));
-        OnPropertyChanged(nameof(StepsProgressRatio));
-        _ = SaveStepsAsync(steps.Value);
+            _stepsForSelectedDate = steps.Value;
+            OnPropertyChanged(nameof(StepsForSelectedDate));
+            OnPropertyChanged(nameof(StepsRemainingLabel));
+            OnPropertyChanged(nameof(StepsProgressRatio));
+            _ = SaveStepsAsync(steps.Value);
+        }
+        catch
+        {
+            // still stehen lassen, der bisherige (manuelle) Wert bleibt gültig
+        }
     }
 
     /// <summary>
