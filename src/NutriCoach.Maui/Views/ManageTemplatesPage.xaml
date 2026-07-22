@@ -68,11 +68,9 @@
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Spacing="14">
 
-                <CollectionView ItemsSource="{Binding Templates}" ItemTemplate="{StaticResource TemplateRowTemplate}" ItemSizingStrategy="MeasureAllItems">
-                    <CollectionView.EmptyView>
-                        <Label Text="Noch keine Trainingsvorlagen angelegt" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,10"/>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Templates}" BindableLayout.ItemTemplate="{StaticResource TemplateRowTemplate}"/>
+                <Label Text="Noch keine Trainingsvorlagen angelegt" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,10"
+                       IsVisible="{Binding HasTemplates, Converter={StaticResource InverseBoolConverter}}"/>
 
                 <Button Text="+ Neue Trainingsvorlage" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding ToggleCreatePanelCommand}" IsVisible="{Binding ShowCreatePanel, Converter={StaticResource InverseBoolConverter}}"/>
@@ -91,10 +89,10 @@
                             <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="16" HeightRequest="16"/>
                             <Label Text="Suche..." FontSize="11" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
-                        <CollectionView ItemsSource="{Binding ExerciseSearchResults}" ItemTemplate="{StaticResource ExerciseResultRowTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding ExerciseSearchResults}" BindableLayout.ItemTemplate="{StaticResource ExerciseResultRowTemplate}"/>
 
                         <Label Text="Ausgewählte Übungen" FontFamily="InterSemiBold" FontSize="13" Margin="0,8,0,0" IsVisible="{Binding HasSelectedExercises}"/>
-                        <CollectionView ItemsSource="{Binding SelectedExerciseNames}" ItemTemplate="{StaticResource SelectedExerciseNameTemplate}" ItemSizingStrategy="MeasureAllItems"/>
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding SelectedExerciseNames}" BindableLayout.ItemTemplate="{StaticResource SelectedExerciseNameTemplate}"/>
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
                             <Button Grid.Column="0" Text="Abbrechen" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleCreatePanelCommand}"/>

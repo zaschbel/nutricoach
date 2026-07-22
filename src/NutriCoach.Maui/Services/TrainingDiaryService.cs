@@ -124,12 +124,38 @@ public class TrainingDiaryService
             var groups = new List<ExerciseGroupDisplay>();
 
             // ---------------- Kraftübungen: nach Muskelgruppe gruppiert, in Reihenfolge des ersten Auftretens ----------------
+            // Zuerst zaehlen, wie viele VERSCHIEDENE Uebungen je Primaer-Muskelgruppe in dieser Einheit
+            // stecken - das erkennt, ob eine Gruppe der klare Schwerpunkt des Trainings ist (z.B. 2
+            // Brust-Uebungen) oder nur zufaellig als Nebenprodukt einer einzelnen Uebung auftaucht
+            // (z.B. Dips, Primaer=Trizeps, nur 1 Uebung). Eine Einzel-Uebungs-Gruppe wird in die
+            // dominante Gruppe eingegliedert, wenn ihre Sekundaer-Muskelgruppe genau dort hinzeigt -
+            // sonst wuerde z.B. "Dips" bei einem reinen Brust-Training als eigenstaendiges "zu wenig
+            // Trizeps trainiert" bewertet, obwohl das nur bei einem echten Push-Tag Sinn ergibt.
+            var primaryExerciseCounts = s.StrengthSets
+                .Select(set => set.ExerciseName)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .GroupBy(name => byName.TryGetValue(name, out var e) ? e.PrimaryMuscleGroup : "Sonstiges")
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            string EffectiveGroupFor(string exerciseName)
+            {
+                if (!byName.TryGetValue(exerciseName, out var ex)) return "Sonstiges";
+                var primary = ex.PrimaryMuscleGroup;
+                if (primaryExerciseCounts.GetValueOrDefault(primary) == 1
+                    && !string.IsNullOrWhiteSpace(ex.SecondaryMuscleGroup)
+                    && primaryExerciseCounts.GetValueOrDefault(ex.SecondaryMuscleGroup) >= 2)
+                {
+                    return ex.SecondaryMuscleGroup;
+                }
+                return primary;
+            }
+
             var groupOrder = new List<string>();
             var setsByGroup = new Dictionary<string, List<StrengthSetEntry>>();
 
             foreach (var set in s.StrengthSets)
             {
-                var muscleGroup = byName.TryGetValue(set.ExerciseName, out var ex) ? ex.PrimaryMuscleGroup : "Sonstiges";
+                var muscleGroup = EffectiveGroupFor(set.ExerciseName);
                 if (!setsByGroup.ContainsKey(muscleGroup))
                 {
                     setsByGroup[muscleGroup] = new List<StrengthSetEntry>();
