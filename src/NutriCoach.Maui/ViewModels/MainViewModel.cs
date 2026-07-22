@@ -718,7 +718,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         try
         {
-            await _dialogService.ShowRecipesAsync(_recipeService, _favoritesService);
+            await _dialogService.ShowRecipesAsync(_recipeService, _favoritesService, _aiService);
         }
         catch (Exception ex)
         {

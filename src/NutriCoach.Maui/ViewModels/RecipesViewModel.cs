@@ -18,14 +18,16 @@ public class RecipesViewModel : INotifyPropertyChanged
     private readonly RecipeLookupService _recipeService;
     private readonly RecipeFavoritesService _favoritesService;
     private readonly IDialogService _dialogService;
+    private readonly GeminiAiService _aiService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public RecipesViewModel(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, IDialogService dialogService)
+    public RecipesViewModel(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, IDialogService dialogService, GeminiAiService aiService)
     {
         _recipeService = recipeService;
         _favoritesService = favoritesService;
         _dialogService = dialogService;
+        _aiService = aiService;
 
         SearchCommand = new RelayCommand(async _ => await SearchAsync());
         SurpriseMeCommand = new RelayCommand(async _ => await SurpriseMeAsync());
@@ -83,10 +85,23 @@ public class RecipesViewModel : INotifyPropertyChanged
         if (string.IsNullOrWhiteSpace(SearchText)) return;
 
         IsSearching = true;
-        SearchStatusText = "Suche läuft …";
+        SearchStatusText = "Übersetze Suchbegriff …";
         SearchResults.Clear();
 
-        var result = await _recipeService.SearchAsync(SearchText);
+        // TheMealDB versteht nur Englisch - deutsche Suchbegriffe erst übersetzen, sonst kommt fast
+        // immer "nichts gefunden" zurück. Schlägt die Übersetzung fehl (z. B. kein API-Key hinterlegt),
+        // wird trotzdem mit dem Original-Suchbegriff weitergesucht, statt die Suche ganz zu blockieren.
+        var (translatedQuery, translateError) = await _aiService.TranslateSearchQueryToEnglishAsync(SearchText);
+        var queryToUse = translatedQuery ?? SearchText;
+
+        SearchStatusText = "Suche läuft …";
+        var result = await _recipeService.SearchAsync(queryToUse);
+
+        if (result.Success && result.Items.Count > 0)
+        {
+            SearchStatusText = "Übersetze Ergebnisse …";
+            await _aiService.TranslateRecipesToGermanAsync(result.Items);
+        }
 
         IsSearching = false;
         foreach (var recipe in result.Items) SearchResults.Add(recipe);
@@ -97,7 +112,9 @@ public class RecipesViewModel : INotifyPropertyChanged
         }
         else if (result.Items.Count == 0)
         {
-            SearchStatusText = "Keine Rezepte gefunden. TheMealDB ist englischsprachig - probier es evtl. mit einem englischen Suchbegriff.";
+            SearchStatusText = translateError is not null
+                ? $"Keine Rezepte gefunden. Übersetzung des Suchbegriffs hat nicht geklappt ({translateError}), gesucht wurde nach \"{queryToUse}\"."
+                : "Keine Rezepte gefunden. Versuch es mit einem anderen Suchbegriff.";
         }
         else
         {
@@ -111,6 +128,12 @@ public class RecipesViewModel : INotifyPropertyChanged
         SearchStatusText = "Suche ein zufälliges Rezept …";
 
         var result = await _recipeService.GetRandomAsync();
+
+        if (result.Success && result.Item is not null)
+        {
+            SearchStatusText = "Übersetze Rezept …";
+            await _aiService.TranslateRecipesToGermanAsync(new List<Recipe> { result.Item });
+        }
 
         IsSearching = false;
 

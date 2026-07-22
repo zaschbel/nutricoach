@@ -93,9 +93,9 @@ public class DialogService : IDialogService
         return result;
     }
 
-    public async Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService)
+    public async Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, GeminiAiService aiService)
     {
-        var viewModel = new RecipesViewModel(recipeService, favoritesService, this);
+        var viewModel = new RecipesViewModel(recipeService, favoritesService, this, aiService);
         var page = new Maui.Views.RecipesPage(viewModel);
         var tcs = new TaskCompletionSource();
 

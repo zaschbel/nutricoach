@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.Maui.Storage;
+using NutriCoach.App.Models;
 
 namespace NutriCoach.Maui.Services;
 
@@ -383,6 +384,161 @@ public class GeminiAiService
         }
 
         return new AiImageResult(null, null, lastErrorMessage ?? "Keines der bekannten Bild-Modelle war erreichbar.");
+    }
+
+    /// <summary>Übersetzt einen kurzen, vom Nutzer eingegebenen Suchbegriff ins Englische, da TheMealDB
+    /// (die externe Rezept-Datenbank) nur englische Suchbegriffe findet.</summary>
+    public async Task<(string? Translated, string? Error)> TranslateSearchQueryToEnglishAsync(string germanQuery)
+    {
+        var apiKey = await GetApiKeyAsync();
+        if (string.IsNullOrWhiteSpace(apiKey))
+            return (null, "Kein Gemini-API-Key hinterlegt. In den Einstellungen einrichten.");
+
+        var prompt = "Übersetze diesen Suchbegriff für eine Rezept-Suche ins Englische. Antworte NUR mit " +
+            "der Übersetzung (1-3 Wörter, wie ein Suchbegriff), ohne Anführungszeichen, ohne Erklärung: " +
+            $"\"{germanQuery}\"";
+
+        var requestBody = new { contents = new[] { new { parts = new[] { new { text = prompt } } } } };
+        var requestJson = JsonSerializer.Serialize(requestBody);
+
+        string? lastErrorMessage = null;
+
+        foreach (var model in GetOrderedModels())
+        {
+            try
+            {
+                using var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
+                using var response = await Http.PostAsync(ApiUrl(model, apiKey), content);
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    lastErrorMessage = TryExtractErrorMessage(responseJson) ?? $"Fehler {(int)response.StatusCode}";
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound) continue;
+                    return (null, lastErrorMessage);
+                }
+
+                using var responseDoc = JsonDocument.Parse(responseJson);
+                var text = responseDoc.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString();
+
+                if (string.IsNullOrWhiteSpace(text)) return (null, "Leere Antwort von der KI erhalten.");
+                RememberWorkingModel(model);
+                return (text.Trim().Trim('"', '.', ' '), null);
+            }
+            catch (Exception ex)
+            {
+                lastErrorMessage = $"Netzwerk-/Verarbeitungsfehler: {ex.Message}";
+            }
+        }
+
+        return (null, lastErrorMessage ?? "Keines der bekannten Modelle war erreichbar.");
+    }
+
+    /// <summary>
+    /// Übersetzt eine ganze Liste von Rezepten (Name, Kategorie, Herkunft, Zutaten, Zubereitung) in
+    /// EINEM Aufruf komplett ins Deutsche, statt vieler Einzel-Aufrufe - schont das kostenlose
+    /// Anfragen-Kontingent. Mutiert die übergebenen Recipe-Objekte direkt (kein separates DTO nötig),
+    /// damit die aufrufende Stelle unverändert weiterbinden kann.
+    /// </summary>
+    public async Task<(bool Success, string? Error)> TranslateRecipesToGermanAsync(List<Recipe> recipes)
+    {
+        if (recipes.Count == 0) return (true, null);
+
+        var apiKey = await GetApiKeyAsync();
+        if (string.IsNullOrWhiteSpace(apiKey))
+            return (false, "Kein Gemini-API-Key hinterlegt. In den Einstellungen einrichten.");
+
+        var payload = recipes.Select(r => new
+        {
+            id = r.Id,
+            name = r.Name,
+            category = r.Category,
+            area = r.Area,
+            instructions = r.Instructions,
+            ingredients = r.IngredientLines
+        }).ToList();
+        var payloadJson = JsonSerializer.Serialize(payload);
+
+        var prompt =
+            "Übersetze die folgenden Rezepte komplett ins Deutsche (Name, Kategorie, Herkunftsregion, " +
+            "Zutatenliste, Zubereitungsanleitung). Übersetze NUR den Text, erfinde nichts hinzu, ändere " +
+            "keine Mengenangaben oder Zahlen. Behalte sinnvolle Zeilenumbrüche in der Anleitung bei. " +
+            "Antworte AUSSCHLIESSLICH mit einem JSON-Array, ohne Markdown, ohne Erklärung davor oder " +
+            "danach, in genau diesem Format (gleiche Reihenfolge, \"id\" unverändert übernehmen): " +
+            "[{\"id\":\"...\",\"name\":\"...\",\"category\":\"...\",\"area\":\"...\",\"instructions\":\"...\",\"ingredients\":[\"...\"]}] " +
+            "Hier die Rezepte: " + payloadJson;
+
+        var requestBody = new { contents = new[] { new { parts = new[] { new { text = prompt } } } } };
+        var requestJson = JsonSerializer.Serialize(requestBody);
+
+        string? lastErrorMessage = null;
+
+        foreach (var model in GetOrderedModels())
+        {
+            try
+            {
+                using var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
+                using var response = await Http.PostAsync(ApiUrl(model, apiKey), content);
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    lastErrorMessage = TryExtractErrorMessage(responseJson) ?? $"Fehler {(int)response.StatusCode}";
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound) continue;
+                    return (false, lastErrorMessage);
+                }
+
+                using var responseDoc = JsonDocument.Parse(responseJson);
+                var text = responseDoc.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts")[0]
+                    .GetProperty("text")
+                    .GetString();
+
+                if (string.IsNullOrWhiteSpace(text)) return (false, "Leere Antwort von der KI erhalten.");
+
+                text = text.Trim().Trim('`').Replace("json\n", "").Trim();
+
+                using var translatedDoc = JsonDocument.Parse(text);
+                foreach (var translatedItem in translatedDoc.RootElement.EnumerateArray())
+                {
+                    var id = translatedItem.TryGetProperty("id", out var idProp) ? idProp.GetString() : null;
+                    var match = recipes.FirstOrDefault(r => r.Id == id);
+                    if (match is null) continue;
+
+                    if (translatedItem.TryGetProperty("name", out var nameProp) && nameProp.GetString() is { } n && !string.IsNullOrWhiteSpace(n))
+                        match.Name = n;
+                    if (translatedItem.TryGetProperty("category", out var catProp))
+                        match.Category = catProp.GetString();
+                    if (translatedItem.TryGetProperty("area", out var areaProp))
+                        match.Area = areaProp.GetString();
+                    if (translatedItem.TryGetProperty("instructions", out var instrProp))
+                        match.Instructions = instrProp.GetString();
+                    if (translatedItem.TryGetProperty("ingredients", out var ingProp) && ingProp.ValueKind == JsonValueKind.Array)
+                    {
+                        match.IngredientLines = ingProp.EnumerateArray()
+                            .Select(e => e.GetString() ?? string.Empty)
+                            .Where(s => !string.IsNullOrWhiteSpace(s))
+                            .ToList();
+                    }
+                }
+
+                RememberWorkingModel(model);
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                lastErrorMessage = $"Netzwerk-/Verarbeitungsfehler: {ex.Message}";
+            }
+        }
+
+        return (false, lastErrorMessage ?? "Keines der bekannten Modelle war erreichbar.");
     }
 
     private static string? TryExtractErrorMessage(string responseJson)
