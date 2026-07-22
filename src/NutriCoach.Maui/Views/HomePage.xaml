@@ -37,12 +37,13 @@
                     <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
                     <Label Text="Tagesübersicht" Style="{StaticResource HeadlineLabelStyle}"/>
                 </VerticalStackLayout>
-                <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="999"
-                       Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="Center">
-                    <HorizontalStackLayout Spacing="4">
+                <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="20"
+                       Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="Center"
+                       HeightRequest="34" MinimumWidthRequest="72" HorizontalOptions="End">
+                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
                         <Label Text="&#xf06d;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="#FF7A45" VerticalOptions="Center"/>
-                        <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorAccent}" FontFamily="InterBold" FontSize="13"/>
-                        <Label Text="Tage" TextColor="{StaticResource ColorAccent}" FontFamily="InterMedium" FontSize="13"/>
+                        <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorAccent}" FontFamily="InterBold" FontSize="13" VerticalOptions="Center"/>
+                        <Label Text="Tage" TextColor="{StaticResource ColorAccent}" FontFamily="InterMedium" FontSize="13" VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                 </Frame>
             </Grid>

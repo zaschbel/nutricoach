@@ -23,11 +23,12 @@ public interface IDialogService
     Task<bool> ShowWeeklyPlanAsync(TrainingPlanService planService, int userProfileId, Dictionary<DayOfWeek, string> currentPlan);
 
     /// <summary>
-    /// Zeigt die Trainingsvorlagen-Verwaltung (anlegen/löschen/auswählen). Liefert die Übungsnamen
-    /// der ausgewählten Vorlage zurück (für die anschließende Vorbefüllung von AddTrainingPage),
-    /// oder null, wenn der Nutzer nur verwaltet hat oder abgebrochen ist.
+    /// Zeigt die Trainingsvorlagen-Verwaltung (anlegen/löschen/auswählen). Liefert die ausgewählte
+    /// Vorlage (Name + Übungsnamen) zurück - der Name wird als Trainings-Vorschlag übernommen, sonst
+    /// blieb das Namensfeld leer und der Speichern-Button dadurch stillschweigend deaktiviert - oder
+    /// null, wenn der Nutzer nur verwaltet hat oder abgebrochen ist.
     /// </summary>
-    Task<List<string>?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId);
+    Task<TemplateDisplay?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId);
 
     Task<AddFoodDialogResult> ShowAddFoodAsync(FoodLookupService lookupService, NutritionDiaryService diaryService,
         int userProfileId, MealType meal, FitnessGoal goal);

@@ -27,8 +27,9 @@ public class ManageTemplatesViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    /// <summary>Wird ausgelöst, wenn der Nutzer eine Vorlage tatsächlich "verwenden" möchte - liefert deren Übungsnamen.</summary>
-    public event Action<List<string>>? TemplateSelected;
+    /// <summary>Wird ausgelöst, wenn der Nutzer eine Vorlage tatsächlich "verwenden" möchte - liefert die
+    /// ganze Vorlage (Name + Übungsnamen), damit der Name als Trainings-Vorschlag übernommen werden kann.</summary>
+    public event Action<TemplateDisplay>? TemplateSelected;
 
     public ObservableCollection<TemplateDisplay> Templates { get; } = new();
     public bool HasTemplates => Templates.Count > 0;
@@ -94,7 +95,7 @@ public class ManageTemplatesViewModel : INotifyPropertyChanged
         SaveTemplateCommand = new RelayCommand(async _ => await SaveTemplateAsync(), _ => CanSaveTemplate());
         UseTemplateCommand = new RelayCommand(param =>
         {
-            if (param is TemplateDisplay template) TemplateSelected?.Invoke(template.ExerciseNames);
+            if (param is TemplateDisplay template) TemplateSelected?.Invoke(template);
         });
         DeleteTemplateCommand = new RelayCommand(async param =>
         {

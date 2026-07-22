@@ -1037,11 +1037,13 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (_profile is null) return;
 
-        var exerciseNames = await _dialogService.ShowManageTemplatesAsync(_templateService, _trainingService, _profile.Id);
-        if (exerciseNames is not { Count: > 0 }) return;
+        var template = await _dialogService.ShowManageTemplatesAsync(_templateService, _trainingService, _profile.Id);
+        if (template is null || template.ExerciseNames.Count == 0) return;
 
+        // Vorlagenname als Trainings-Vorschlag übernehmen - ohne das blieb SessionName leer und der
+        // Speichern-Button (braucht einen nicht-leeren Namen) war dadurch unbemerkt deaktiviert.
         var wasSaved = await _dialogService.ShowAddTrainingAsync(_trainingService, _profile.Id, SelectedDate,
-            prefilledExerciseNames: exerciseNames);
+            suggestedName: template.Name, prefilledExerciseNames: template.ExerciseNames);
 
         if (wasSaved)
         {

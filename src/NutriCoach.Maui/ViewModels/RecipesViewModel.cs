@@ -76,8 +76,12 @@ public class RecipesViewModel : INotifyPropertyChanged
 
         var result = await _recipeService.GetByCategoryAsync(_suggestedCategory);
 
+        string? translationError = null;
         if (result.Success && result.Items.Count > 0)
-            await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
+        {
+            var (translateSuccess, error) = await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
+            if (!translateSuccess) translationError = error;
+        }
 
         IsLoadingSuggestions = false;
 
@@ -88,6 +92,9 @@ public class RecipesViewModel : INotifyPropertyChanged
         }
 
         foreach (var recipe in result.Items) SuggestedRecipes.Add(recipe);
+
+        if (translationError is not null)
+            SuggestionsStatusText = $"Vorschläge konnten nicht übersetzt werden, werden auf Englisch angezeigt: {translationError}";
     }
 
     // ---------------- Modus-Umschaltung ----------------
@@ -143,10 +150,12 @@ public class RecipesViewModel : INotifyPropertyChanged
         SearchStatusText = "Suche läuft …";
         var result = await _recipeService.SearchAsync(queryToUse);
 
+        string? translationError = null;
         if (result.Success && result.Items.Count > 0)
         {
             SearchStatusText = "Übersetze Ergebnisse …";
-            await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
+            var (translateSuccess, error) = await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
+            if (!translateSuccess) translationError = error;
         }
 
         IsSearching = false;
@@ -162,6 +171,12 @@ public class RecipesViewModel : INotifyPropertyChanged
                 ? $"Keine Rezepte gefunden. Übersetzung des Suchbegriffs hat nicht geklappt ({translateError}), gesucht wurde nach \"{queryToUse}\"."
                 : "Keine Rezepte gefunden. Versuch es mit einem anderen Suchbegriff.";
         }
+        else if (translationError is not null)
+        {
+            // Suche/Anzeige hat trotzdem geklappt (Ergebnisse bleiben auf Englisch) - Fehler sichtbar
+            // machen statt stillschweigend unübersetzt anzuzeigen, wie es zuvor der Fall war.
+            SearchStatusText = $"Ergebnisse konnten nicht übersetzt werden, werden auf Englisch angezeigt: {translationError}";
+        }
         else
         {
             SearchStatusText = null;
@@ -175,10 +190,12 @@ public class RecipesViewModel : INotifyPropertyChanged
 
         var result = await _recipeService.GetRandomAsync();
 
+        string? translationError = null;
         if (result.Success && result.Item is not null)
         {
             SearchStatusText = "Übersetze Rezept …";
-            await _aiService.TranslateRecipesToGermanAsync(new List<Recipe> { result.Item }, _goalContext);
+            var (translateSuccess, error) = await _aiService.TranslateRecipesToGermanAsync(new List<Recipe> { result.Item }, _goalContext);
+            if (!translateSuccess) translationError = error;
         }
 
         IsSearching = false;
@@ -189,7 +206,9 @@ public class RecipesViewModel : INotifyPropertyChanged
             return;
         }
 
-        SearchStatusText = null;
+        SearchStatusText = translationError is not null
+            ? $"Übersetzung hat nicht geklappt, Rezept wird auf Englisch angezeigt: {translationError}"
+            : null;
         await OpenRecipeAsync(result.Item);
     }
 

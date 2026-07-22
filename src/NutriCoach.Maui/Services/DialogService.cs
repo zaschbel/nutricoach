@@ -63,13 +63,13 @@ public class DialogService : IDialogService
         return result;
     }
 
-    public async Task<List<string>?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId)
+    public async Task<TemplateDisplay?> ShowManageTemplatesAsync(WorkoutTemplateService templateService, TrainingDiaryService trainingService, int userProfileId)
     {
         var viewModel = new ManageTemplatesViewModel(templateService, trainingService, userProfileId);
         var page = new Maui.Views.ManageTemplatesPage(viewModel);
-        var tcs = new TaskCompletionSource<List<string>?>();
+        var tcs = new TaskCompletionSource<TemplateDisplay?>();
 
-        viewModel.TemplateSelected += names => tcs.TrySetResult(names);
+        viewModel.TemplateSelected += template => tcs.TrySetResult(template);
         page.CancelRequested += () => tcs.TrySetResult(null);
 
         await Navigation.PushModalAsync(page);

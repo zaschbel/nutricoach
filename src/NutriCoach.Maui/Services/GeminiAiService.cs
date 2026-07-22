@@ -481,11 +481,14 @@ public class GeminiAiService
         var prompt =
             "Übersetze die folgenden Rezepte komplett ins Deutsche (Name, Kategorie, Herkunftsregion, " +
             "Zutatenliste, Zubereitungsanleitung). Übersetze NUR den Text, erfinde nichts hinzu, ändere " +
-            "keine Mengenangaben oder Zahlen. Behalte sinnvolle Zeilenumbrüche in der Anleitung bei." +
+            "keine Mengenangaben oder Zahlen." +
             assessmentInstruction +
             " Antworte AUSSCHLIESSLICH mit einem JSON-Array, ohne Markdown, ohne Erklärung davor oder " +
             "danach, in genau diesem Format (gleiche Reihenfolge, \"id\" unverändert übernehmen): " +
             $"[{{\"id\":\"...\",\"name\":\"...\",\"category\":\"...\",\"area\":\"...\",\"instructions\":\"...\",{jsonFormatFields}}}] " +
+            "WICHTIG für gültiges JSON: \"instructions\" muss ein EINZEILIGER JSON-String sein - " +
+            "verwende dort NIEMALS echte Zeilenumbrüche, sondern schreibe stattdessen \"\\n\" (Backslash+n) " +
+            "als Trennzeichen zwischen Zubereitungsschritten, genau wie im JSON-Standard üblich. " +
             "Hier die Rezepte: " + payloadJson;
 
         var requestBody = new { contents = new[] { new { parts = new[] { new { text = prompt } } } } };
