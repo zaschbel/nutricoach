@@ -21,6 +21,26 @@
             <Setter Property="WidthRequest" Value="70"/>
             <Setter Property="HorizontalTextAlignment" Value="Center"/>
         </Style>
+        <Style x:Key="StepIconBadgeStyle" TargetType="Frame">
+            <Setter Property="WidthRequest" Value="56"/>
+            <Setter Property="HeightRequest" Value="56"/>
+            <Setter Property="CornerRadius" Value="28"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="BorderColor" Value="Transparent"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource ColorSurfaceElevated}"/>
+            <Setter Property="HorizontalOptions" Value="Start"/>
+            <Setter Property="Margin" Value="0,4,0,10"/>
+        </Style>
+        <Style x:Key="StepIconGlyphStyle" TargetType="Label">
+            <Setter Property="FontFamily" Value="FontAwesomeSolid"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="TextColor" Value="{StaticResource ColorAccent}"/>
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+            <Setter Property="HorizontalOptions" Value="Center"/>
+            <Setter Property="VerticalOptions" Value="Center"/>
+        </Style>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto" Padding="20,16">
@@ -40,6 +60,9 @@
 
                 <!-- ===== Schritt 0: Stammdaten ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=0}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf007;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Wie heißt du?" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Damit wir dich persönlich ansprechen können." Style="{StaticResource HintStyle}"/>
                     <Entry Text="{Binding Name}" Placeholder="Dein Name"/>
@@ -57,6 +80,9 @@
 
                 <!-- ===== Schritt 1: Körperdaten ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=1}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf496;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Deine Körperdaten" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Grundlage für Kalorien- und Makro-Berechnung." Style="{StaticResource HintStyle}"/>
 
@@ -72,6 +98,9 @@
 
                 <!-- ===== Schritt 2: Ziel ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=2}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf140;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Was ist dein Ziel?" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Bestimmt, wie wir deine Kalorien- und Makro-Ziele berechnen." Style="{StaticResource HintStyle}"/>
                     <Picker ItemsSource="{Binding GoalOptions}" SelectedItem="{Binding Goal}"/>
@@ -79,6 +108,9 @@
 
                 <!-- ===== Schritt 3: Zeitrahmen / Zielgewicht ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=3}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf073;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Dein Zeitrahmen" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Optional - hilft uns, realistische Etappenziele vorzuschlagen." Style="{StaticResource HintStyle}"/>
 
@@ -95,6 +127,9 @@
 
                 <!-- ===== Schritt 4: Erfahrung ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=4}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf44b;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Deine Trainingserfahrung" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Damit die Übungsauswahl zu deinem Niveau passt." Style="{StaticResource HintStyle}"/>
                     <Picker ItemsSource="{Binding ExperienceOptions}" SelectedItem="{Binding Experience}"/>
@@ -109,6 +144,9 @@
 
                 <!-- ===== Schritt 5: Letzte Entwicklung ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=5}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf201;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Wie war's zuletzt?" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Hilft uns, besser einzuschätzen, wo du gerade stehst." Style="{StaticResource HintStyle}"/>
                     <Picker ItemsSource="{Binding RecentTrendOptions}" SelectedItem="{Binding RecentTrend}"/>
@@ -119,6 +157,9 @@
 
                 <!-- ===== Schritt 6: Verletzungen ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=6}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf21e;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Verletzungen oder Einschränkungen?" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Damit der Trainingsplan Rücksicht darauf nimmt." Style="{StaticResource HintStyle}"/>
 
@@ -166,6 +207,9 @@
 
                 <!-- ===== Schritt 7: Alltag ===== -->
                 <VerticalStackLayout Spacing="4" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=7}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf0b1;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="Dein Alltag" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Fließt in die Berechnung deines Kalorienbedarfs ein." Style="{StaticResource HintStyle}"/>
 
@@ -178,6 +222,9 @@
 
                 <!-- ===== Schritt 8: Zusammenfassung ===== -->
                 <VerticalStackLayout Spacing="10" IsVisible="{Binding CurrentStep, Converter={StaticResource IntEqualsConverter}, ConverterParameter=8}">
+                    <Frame Style="{StaticResource StepIconBadgeStyle}">
+                        <Label Text="&#xf058;" Style="{StaticResource StepIconGlyphStyle}"/>
+                    </Frame>
                     <Label Text="{Binding Name, StringFormat='Alles bereit, {0}!'}" Style="{StaticResource StepLabelStyle}"/>
                     <Label Text="Kurzer Überblick, bevor's losgeht:" Style="{StaticResource HintStyle}"/>
 
