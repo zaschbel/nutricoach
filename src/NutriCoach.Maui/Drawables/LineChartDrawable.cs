@@ -32,9 +32,13 @@ public class LineChartDrawable : IDrawable
 
         const float topPadding = 22f;
         const float bottomLabelHeight = 34f;
+        // Seitlicher Rand, damit der erste/letzte Punkt (insbesondere der "Heute"-Punkt mit seiner
+        // breiteren Beschriftung) nicht exakt auf der Kante der Zeichenfläche landet und abgeschnitten wird.
+        const float sidePadding = 28f;
         var chartTop = topPadding;
         var chartBottom = dirtyRect.Height - bottomLabelHeight;
         var chartHeight = Math.Max(10, chartBottom - chartTop);
+        var plotWidth = Math.Max(10, dirtyRect.Width - sidePadding * 2);
 
         var known = _points.Where(p => p.Value.HasValue).Select(p => p.Value!.Value).ToList();
         if (known.Count == 0) known.Add(0);
@@ -47,9 +51,9 @@ public class LineChartDrawable : IDrawable
         }
         if (Math.Abs(maxValue - minValue) < 0.01) { maxValue += 1; minValue -= 1; }
 
-        var stepX = _points.Count > 1 ? dirtyRect.Width / (_points.Count - 1) : 0;
+        var stepX = _points.Count > 1 ? plotWidth / (_points.Count - 1) : 0;
         float YFor(double value) => (float)(chartBottom - (value - minValue) / (maxValue - minValue) * chartHeight);
-        float XFor(int i) => i * stepX;
+        float XFor(int i) => sidePadding + i * stepX;
 
         // Ziel-Linie: dezent gestrichelt, ganz unten gezeichnet, damit Balken/Durchschnittsfläche
         // und die eigentliche Datenlinie unveraendert obenauf bleiben und nichts verdeckt wird.
