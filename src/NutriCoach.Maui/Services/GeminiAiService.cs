@@ -444,8 +444,11 @@ public class GeminiAiService
     /// EINEM Aufruf komplett ins Deutsche, statt vieler Einzel-Aufrufe - schont das kostenlose
     /// Anfragen-Kontingent. Mutiert die übergebenen Recipe-Objekte direkt (kein separates DTO nötig),
     /// damit die aufrufende Stelle unverändert weiterbinden kann.
+    /// Ist <paramref name="goalContext"/> gesetzt (Ziel + Kalorien-/Makro-Ziel des Nutzers), bewertet
+    /// derselbe Aufruf zusätzlich, ob jedes Rezept zu diesem Ziel passt (GoalFit/GoalFitReason) -
+    /// spart einen zweiten separaten Aufruf gegenüber Übersetzung + Bewertung einzeln.
     /// </summary>
-    public async Task<(bool Success, string? Error)> TranslateRecipesToGermanAsync(List<Recipe> recipes)
+    public async Task<(bool Success, string? Error)> TranslateRecipesToGermanAsync(List<Recipe> recipes, string? goalContext = null)
     {
         if (recipes.Count == 0) return (true, null);
 
@@ -464,13 +467,25 @@ public class GeminiAiService
         }).ToList();
         var payloadJson = JsonSerializer.Serialize(payload);
 
+        var assessmentInstruction = string.IsNullOrWhiteSpace(goalContext)
+            ? ""
+            : $" Bewerte außerdem für jedes Rezept, ob es zum folgenden Nutzerziel passt: {goalContext} " +
+              "Ergänze dafür im JSON pro Rezept \"goalFit\" (GENAU einer der drei Werte: \"Gut fürs Ziel\", " +
+              "\"Neutral\", \"Nicht ideal\") und \"goalFitReason\" (ein kurzer, konkreter Satz, der erklärt " +
+              "warum - bezogen auf Kalorien/Makros/Zutaten des Rezepts im Verhältnis zum Ziel).";
+
+        var jsonFormatFields = string.IsNullOrWhiteSpace(goalContext)
+            ? "\"ingredients\":[\"...\"]"
+            : "\"ingredients\":[\"...\"],\"goalFit\":\"...\",\"goalFitReason\":\"...\"";
+
         var prompt =
             "Übersetze die folgenden Rezepte komplett ins Deutsche (Name, Kategorie, Herkunftsregion, " +
             "Zutatenliste, Zubereitungsanleitung). Übersetze NUR den Text, erfinde nichts hinzu, ändere " +
-            "keine Mengenangaben oder Zahlen. Behalte sinnvolle Zeilenumbrüche in der Anleitung bei. " +
-            "Antworte AUSSCHLIESSLICH mit einem JSON-Array, ohne Markdown, ohne Erklärung davor oder " +
+            "keine Mengenangaben oder Zahlen. Behalte sinnvolle Zeilenumbrüche in der Anleitung bei." +
+            assessmentInstruction +
+            " Antworte AUSSCHLIESSLICH mit einem JSON-Array, ohne Markdown, ohne Erklärung davor oder " +
             "danach, in genau diesem Format (gleiche Reihenfolge, \"id\" unverändert übernehmen): " +
-            "[{\"id\":\"...\",\"name\":\"...\",\"category\":\"...\",\"area\":\"...\",\"instructions\":\"...\",\"ingredients\":[\"...\"]}] " +
+            $"[{{\"id\":\"...\",\"name\":\"...\",\"category\":\"...\",\"area\":\"...\",\"instructions\":\"...\",{jsonFormatFields}}}] " +
             "Hier die Rezepte: " + payloadJson;
 
         var requestBody = new { contents = new[] { new { parts = new[] { new { text = prompt } } } } };
@@ -527,6 +542,10 @@ public class GeminiAiService
                             .Where(s => !string.IsNullOrWhiteSpace(s))
                             .ToList();
                     }
+                    if (translatedItem.TryGetProperty("goalFit", out var goalFitProp))
+                        match.GoalFit = goalFitProp.GetString();
+                    if (translatedItem.TryGetProperty("goalFitReason", out var goalFitReasonProp))
+                        match.GoalFitReason = goalFitReasonProp.GetString();
                 }
 
                 RememberWorkingModel(model);

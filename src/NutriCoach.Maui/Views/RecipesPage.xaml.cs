@@ -12,6 +12,17 @@ public partial class RecipesPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
+        Loaded += async (_, _) =>
+        {
+            try
+            {
+                await _viewModel.LoadSuggestedRecipesAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Vorschläge konnten nicht geladen werden", ex.ToString(), "OK");
+            }
+        };
     }
 
     private void OnCancelTapped(object? sender, EventArgs e) => CancelRequested?.Invoke();

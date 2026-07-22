@@ -27,6 +27,14 @@ public class Recipe
 
     public bool HasThumbnail => !string.IsNullOrWhiteSpace(ThumbnailUrl);
 
+    /// <summary>Kurze KI-Einschätzung, ob das Rezept zum Nutzerziel passt (z. B. "Gut fürs Ziel", "Neutral", "Nicht ideal") - null, solange nicht bewertet.</summary>
+    public string? GoalFit { get; set; }
+
+    /// <summary>Ein-Satz-Begründung zur GoalFit-Einschätzung.</summary>
+    public string? GoalFitReason { get; set; }
+
+    public bool HasGoalFit => !string.IsNullOrWhiteSpace(GoalFit);
+
     /// <summary>Kategorie und Herkunftsregion kombiniert für eine kompakte Anzeige (z. B. "Dessert · Italian").</summary>
     public string CategoryAreaLabel
     {

@@ -36,7 +36,8 @@ public interface IDialogService
         double? initialAmountGrams = null, bool isEditMode = false);
 
     /// <summary>Zeigt die Rezepte-Seite (Suche + Favoriten). Schließt sich selbst, kein Rückgabewert nötig.</summary>
-    Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, GeminiAiService aiService);
+    Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, GeminiAiService aiService,
+        string? goalContext = null, string? suggestedCategory = null);
 
     /// <summary>Zeigt die Detailseite eines einzelnen Rezepts (Zutaten, Zubereitung, Favorisieren).</summary>
     Task ShowRecipeDetailAsync(Recipe recipe, RecipeFavoritesService favoritesService);

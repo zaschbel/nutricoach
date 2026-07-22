@@ -718,7 +718,28 @@ public class MainViewModel : INotifyPropertyChanged
     {
         try
         {
-            await _dialogService.ShowRecipesAsync(_recipeService, _favoritesService, _aiService);
+            // Ziel + Kalorien-/Makro-Ziel als Kontext für die KI-Bewertung der Rezepte mitgeben, plus
+            // eine zum Ziel passende TheMealDB-Kategorie für die "Für dein Ziel"-Vorschläge (die
+            // Datenbank hat keine Nährwerte, deshalb nur eine grobe, plausible Kategorie-Zuordnung).
+            string? goalContext = null;
+            string? suggestedCategory = null;
+            if (_profile is not null)
+            {
+                var kcalTarget = BmrCalculator.CalculateCalorieTarget(_profile);
+                var macros = BmrCalculator.CalculateMacroTargets(_profile);
+                goalContext = $"Ziel: {_profile.Goal}. Tägliches Kalorienziel: {kcalTarget:0} kcal, " +
+                    $"Eiweiß {macros.ProteinG:0}g, Kohlenhydrate {macros.CarbsG:0}g, Fett {macros.FatG:0}g.";
+                suggestedCategory = _profile.Goal switch
+                {
+                    FitnessGoal.Abnehmen => "Seafood",
+                    FitnessGoal.MuskelAufbau => "Chicken",
+                    FitnessGoal.KraftSteigern => "Beef",
+                    FitnessGoal.AusdauerVerbessern => "Pasta",
+                    _ => "Chicken"
+                };
+            }
+
+            await _dialogService.ShowRecipesAsync(_recipeService, _favoritesService, _aiService, goalContext, suggestedCategory);
         }
         catch (Exception ex)
         {

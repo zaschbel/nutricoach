@@ -23,6 +23,20 @@
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
                         <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="14"/>
                         <Label Text="{Binding CategoryAreaLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasCategoryAreaLabel}"/>
+                        <Label Text="{Binding GoalFit}" FontFamily="InterSemiBold" FontSize="11" IsVisible="{Binding HasGoalFit}" Margin="0,2,0,0">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding GoalFit}" Value="Gut fürs Ziel">
+                                    <Setter Property="TextColor" Value="{StaticResource ColorSuccess}"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GoalFit}" Value="Nicht ideal">
+                                    <Setter Property="TextColor" Value="#E08A2E"/>
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding GoalFit}" Value="Neutral">
+                                    <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                        <Label Text="{Binding GoalFitReason}" FontSize="10" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasGoalFit}" LineBreakMode="WordWrap"/>
                     </VerticalStackLayout>
                 </Grid>
             </Frame>
@@ -57,6 +71,18 @@
 
             <!-- Suche -->
             <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSearchMode}">
+
+                <!-- Für dein Ziel: Vorschläge passend zum Kalorien-/Trainingsziel -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding HasSuggestedRecipes}">
+                    <Label Text="Für dein Ziel" FontFamily="InterSemiBold" FontSize="14"/>
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding SuggestedRecipes}" BindableLayout.ItemTemplate="{StaticResource RecipeResultTemplate}"/>
+                </VerticalStackLayout>
+                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsLoadingSuggestions}">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="16" HeightRequest="16"/>
+                    <Label Text="Suche Vorschläge für dein Ziel..." FontSize="11" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+                <Label Text="{Binding SuggestionsStatusText}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasSuggestionsStatus}"/>
+
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Entry Grid.Column="0" Text="{Binding SearchText}" Placeholder="Rezept suchen (z. B. Chicken, Pasta)..." ReturnCommand="{Binding SearchCommand}"/>
                     <Button Grid.Column="1" Text="Suchen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SearchCommand}"/>

@@ -19,15 +19,20 @@ public class RecipesViewModel : INotifyPropertyChanged
     private readonly RecipeFavoritesService _favoritesService;
     private readonly IDialogService _dialogService;
     private readonly GeminiAiService _aiService;
+    private readonly string? _goalContext;
+    private readonly string? _suggestedCategory;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public RecipesViewModel(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, IDialogService dialogService, GeminiAiService aiService)
+    public RecipesViewModel(RecipeLookupService recipeService, RecipeFavoritesService favoritesService, IDialogService dialogService,
+        GeminiAiService aiService, string? goalContext = null, string? suggestedCategory = null)
     {
         _recipeService = recipeService;
         _favoritesService = favoritesService;
         _dialogService = dialogService;
         _aiService = aiService;
+        _goalContext = goalContext;
+        _suggestedCategory = suggestedCategory;
 
         SearchCommand = new RelayCommand(async _ => await SearchAsync());
         SurpriseMeCommand = new RelayCommand(async _ => await SurpriseMeAsync());
@@ -42,6 +47,47 @@ public class RecipesViewModel : INotifyPropertyChanged
 
         SearchResults.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSearchResults));
         Favorites.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasFavorites));
+        SuggestedRecipes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSuggestedRecipes));
+    }
+
+    // ---------------- Vorschläge "Für dein Ziel" ----------------
+    public ObservableCollection<Recipe> SuggestedRecipes { get; } = new();
+    public bool HasSuggestedRecipes => SuggestedRecipes.Count > 0;
+
+    private bool _isLoadingSuggestions;
+    public bool IsLoadingSuggestions { get => _isLoadingSuggestions; set { _isLoadingSuggestions = value; OnPropertyChanged(); } }
+
+    private string? _suggestionsStatusText;
+    public string? SuggestionsStatusText { get => _suggestionsStatusText; set { _suggestionsStatusText = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasSuggestionsStatus)); } }
+    public bool HasSuggestionsStatus => !string.IsNullOrWhiteSpace(SuggestionsStatusText);
+
+    /// <summary>
+    /// Lädt ein paar Rezepte aus einer zum Nutzerziel passenden Kategorie (z. B. "Chicken" bei
+    /// Muskelaufbau) und bewertet/übersetzt sie sofort mit - wird beim Öffnen der Seite einmal
+    /// automatisch aufgerufen (siehe RecipesPage.xaml.cs).
+    /// </summary>
+    public async Task LoadSuggestedRecipesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_suggestedCategory)) return;
+
+        IsLoadingSuggestions = true;
+        SuggestionsStatusText = null;
+        SuggestedRecipes.Clear();
+
+        var result = await _recipeService.GetByCategoryAsync(_suggestedCategory);
+
+        if (result.Success && result.Items.Count > 0)
+            await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
+
+        IsLoadingSuggestions = false;
+
+        if (!result.Success)
+        {
+            SuggestionsStatusText = $"Vorschläge konnten nicht geladen werden: {result.ErrorMessage}";
+            return;
+        }
+
+        foreach (var recipe in result.Items) SuggestedRecipes.Add(recipe);
     }
 
     // ---------------- Modus-Umschaltung ----------------
@@ -100,7 +146,7 @@ public class RecipesViewModel : INotifyPropertyChanged
         if (result.Success && result.Items.Count > 0)
         {
             SearchStatusText = "Übersetze Ergebnisse …";
-            await _aiService.TranslateRecipesToGermanAsync(result.Items);
+            await _aiService.TranslateRecipesToGermanAsync(result.Items, _goalContext);
         }
 
         IsSearching = false;
@@ -132,7 +178,7 @@ public class RecipesViewModel : INotifyPropertyChanged
         if (result.Success && result.Item is not null)
         {
             SearchStatusText = "Übersetze Rezept …";
-            await _aiService.TranslateRecipesToGermanAsync(new List<Recipe> { result.Item });
+            await _aiService.TranslateRecipesToGermanAsync(new List<Recipe> { result.Item }, _goalContext);
         }
 
         IsSearching = false;

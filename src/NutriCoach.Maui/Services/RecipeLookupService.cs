@@ -128,4 +128,43 @@ public class RecipeLookupService
         if (!element.TryGetProperty(propertyName, out var value)) return null;
         return value.ValueKind == JsonValueKind.String ? value.GetString() : null;
     }
+
+    /// <summary>
+    /// Holt Rezepte einer Kategorie (filter.php?c=...) für die "Für dein Ziel"-Vorschläge. Dieser
+    /// Endpunkt liefert nur Id/Name/Bild ohne Zutaten/Anleitung, deshalb wird jedes Ergebnis danach
+    /// per GetByIdAsync einzeln nachgeladen, um vollständige Recipe-Objekte zu bekommen.
+    /// </summary>
+    public async Task<RecipeSearchResult> GetByCategoryAsync(string category, int limit = 5)
+    {
+        try
+        {
+            var url = $"filter.php?c={Uri.EscapeDataString(category)}";
+            await using var stream = await Http.GetStreamAsync(url);
+            using var doc = await JsonDocument.ParseAsync(stream);
+
+            var ids = new List<string>();
+            if (doc.RootElement.TryGetProperty("meals", out var meals) && meals.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var meal in meals.EnumerateArray())
+                {
+                    var id = GetString(meal, "idMeal");
+                    if (!string.IsNullOrWhiteSpace(id)) ids.Add(id);
+                    if (ids.Count >= limit) break;
+                }
+            }
+
+            var recipes = new List<Recipe>();
+            foreach (var id in ids)
+            {
+                var detail = await GetByIdAsync(id);
+                if (detail.Item is not null) recipes.Add(detail.Item);
+            }
+
+            return new RecipeSearchResult(recipes, true, null);
+        }
+        catch (Exception ex)
+        {
+            return new RecipeSearchResult(new List<Recipe>(), false, ex.Message);
+        }
+    }
 }
