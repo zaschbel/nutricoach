@@ -4,6 +4,9 @@ using Microsoft.Maui.Storage;
 
 namespace NutriCoach.Maui.Services;
 
+/// <summary>Ergebnis der Zukunftsbild-Generierung: entweder die rohen Bilddaten + Mimetype, oder ein Fehlergrund.</summary>
+public record AiImageResult(byte[]? ImageBytes, string? MimeType, string? Error);
+
 /// <summary>
 /// Ruft Googles Gemini API auf (statt Anthropic) - Google bietet für die Gemini-API eine echte
 /// kostenlose Stufe ohne Kreditkarte an (über Google AI Studio), was das Zahlungs-Problem bei
@@ -17,6 +20,12 @@ public class GeminiAiService
     // falls Google das nochmal macht: das aktuelle Flaggschiff zuerst, dann zwei bekannte Rückfallebenen.
     private static readonly string[] ModelsToTry = { "gemini-3.5-flash", "gemini-3-flash-preview", "gemini-2.5-flash" };
     private const string LastWorkingModelKey = "gemini_last_working_model";
+
+    // Bild-GENERIERUNG/-Bearbeitung braucht eine eigene Modell-Familie (responseModalities inkl. IMAGE) -
+    // die normalen Text-Modelle oben können das nicht, deshalb komplett getrennte Liste + eigener
+    // "zuletzt funktioniert"-Preference-Key, damit sich Text- und Bild-Fallback nicht gegenseitig stören.
+    private static readonly string[] ImageModelsToTry = { "gemini-3-flash-image", "gemini-2.5-flash-image", "gemini-2.0-flash-exp-image-generation" };
+    private const string LastWorkingImageModelKey = "gemini_last_working_image_model";
 
     /// <summary>
     /// Merkt sich das zuletzt erfolgreich genutzte Modell und probiert es beim nächsten Mal zuerst -
@@ -38,6 +47,23 @@ public class GeminiAiService
     }
 
     private static void RememberWorkingModel(string model) => Preferences.Default.Set(LastWorkingModelKey, model);
+
+    /// <summary>Analoge Fallback-Reihenfolge wie GetOrderedModels(), aber für die separate Bild-Modell-Liste.</summary>
+    private static IEnumerable<string> GetOrderedImageModels()
+    {
+        var lastWorking = Preferences.Default.Get(LastWorkingImageModelKey, string.Empty);
+        if (!string.IsNullOrWhiteSpace(lastWorking) && ImageModelsToTry.Contains(lastWorking))
+        {
+            yield return lastWorking;
+            foreach (var m in ImageModelsToTry.Where(m => m != lastWorking)) yield return m;
+        }
+        else
+        {
+            foreach (var m in ImageModelsToTry) yield return m;
+        }
+    }
+
+    private static void RememberWorkingImageModel(string model) => Preferences.Default.Set(LastWorkingImageModelKey, model);
     private static string ApiUrl(string model, string apiKey) =>
         $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
 
@@ -272,6 +298,91 @@ public class GeminiAiService
         }
 
         return new AiFoodPhotoResult("", 0, 0, 0, 0, lastErrorMessage ?? "Keines der bekannten Modelle war erreichbar.");
+    }
+
+    /// <summary>
+    /// Schickt ein Foto einer Person an Gemini und lässt es dasselbe Foto so bearbeiten, dass es zeigt,
+    /// wie die Person nach 6 Monaten konsequenter Ernährung/Training realistisch aussehen könnte -
+    /// gleiches Bild-Input-Prinzip wie AnalyzeFoodPhotoAsync (inline_data), nur mit responseModalities
+    /// TEXT+IMAGE, damit auch ein Bild zurückkommt (nicht nur Text wie bei den anderen Methoden hier).
+    /// </summary>
+    public async Task<AiImageResult> GenerateFutureBodyImageAsync(byte[] imageBytes, string mimeType, string transformationPrompt)
+    {
+        var apiKey = await GetApiKeyAsync();
+        if (string.IsNullOrWhiteSpace(apiKey))
+            return new AiImageResult(null, null, "Kein Gemini-API-Key hinterlegt. In den Einstellungen einrichten.");
+
+        var base64Image = Convert.ToBase64String(imageBytes);
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new object[]
+                    {
+                        new { text = transformationPrompt },
+                        new { inline_data = new { mime_type = mimeType, data = base64Image } }
+                    }
+                }
+            },
+            generationConfig = new { responseModalities = new[] { "TEXT", "IMAGE" } }
+        };
+        var requestJson = JsonSerializer.Serialize(requestBody);
+
+        string? lastErrorMessage = null;
+
+        foreach (var model in GetOrderedImageModels())
+        {
+            try
+            {
+                using var content = new StringContent(requestJson, Encoding.UTF8, "application/json");
+                using var response = await Http.PostAsync(ApiUrl(model, apiKey), content);
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    lastErrorMessage = TryExtractErrorMessage(responseJson) ?? $"Fehler {(int)response.StatusCode}";
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound) continue;
+                    return new AiImageResult(null, null, lastErrorMessage);
+                }
+
+                using var responseDoc = JsonDocument.Parse(responseJson);
+                var parts = responseDoc.RootElement
+                    .GetProperty("candidates")[0]
+                    .GetProperty("content")
+                    .GetProperty("parts");
+
+                // Nicht auf einen festen Index verlassen - je nach Modell kann erst der Text-Teil,
+                // dann das Bild kommen oder umgekehrt. Deshalb das Array durchsuchen, bis ein Teil
+                // mit inlineData/inline_data gefunden wird (Google nutzt hier inkonsistent camelCase
+                // in der Response, auch wenn der Request snake_case erwartet).
+                foreach (var part in parts.EnumerateArray())
+                {
+                    JsonElement inlineData;
+                    if (part.TryGetProperty("inlineData", out inlineData) || part.TryGetProperty("inline_data", out inlineData))
+                    {
+                        var resultMimeType = inlineData.TryGetProperty("mimeType", out var mt) ? mt.GetString()
+                            : inlineData.TryGetProperty("mime_type", out var mt2) ? mt2.GetString()
+                            : "image/png";
+                        var base64Data = inlineData.GetProperty("data").GetString();
+                        if (string.IsNullOrWhiteSpace(base64Data))
+                            return new AiImageResult(null, null, "Leere Bilddaten von der KI erhalten.");
+
+                        RememberWorkingImageModel(model);
+                        return new AiImageResult(Convert.FromBase64String(base64Data), resultMimeType ?? "image/png", null);
+                    }
+                }
+
+                lastErrorMessage = "Die KI hat kein Bild zurückgegeben (nur Text oder leere Antwort).";
+            }
+            catch (Exception ex)
+            {
+                lastErrorMessage = $"Netzwerk-/Verarbeitungsfehler: {ex.Message}";
+            }
+        }
+
+        return new AiImageResult(null, null, lastErrorMessage ?? "Keines der bekannten Bild-Modelle war erreichbar.");
     }
 
     private static string? TryExtractErrorMessage(string responseJson)

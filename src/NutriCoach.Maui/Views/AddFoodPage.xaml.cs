@@ -1,4 +1,5 @@
 using NutriCoach.App.ViewModels;
+using NutriCoach.Maui.Services;
 
 namespace NutriCoach.Maui.Views;
 
@@ -63,21 +64,10 @@ public partial class AddFoodPage : ContentPage
         // (im Gegensatz zu Galerie-Auswahl) - deshalb das tatsaechliche Format direkt an den Magic
         // Bytes der Bilddaten erkennen, statt der Metadaten zu vertrauen und ggf. das falsche
         // mime_type an die Gemini-API zu schicken (die das dann als "nicht unterstuetzt" ablehnt).
-        var mimeType = DetectImageMimeType(imageBytes) ?? photo.ContentType;
+        var mimeType = ImageMimeTypeSniffer.DetectImageMimeType(imageBytes) ?? photo.ContentType;
         if (string.IsNullOrWhiteSpace(mimeType)) mimeType = "image/jpeg";
 
         await _viewModel.AnalyzePhotoAsync(imageBytes, mimeType);
-    }
-
-    private static string? DetectImageMimeType(byte[] bytes)
-    {
-        if (bytes.Length >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
-            return "image/png";
-        if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
-            return "image/jpeg";
-        if (bytes.Length >= 12 && bytes[8] == 0x48 && bytes[9] == 0x45 && bytes[10] == 0x49 && bytes[11] == 0x43)
-            return "image/heic";
-        return null;
     }
 
     private async void OnScanBarcodeClicked(object? sender, EventArgs e)

@@ -2,8 +2,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Storage;
 using NutriCoach.App.Services;
 using NutriCoach.Maui.Drawables;
+using NutriCoach.Maui.Services;
 
 namespace NutriCoach.App.ViewModels;
 
@@ -17,6 +19,7 @@ public class StatistikenViewModel : INotifyPropertyChanged
     private readonly UserProfileService _profileService;
     private readonly NutritionDiaryService _diaryService;
     private readonly TrainingDiaryService _trainingService;
+    private readonly GeminiAiService _aiService = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -30,6 +33,14 @@ public class StatistikenViewModel : INotifyPropertyChanged
         {
             if (param is string tab) SubTab = tab;
         });
+
+        ResetFutureBodyCommand = new RelayCommand(_ =>
+        {
+            HasFutureImage = false;
+            FutureImageErrorMessage = "";
+        });
+
+        LoadFutureBodyState();
     }
 
     private string _subTab = "Ernährung";
@@ -42,12 +53,159 @@ public class StatistikenViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsErnaehrungTab));
             OnPropertyChanged(nameof(IsCardioTab));
+            OnPropertyChanged(nameof(IsZukunftsbildTab));
         }
     }
 
     public bool IsErnaehrungTab => SubTab == "Ernährung";
     public bool IsCardioTab => SubTab == "Cardio";
+    public bool IsZukunftsbildTab => SubTab == "Zukunftsbild";
     public RelayCommand SelectSubTabCommand { get; }
+
+    // ---------------- Zukunftsbild (KI-Vorschau "du in 6 Monaten") ----------------
+    private const string FutureBodyOriginalFileName = "future_body_original.jpg";
+    private const string FutureBodyGeneratedFileName = "future_body_generated.jpg";
+    private const string FutureBodyGeneratedAtPrefKey = "future_body_generated_at";
+    private const string FutureBodyProjectedKgChangePrefKey = "future_body_projected_kg_change";
+
+    private static string FutureBodyOriginalPath => Path.Combine(FileSystem.AppDataDirectory, FutureBodyOriginalFileName);
+    private static string FutureBodyGeneratedPath => Path.Combine(FileSystem.AppDataDirectory, FutureBodyGeneratedFileName);
+
+    private bool _hasFutureImage;
+    public bool HasFutureImage
+    {
+        get => _hasFutureImage;
+        set { _hasFutureImage = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFutureBodySetupVisible)); OnPropertyChanged(nameof(IsFutureBodyComparisonVisible)); }
+    }
+
+    private bool _isGeneratingFutureImage;
+    public bool IsGeneratingFutureImage
+    {
+        get => _isGeneratingFutureImage;
+        set { _isGeneratingFutureImage = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFutureBodySetupVisible)); OnPropertyChanged(nameof(IsFutureBodyComparisonVisible)); }
+    }
+
+    /// <summary>Setup-Ansicht (Erklärung + Foto aufnehmen/wählen) - solange noch kein Bild da ist und gerade nichts läuft.</summary>
+    public bool IsFutureBodySetupVisible => !HasFutureImage && !IsGeneratingFutureImage;
+    /// <summary>Vergleichs-Ansicht (Vorher/Nachher-Schieberegler) - sobald ein Bild vorliegt und gerade nichts (neu) läuft.</summary>
+    public bool IsFutureBodyComparisonVisible => HasFutureImage && !IsGeneratingFutureImage;
+
+    private string _futureImageErrorMessage = "";
+    public string FutureImageErrorMessage { get => _futureImageErrorMessage; set { _futureImageErrorMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasFutureImageError)); } }
+    public bool HasFutureImageError => !string.IsNullOrWhiteSpace(FutureImageErrorMessage);
+
+    private string _originalImagePath = "";
+    public string OriginalImagePath { get => _originalImagePath; set { _originalImagePath = value; OnPropertyChanged(); } }
+
+    private string _generatedImagePath = "";
+    public string GeneratedImagePath { get => _generatedImagePath; set { _generatedImagePath = value; OnPropertyChanged(); } }
+
+    private string _projectedChangeLabel = "";
+    public string ProjectedChangeLabel { get => _projectedChangeLabel; set { _projectedChangeLabel = value; OnPropertyChanged(); } }
+
+    public RelayCommand ResetFutureBodyCommand { get; }
+
+    /// <summary>Prüft beim Start, ob bereits ein zuvor generiertes Zukunftsbild auf dem Gerät liegt (Dateien +
+    /// Preferences), damit man es direkt sieht statt jedes Mal neu ein Foto aufnehmen zu müssen.</summary>
+    private void LoadFutureBodyState()
+    {
+        var hasFiles = File.Exists(FutureBodyOriginalPath) && File.Exists(FutureBodyGeneratedPath);
+        if (!hasFiles)
+        {
+            HasFutureImage = false;
+            return;
+        }
+
+        OriginalImagePath = FutureBodyOriginalPath;
+        GeneratedImagePath = FutureBodyGeneratedPath;
+        var projectedKgChange = Preferences.Default.Get(FutureBodyProjectedKgChangePrefKey, 0.0);
+        ProjectedChangeLabel = BuildProjectedChangeLabel(projectedKgChange);
+        HasFutureImage = true;
+    }
+
+    private static string BuildProjectedChangeLabel(double projectedKgChange)
+    {
+        if (Math.Abs(projectedKgChange) < 0.1) return "Geschätzte Veränderung in 6 Monaten: keine nennenswerte Veränderung";
+        var sign = projectedKgChange > 0 ? "+" : "";
+        return $"Geschätzte Veränderung in 6 Monaten: {sign}{projectedKgChange:0.0} kg";
+    }
+
+    /// <summary>
+    /// Berechnet aus dem Profil (TDEE vs. Kalorienziel) eine realistische Gewichtsprognose für 6 Monate und
+    /// schickt das aufgenommene/gewählte Foto zusammen mit dieser Prognose an Gemini, um ein bearbeitetes
+    /// "Zukunftsbild" zu erzeugen. Wird NUR durch einen expliziten Button-Tap in StatistikenPage ausgelöst -
+    /// kein automatischer Start beim App-Start (Absicht, siehe Lehren aus dem Schrittzähler-Feature).
+    /// </summary>
+    public async Task GenerateFutureBodyImageAsync(byte[] imageBytes, string mimeType)
+    {
+        IsGeneratingFutureImage = true;
+        FutureImageErrorMessage = "";
+
+        try
+        {
+            var profile = await _profileService.GetActiveProfileAsync();
+            if (profile is null)
+            {
+                FutureImageErrorMessage = "Kein aktives Profil gefunden. Bitte zuerst ein Profil anlegen.";
+                return;
+            }
+
+            var tdee = BmrCalculator.CalculateTdee(profile);
+            var calorieTarget = BmrCalculator.CalculateCalorieTarget(profile);
+            var dailyDeficitOrSurplus = calorieTarget - tdee;
+            // 182 Tage ≈ 6 Monate, ~7700 kcal pro kg Körperfett (gleiche Faustregel wie in
+            // BmrCalculator.CalculateCalorieTarget schon implizit verwendet).
+            var projectedKgChange = Math.Clamp(dailyDeficitOrSurplus * 182 / 7700.0, -15, 15);
+
+            var direction = projectedKgChange < -0.1 ? "healthy weight loss" : projectedKgChange > 0.1 ? "healthy weight/muscle gain" : "body recomposition";
+            var absChange = Math.Abs(projectedKgChange);
+            var prompt =
+                "This is a real photo of a person. Generate a photorealistic edited version of the SAME photo " +
+                "showing how this person's body might realistically look after 6 months of consistent healthy " +
+                $"eating and exercise, resulting in approximately {(projectedKgChange >= 0 ? "+" : "-")}{absChange:0.0} kg change in body weight. " +
+                "Keep the exact same face, identity, pose, camera angle, lighting, background, and clothing style - " +
+                $"only adjust visible body composition (fat/muscle) in a realistic, non-exaggerated way appropriate for a {direction} over 6 months. " +
+                "Do not add any text, watermark, or overlay to the image.";
+
+            var result = await _aiService.GenerateFutureBodyImageAsync(imageBytes, mimeType, prompt);
+
+            if (result.Error is not null)
+            {
+                FutureImageErrorMessage = result.Error;
+                return;
+            }
+            if (result.ImageBytes is null || result.ImageBytes.Length == 0)
+            {
+                FutureImageErrorMessage = "Die KI hat kein verwertbares Bild zurückgegeben.";
+                return;
+            }
+
+            await File.WriteAllBytesAsync(FutureBodyOriginalPath, imageBytes);
+            await File.WriteAllBytesAsync(FutureBodyGeneratedPath, result.ImageBytes);
+
+            Preferences.Default.Set(FutureBodyGeneratedAtPrefKey, DateTime.UtcNow.ToString("O"));
+            Preferences.Default.Set(FutureBodyProjectedKgChangePrefKey, projectedKgChange);
+
+            // Pfade kurz auf "" setzen und neu zuweisen, damit die Image-Controls das gerade
+            // überschriebene Bild neu laden statt (bei identischem Dateinamen) das alte gecachte Bild
+            // weiter anzuzeigen.
+            OriginalImagePath = "";
+            GeneratedImagePath = "";
+            OriginalImagePath = FutureBodyOriginalPath;
+            GeneratedImagePath = FutureBodyGeneratedPath;
+
+            ProjectedChangeLabel = BuildProjectedChangeLabel(projectedKgChange);
+            HasFutureImage = true;
+        }
+        catch (Exception ex)
+        {
+            FutureImageErrorMessage = $"Fehler bei der Zukunftsbild-Erstellung: {ex}";
+        }
+        finally
+        {
+            IsGeneratingFutureImage = false;
+        }
+    }
 
     // ---------------- Körpergewicht ----------------
     private string _weightCurrentLabel = "";
