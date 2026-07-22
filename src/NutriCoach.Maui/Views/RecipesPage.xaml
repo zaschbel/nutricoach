@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="NutriCoach.Maui.Views.RecipesPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             x:Name="Root">
+
+    <ContentPage.Resources>
+        <DataTemplate x:Key="RecipeResultTemplate">
+            <Frame BackgroundColor="{StaticResource ColorSurface}" CornerRadius="12" Padding="10" Margin="0,0,0,6" HasShadow="False" BorderColor="Transparent">
+                <Grid ColumnDefinitions="56,*" BackgroundColor="Transparent">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding BindingContext.SelectRecipeCommand, Source={x:Reference Root}}"
+                                               CommandParameter="{Binding}"/>
+                    </Grid.GestureRecognizers>
+                    <Border Grid.Column="0" WidthRequest="56" HeightRequest="56" StrokeThickness="0" Margin="0,0,10,0"
+                            BackgroundColor="{StaticResource ColorSurfaceElevated}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12"/>
+                        </Border.StrokeShape>
+                        <Image Source="{Binding ThumbnailUrl}" Aspect="AspectFill" IsVisible="{Binding HasThumbnail}"/>
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="14"/>
+                        <Label Text="{Binding CategoryAreaLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasCategoryAreaLabel}"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" Text="Rezepte entdecken" Style="{StaticResource HeadlineLabelStyle}"/>
+                <Label Grid.Column="1" Text="&#xf00d;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="Transparent">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCancelTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+
+            <!-- Modus -->
+            <HorizontalStackLayout Spacing="8">
+                <Button Text="Suche" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeSearch" ContentLayout="Left,6">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf002;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Text="Favoriten" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Clicked="OnModeFavoriten" ContentLayout="Left,6">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf005;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
+                    </Button.ImageSource>
+                </Button>
+            </HorizontalStackLayout>
+
+            <!-- Suche -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsSearchMode}">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Entry Grid.Column="0" Text="{Binding SearchText}" Placeholder="Rezept suchen (z. B. Chicken, Pasta)..." ReturnCommand="{Binding SearchCommand}"/>
+                    <Button Grid.Column="1" Text="Suchen" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SearchCommand}"/>
+                </Grid>
+                <Button Text="🎲 Überrasch mich" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start" FontSize="12"
+                        Command="{Binding SurpriseMeCommand}"/>
+
+                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsSearching}">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource ColorAccent}" WidthRequest="16" HeightRequest="16"/>
+                    <Label Text="Bitte warten..." FontSize="11" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+
+                <Label Text="{Binding SearchStatusText}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasSearchStatus}"/>
+
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding SearchResults}" BindableLayout.ItemTemplate="{StaticResource RecipeResultTemplate}" Margin="0,6,0,0"/>
+            </VerticalStackLayout>
+
+            <!-- Favoriten -->
+            <VerticalStackLayout Spacing="10" IsVisible="{Binding IsFavoritesMode}">
+                <Label Text="Noch keine Rezepte favorisiert. Öffne ein Rezept aus der Suche und tippe auf 'Als Favorit speichern'."
+                       FontSize="12" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding HasFavorites, Converter={StaticResource InverseBoolConverter}}"/>
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Favorites}" BindableLayout.ItemTemplate="{StaticResource RecipeResultTemplate}"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

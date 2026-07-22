@@ -63,6 +63,22 @@
                 </Grid>
             </Frame>
 
+            <!-- Rezepte entdecken -->
+            <Frame Style="{StaticResource CardStyle}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenRecipesCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="&#xf02d;" FontFamily="FontAwesomeSolid" FontSize="20" BackgroundColor="#0058BC1A"
+                           WidthRequest="44" HeightRequest="44" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Margin="0,0,12,0"/>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Rezepte entdecken" FontFamily="InterSemiBold" FontSize="15"/>
+                        <Label Text="Echte Rezepte mit Zutaten &amp; Zubereitung durchsuchen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
+
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="2">

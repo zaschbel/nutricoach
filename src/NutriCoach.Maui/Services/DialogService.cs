@@ -92,4 +92,30 @@ public class DialogService : IDialogService
         await Navigation.PopModalAsync();
         return result;
     }
+
+    public async Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService)
+    {
+        var viewModel = new RecipesViewModel(recipeService, favoritesService, this);
+        var page = new Maui.Views.RecipesPage(viewModel);
+        var tcs = new TaskCompletionSource();
+
+        page.CancelRequested += () => tcs.TrySetResult();
+
+        await Navigation.PushModalAsync(page);
+        await tcs.Task;
+        await Navigation.PopModalAsync();
+    }
+
+    public async Task ShowRecipeDetailAsync(Recipe recipe, RecipeFavoritesService favoritesService)
+    {
+        var viewModel = new RecipeDetailViewModel(recipe, favoritesService);
+        var page = new Maui.Views.RecipeDetailPage(viewModel);
+        var tcs = new TaskCompletionSource();
+
+        page.CancelRequested += () => tcs.TrySetResult();
+
+        await Navigation.PushModalAsync(page);
+        await tcs.Task;
+        await Navigation.PopModalAsync();
+    }
 }

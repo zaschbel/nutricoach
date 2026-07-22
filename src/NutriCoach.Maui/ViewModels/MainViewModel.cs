@@ -24,6 +24,8 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly TrainingDiaryService _trainingService;
     private readonly TrainingPlanService _planService;
     private readonly WorkoutTemplateService _templateService;
+    private readonly RecipeLookupService _recipeService;
+    private readonly RecipeFavoritesService _favoritesService;
     private readonly IDialogService _dialogService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -57,7 +59,8 @@ public class MainViewModel : INotifyPropertyChanged
 
     public MainViewModel(UserProfileService profileService, NutritionDiaryService diaryService,
         FoodLookupService lookupService, TrainingDiaryService trainingService, TrainingPlanService planService,
-        IDialogService dialogService, WorkoutTemplateService? templateService = null)
+        IDialogService dialogService, WorkoutTemplateService? templateService = null,
+        RecipeLookupService? recipeService = null, RecipeFavoritesService? favoritesService = null)
     {
         _profileService = profileService;
         _diaryService = diaryService;
@@ -66,6 +69,8 @@ public class MainViewModel : INotifyPropertyChanged
         _planService = planService;
         _dialogService = dialogService;
         _templateService = templateService ?? new WorkoutTemplateService();
+        _recipeService = recipeService ?? new RecipeLookupService();
+        _favoritesService = favoritesService ?? new RecipeFavoritesService();
 
         AddFoodCommand = new RelayCommand(async param =>
         {
@@ -119,6 +124,7 @@ public class MainViewModel : INotifyPropertyChanged
         GenerateAutoPlanCommand = new RelayCommand(async _ => await GenerateAutoPlanAsync());
         StartTodayPlannedTrainingCommand = new RelayCommand(async _ => await StartTodayPlannedTrainingAsync());
         ManageTemplatesCommand = new RelayCommand(async _ => await ManageTemplatesAsync());
+        OpenRecipesCommand = new RelayCommand(async _ => await OpenRecipesAsync());
 
         TrainingSessions.CollectionChanged += (_, _) =>
         {
@@ -704,6 +710,21 @@ public class MainViewModel : INotifyPropertyChanged
     public RelayCommand AddFoodCommand { get; }
     public RelayCommand RemoveEntryCommand { get; }
     public RelayCommand EditEntryCommand { get; }
+    public RelayCommand OpenRecipesCommand { get; }
+
+    /// <summary>Öffnet die Rezepte-Seite (Suche bei TheMealDB + lokale Favoriten) - eigenständiges
+    /// Browsing-Feature, unabhängig vom Ernährungstagebuch (siehe RecipesPage/RecipesViewModel).</summary>
+    private async Task OpenRecipesAsync()
+    {
+        try
+        {
+            await _dialogService.ShowRecipesAsync(_recipeService, _favoritesService);
+        }
+        catch (Exception ex)
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Fehler beim Öffnen der Rezepte", ex.ToString(), "OK");
+        }
+    }
 
     // ---------------- Training ----------------
     public ObservableCollection<TrainingSessionDisplay> TrainingSessions { get; } = new();

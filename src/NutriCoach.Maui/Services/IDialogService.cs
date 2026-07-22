@@ -1,5 +1,6 @@
 using NutriCoach.App.Models;
 using NutriCoach.App.Services;
+using NutriCoach.App.ViewModels;
 
 namespace NutriCoach.Maui.Services;
 
@@ -33,4 +34,10 @@ public interface IDialogService
 
     Task<FoodDetailDialogResult> ShowFoodDetailAsync(FoodItem food, FitnessGoal goal,
         double? initialAmountGrams = null, bool isEditMode = false);
+
+    /// <summary>Zeigt die Rezepte-Seite (Suche + Favoriten). Schließt sich selbst, kein Rückgabewert nötig.</summary>
+    Task ShowRecipesAsync(RecipeLookupService recipeService, RecipeFavoritesService favoritesService);
+
+    /// <summary>Zeigt die Detailseite eines einzelnen Rezepts (Zutaten, Zubereitung, Favorisieren).</summary>
+    Task ShowRecipeDetailAsync(Recipe recipe, RecipeFavoritesService favoritesService);
 }
