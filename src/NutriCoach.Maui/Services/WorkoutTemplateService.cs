@@ -12,52 +12,46 @@ namespace NutriCoach.App.Services;
 /// </summary>
 public class WorkoutTemplateService
 {
-    /// <summary>Lädt alle Vorlagen eines Nutzers inkl. ihrer Übungen (nach SortOrder sortiert), alphabetisch nach Name.</summary>
+    /// <summary>
+    /// Lädt alle Vorlagen eines Nutzers inkl. ihrer Übungen (nach SortOrder sortiert), alphabetisch nach Name.
+    /// Wirft absichtlich weiter, statt Fehler zu verschlucken (frühere Version tat das und liess das
+    /// Feature dadurch "stillschweigend kaputt" aussehen) - der Aufrufer (ManageTemplatesViewModel)
+    /// zeigt den echten Fehler jetzt sichtbar an.
+    /// </summary>
     public async Task<List<WorkoutTemplate>> GetTemplatesAsync(int userProfileId)
     {
-        try
-        {
-            await using var context = new AppDbContext();
-            var templates = await context.WorkoutTemplates
-                .Include(t => t.Exercises)
-                .Where(t => t.UserProfileId == userProfileId)
-                .OrderBy(t => t.Name)
-                .ToListAsync();
+        await using var context = new AppDbContext();
+        var templates = await context.WorkoutTemplates
+            .Include(t => t.Exercises)
+            .Where(t => t.UserProfileId == userProfileId)
+            .OrderBy(t => t.Name)
+            .ToListAsync();
 
-            foreach (var template in templates)
-                template.Exercises = template.Exercises.OrderBy(e => e.SortOrder).ToList();
+        foreach (var template in templates)
+            template.Exercises = template.Exercises.OrderBy(e => e.SortOrder).ToList();
 
-            return templates;
-        }
-        catch
-        {
-            return new List<WorkoutTemplate>();
-        }
+        return templates;
     }
 
-    /// <summary>Legt eine neue Vorlage mit den übergebenen Übungsnamen an (Reihenfolge = Liste-Reihenfolge).</summary>
+    /// <summary>
+    /// Legt eine neue Vorlage mit den übergebenen Übungsnamen an (Reihenfolge = Liste-Reihenfolge).
+    /// Wirft absichtlich weiter statt Fehler zu verschlucken (siehe GetTemplatesAsync).
+    /// </summary>
     public async Task CreateTemplateAsync(int userProfileId, string name, List<string> exerciseNames)
     {
         if (string.IsNullOrWhiteSpace(name) || exerciseNames.Count == 0) return;
 
-        try
-        {
-            await using var context = new AppDbContext();
-            var template = new WorkoutTemplate { UserProfileId = userProfileId, Name = name.Trim() };
+        await using var context = new AppDbContext();
+        var template = new WorkoutTemplate { UserProfileId = userProfileId, Name = name.Trim() };
 
-            var order = 0;
-            foreach (var exerciseName in exerciseNames)
-            {
-                template.Exercises.Add(new WorkoutTemplateExercise { ExerciseName = exerciseName, SortOrder = order++ });
-            }
-
-            context.WorkoutTemplates.Add(template);
-            await context.SaveChangesAsync();
-        }
-        catch
+        var order = 0;
+        foreach (var exerciseName in exerciseNames)
         {
-            // Vorlage konnte nicht gespeichert werden - App bleibt trotzdem nutzbar, Nutzer kann es erneut versuchen.
+            template.Exercises.Add(new WorkoutTemplateExercise { ExerciseName = exerciseName, SortOrder = order++ });
         }
+
+        context.WorkoutTemplates.Add(template);
+        await context.SaveChangesAsync();
     }
 
     /// <summary>Löscht eine Vorlage (und über die Kaskade automatisch alle ihre Übungs-Einträge).</summary>

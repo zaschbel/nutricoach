@@ -19,7 +19,7 @@
                         </Label>
                     </Grid>
                     <Label Text="{Binding ExerciseNamesLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                    <Button Text="Vorlage verwenden" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Padding="10,6" HorizontalOptions="Start"
+                    <Button Text="Trainingsvorlage verwenden" Style="{StaticResource SecondaryButtonStyle}" FontSize="12" Padding="10,6" HorizontalOptions="Start"
                             Command="{Binding BindingContext.UseTemplateCommand, Source={x:Reference Root}}"
                             CommandParameter="{Binding}"/>
                 </VerticalStackLayout>
@@ -70,16 +70,16 @@
 
                 <CollectionView ItemsSource="{Binding Templates}" ItemTemplate="{StaticResource TemplateRowTemplate}" ItemSizingStrategy="MeasureAllItems">
                     <CollectionView.EmptyView>
-                        <Label Text="Noch keine Vorlagen angelegt" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,10"/>
+                        <Label Text="Noch keine Trainingsvorlagen angelegt" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,10"/>
                     </CollectionView.EmptyView>
                 </CollectionView>
 
-                <Button Text="+ Neue Vorlage" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                <Button Text="+ Neue Trainingsvorlage" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
                         Command="{Binding ToggleCreatePanelCommand}" IsVisible="{Binding ShowCreatePanel, Converter={StaticResource InverseBoolConverter}}"/>
 
                 <Frame Style="{StaticResource CardStyle}" IsVisible="{Binding ShowCreatePanel}">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Name der Vorlage (z. B. Push Day)" Style="{StaticResource SectionLabelStyle}"/>
+                        <Label Text="Name der Trainingsvorlage (z. B. Push Day)" Style="{StaticResource SectionLabelStyle}"/>
                         <Entry Text="{Binding NewTemplateName}"/>
 
                         <Label Text="Übung suchen und hinzufügen" Style="{StaticResource SectionLabelStyle}" Margin="0,8,0,0"/>
@@ -98,7 +98,7 @@
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
                             <Button Grid.Column="0" Text="Abbrechen" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ToggleCreatePanelCommand}"/>
-                            <Button Grid.Column="1" Text="Vorlage speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveTemplateCommand}"/>
+                            <Button Grid.Column="1" Text="Trainingsvorlage speichern" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveTemplateCommand}"/>
                         </Grid>
                     </VerticalStackLayout>
                 </Frame>

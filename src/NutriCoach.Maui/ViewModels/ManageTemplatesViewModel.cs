@@ -105,14 +105,23 @@ public class ManageTemplatesViewModel : INotifyPropertyChanged
     public async Task LoadAsync()
     {
         IsLoading = true;
-        var templates = await _templateService.GetTemplatesAsync(_userProfileId);
+        try
+        {
+            var templates = await _templateService.GetTemplatesAsync(_userProfileId);
 
-        Templates.Clear();
-        foreach (var t in templates)
-            Templates.Add(new TemplateDisplay(t.Id, t.Name, t.Exercises.Select(e => e.ExerciseName).ToList()));
-
-        IsLoading = false;
-        OnPropertyChanged(nameof(HasTemplates));
+            Templates.Clear();
+            foreach (var t in templates)
+                Templates.Add(new TemplateDisplay(t.Id, t.Name, t.Exercises.Select(e => e.ExerciseName).ToList()));
+        }
+        catch (Exception ex)
+        {
+            await Application.Current!.MainPage!.DisplayAlert("Vorlagen konnten nicht geladen werden", ex.ToString(), "OK");
+        }
+        finally
+        {
+            IsLoading = false;
+            OnPropertyChanged(nameof(HasTemplates));
+        }
     }
 
     private bool CanSaveTemplate() => !string.IsNullOrWhiteSpace(NewTemplateName) && SelectedExerciseNames.Count > 0;
@@ -130,7 +139,17 @@ public class ManageTemplatesViewModel : INotifyPropertyChanged
 
     private async Task SaveTemplateAsync()
     {
-        await _templateService.CreateTemplateAsync(_userProfileId, NewTemplateName, SelectedExerciseNames.ToList());
+        try
+        {
+            await _templateService.CreateTemplateAsync(_userProfileId, NewTemplateName, SelectedExerciseNames.ToList());
+        }
+        catch (Exception ex)
+        {
+            // Nur bei echtem Erfolg das Formular zuruecksetzen/schliessen - vorher wurde das
+            // bedingungslos gemacht, wodurch ein stiller Speicherfehler aussah wie ein Erfolg.
+            await Application.Current!.MainPage!.DisplayAlert("Trainingsvorlage konnte nicht gespeichert werden", ex.ToString(), "OK");
+            return;
+        }
 
         NewTemplateName = string.Empty;
         SelectedExerciseNames.Clear();

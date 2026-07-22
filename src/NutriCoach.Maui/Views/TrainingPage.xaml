@@ -60,34 +60,6 @@
 
             <Label Text="TRAINING" FontFamily="InterBold" FontSize="13" TextColor="{StaticResource ColorAccent}"/>
 
-            <!-- Schritte (übergangsweise per Regler, bis eine echte Schrittzähler-Anbindung existiert) -->
-            <Frame Style="{StaticResource CardStyle}">
-                <VerticalStackLayout Spacing="4">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="14">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;"/>
-                                    <Span Text=" Schritte" FontFamily="InterSemiBold"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label Grid.Column="1" Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="16"
-                               TextColor="{StaticResource ColorAccent}"/>
-                    </Grid>
-                    <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
-                    <HorizontalStackLayout Spacing="8" Margin="0,6,0,0">
-                        <Button Text="+ 500" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12"
-                                Command="{Binding AddStepsQuickCommand}" CommandParameter="500"/>
-                        <Button Text="+ 1000" Style="{StaticResource SecondaryButtonStyle}" Padding="12,6" FontSize="12"
-                                Command="{Binding AddStepsQuickCommand}" CommandParameter="1000"/>
-                        <Button Text="+ 2000" Style="{StaticResource PrimaryButtonStyle}" Padding="12,6" FontSize="12"
-                                Command="{Binding AddStepsQuickCommand}" CommandParameter="2000"/>
-                    </HorizontalStackLayout>
-                    <Label Text="{Binding StepsRemainingLabel}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                </VerticalStackLayout>
-            </Frame>
-
             <!-- Aktiver Plan -->
             <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasTodayPlan}">
                 <VerticalStackLayout Grid.Column="0">
@@ -249,7 +221,7 @@
                         <FontImageSource FontFamily="FontAwesomeSolid" Glyph="&#xf236;" Color="{DynamicResource ColorTextPrimary}" Size="14"/>
                     </Button.ImageSource>
                 </Button>
-                <Button Grid.Column="2" Text="Vorlage" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8"
+                <Button Grid.Column="2" Text="Trainingsvorlage" Style="{StaticResource SecondaryButtonStyle}" Padding="12,8" FontSize="12"
                         Command="{Binding ManageTemplatesCommand}"/>
                 <Button Grid.Column="3" Text="+ Training" Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding AddTrainingCommand}"/>

@@ -112,19 +112,33 @@ public class LineChartDrawable : IDrawable
         }
         canvas.RestoreState();
 
-        // Punkte + Beschriftung (nur für Tage mit Wert)
+        // Punkte + Beschriftung (nur für Tage mit Wert) - der letzte Punkt ist immer "heute"
+        // (rollierendes Fenster, siehe StatistikenViewModel), wird deshalb wie im Wochenkalender
+        // oben farblich hervorgehoben statt wie die übrigen Tage neutral/grau dargestellt.
         for (var i = 0; i < _points.Count; i++)
         {
             var x = XFor(i);
+            var isToday = i == _points.Count - 1;
 
             if (_points[i].Value is double value)
             {
                 var y = YFor(value);
-                canvas.FillColor = Colors.White;
-                canvas.FillCircle(x, y, 5);
-                canvas.StrokeColor = _lineColor;
-                canvas.StrokeSize = 2.5f;
-                canvas.DrawCircle(x, y, 5);
+                if (isToday)
+                {
+                    canvas.FillColor = _lineColor;
+                    canvas.FillCircle(x, y, 6.5f);
+                    canvas.StrokeColor = Colors.White;
+                    canvas.StrokeSize = 2f;
+                    canvas.DrawCircle(x, y, 6.5f);
+                }
+                else
+                {
+                    canvas.FillColor = Colors.White;
+                    canvas.FillCircle(x, y, 5);
+                    canvas.StrokeColor = _lineColor;
+                    canvas.StrokeSize = 2.5f;
+                    canvas.DrawCircle(x, y, 5);
+                }
 
                 canvas.FontColor = _lineColor;
                 canvas.FontSize = 11;
@@ -132,9 +146,9 @@ public class LineChartDrawable : IDrawable
                     HorizontalAlignment.Center, VerticalAlignment.Center);
             }
 
-            canvas.FontColor = Color.FromArgb("#717786");
+            canvas.FontColor = isToday ? _lineColor : Color.FromArgb("#717786");
             canvas.FontSize = 11;
-            canvas.DrawString(_points[i].DayAbbrev, x - 25, dirtyRect.Height - bottomLabelHeight + 4, 50, 16,
+            canvas.DrawString(isToday ? "Heute" : _points[i].DayAbbrev, x - 25, dirtyRect.Height - bottomLabelHeight + 4, 50, 16,
                 HorizontalAlignment.Center, VerticalAlignment.Top);
             canvas.DrawString(_points[i].DayNumber, x - 25, dirtyRect.Height - bottomLabelHeight + 18, 50, 16,
                 HorizontalAlignment.Center, VerticalAlignment.Top);
