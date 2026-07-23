@@ -25,10 +25,15 @@ public class AnimatedProgressBehavior : Behavior<ProgressBar>
     protected override void OnAttachedTo(ProgressBar bindable)
     {
         base.OnAttachedTo(bindable);
+        bindable.Progress = 0;
         _progressBar = bindable;
         bindable.BindingContextChanged += OnBindableBindingContextChanged;
+        // Setzen von BindingContext löst die Bindung sofort auf und ruft dadurch synchron
+        // OnAnimatedProgressChanged auf (siehe unten) - das startet die Auffüll-Animation direkt
+        // beim ersten Anzeigen. Ein zusätzliches direktes "bindable.Progress = AnimatedProgress"
+        // hier würde diese gerade gestartete Animation sofort wieder abschneiden/überschreiben,
+        // deshalb bewusst NICHT mehr direkt zuweisen - das war der eigentliche Fehler.
         BindingContext = bindable.BindingContext;
-        bindable.Progress = AnimatedProgress;
     }
 
     protected override void OnDetachingFrom(ProgressBar bindable)
