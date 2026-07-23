@@ -13,29 +13,26 @@ public partial class HomePage : ContentView
         Loaded += (_, _) => StartFlameAnimation();
         Unloaded += (_, _) => _flameAnimationCts?.Cancel();
 
-        // Fortschrittsbalken bewusst NICHT mehr per XAML-Binding an Progress gebunden (siehe
-        // AnimatedProgressBehavior - zweimal versucht, hat nicht zuverlässig funktioniert), sondern
-        // direkt hier per PropertyChanged angesteuert - gleiches erprobtes Muster wie die Flamme oben.
+        // ProgressBar.ProgressTo() animiert auf diesem Geraet/dieser MAUI-Version offenbar gar nicht
+        // (bestaetigt durch mehrere Live-Tests direkt auf derselben Seite, ganz ohne Tab-Wechsel oder
+        // Konstruktor-Timing-Verdacht) - deshalb komplett ersetzt durch zwei BoxViews (Hintergrund +
+        // Fuellbalken), deren Fuellbalken per ScaleX/AnchorX skaliert wird. ScaleXTo nutzt denselben
+        // Animationsmechanismus wie ScaleTo bei der Flamme oben, der nachweislich funktioniert.
         AppState.MainViewModel.PropertyChanged += OnMainViewModelPropertyChanged;
 
-        // WICHTIG: Die allererste ProgressTo-Animation NICHT hier im Konstruktor auslösen - an dieser
-        // Stelle existiert die native iOS-Ansicht des ProgressBar noch gar nicht (die entsteht erst,
-        // wenn das Element tatsächlich im sichtbaren Baum ankommt, ungefähr beim Loaded-Event), eine
-        // Animation auf eine noch nicht gerenderte Ansicht läuft entweder ins Leere oder springt ohne
-        // sichtbaren Übergang direkt zum Zielwert. Exakt wie die Flamme oben deshalb über Loaded starten.
         Loaded += (_, _) =>
         {
-            _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
-            _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
+            _ = StepsFillBar.ScaleXTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
+            _ = CaloriesFillBar.ScaleXTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
         };
     }
 
     private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.StepsProgressRatio))
-            _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
+            _ = StepsFillBar.ScaleXTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
         else if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.CalorieProgressRatio))
-            _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
+            _ = CaloriesFillBar.ScaleXTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
     }
 
     /// <summary>

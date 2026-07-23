@@ -182,7 +182,11 @@
                                 </Button.ImageSource>
                             </Button>
                         </Grid>
-                        <ProgressBar x:Name="WeeklyGoalProgressBar" ProgressColor="{StaticResource ColorAccent}"/>
+                        <Grid HeightRequest="6">
+                            <BoxView BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView x:Name="WeeklyGoalFillBar" BackgroundColor="{StaticResource ColorAccent}" CornerRadius="3" HeightRequest="6"
+                                     HorizontalOptions="Fill" AnchorX="0" ScaleX="0"/>
+                        </Grid>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasNoWeeklyGoal}">
