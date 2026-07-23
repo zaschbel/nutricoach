@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:NutriCoach.Maui.Behaviors"
              x:Class="NutriCoach.Maui.Views.HomePage"
              BackgroundColor="{StaticResource ColorBackground}">
 
@@ -64,7 +65,11 @@
                         <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="26"
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
+                        <ProgressBar ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0">
+                            <ProgressBar.Behaviors>
+                                <behaviors:AnimatedProgressBehavior AnimatedProgress="{Binding StepsProgressRatio}"/>
+                            </ProgressBar.Behaviors>
+                        </ProgressBar>
                         <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
                                BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
                             <Label.FormattedText>
@@ -103,7 +108,11 @@
                         <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="kcal gegessen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorTertiary}" Margin="0,6,0,0"/>
+                        <ProgressBar ProgressColor="{StaticResource ColorTertiary}" Margin="0,6,0,0">
+                            <ProgressBar.Behaviors>
+                                <behaviors:AnimatedProgressBehavior AnimatedProgress="{Binding CalorieProgressRatio}"/>
+                            </ProgressBar.Behaviors>
+                        </ProgressBar>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>

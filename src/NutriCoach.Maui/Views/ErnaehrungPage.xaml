@@ -45,6 +45,7 @@
         </DataTemplate>
     </ContentView.Resources>
 
+    <Grid>
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
 
@@ -357,4 +358,9 @@
 
         </VerticalStackLayout>
     </ScrollView>
+
+        <Label x:Name="SuccessCheckmark" Text="&#xf058;" FontFamily="FontAwesomeSolid" FontSize="64"
+               TextColor="{StaticResource ColorSuccess}" HorizontalOptions="Center" VerticalOptions="Center"
+               Opacity="0" Scale="0.6" InputTransparent="True"/>
+    </Grid>
 </ContentView>

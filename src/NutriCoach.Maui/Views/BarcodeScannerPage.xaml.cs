@@ -37,4 +37,11 @@ public partial class BarcodeScannerPage : ContentPage
     }
 
     private void OnCancelClicked(object? sender, EventArgs e) => Cancelled?.Invoke();
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        Opacity = 0;
+        await this.FadeTo(1, 220, Easing.CubicOut);
+    }
 }

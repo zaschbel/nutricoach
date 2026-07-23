@@ -46,6 +46,12 @@ public partial class MainTabsPage : ContentPage
     {
         UpdateTabVisuals(e.CurrentPosition);
 
+        // Sanftes "Einpendeln" statt hartem Sprung beim Reiterwechsel - bewusst subtil (nur ab
+        // halber Deckkraft), damit es beim Wischen selbst nicht wie ein Flackern wirkt.
+        var incoming = _pages[e.CurrentPosition];
+        incoming.Opacity = 0.5;
+        _ = incoming.FadeTo(1, 180, Easing.CubicOut);
+
         if (e.CurrentPosition == 3 && _pages[3] is StatistikenPage statsPage)
             await statsPage.RefreshAsync();
     }

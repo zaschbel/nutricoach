@@ -37,4 +37,11 @@ public partial class OnboardingPage : ContentPage
                 DismissKeyboard(childElement);
         }
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        Opacity = 0;
+        await this.FadeTo(1, 220, Easing.CubicOut);
+    }
 }

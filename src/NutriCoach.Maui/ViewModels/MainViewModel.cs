@@ -30,6 +30,11 @@ public class MainViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    /// <summary>Feuert nach jedem erfolgreich gespeicherten Eintrag (Essen, Wasser, Training) - Seiten
+    /// abonnieren das für ein kurzes Erfolgs-Feedback (Häkchen-Animation), unabhängig davon, welche
+    /// Aktion konkret gespeichert hat.</summary>
+    public event Action? EntrySaved;
+
     private UserProfile? _profile;
 
     private double _currentWeightKg;
@@ -114,7 +119,7 @@ public class MainViewModel : INotifyPropertyChanged
         });
         AddWaterQuickCommand = new RelayCommand(param =>
         {
-            if (param is string s && int.TryParse(s, out var ml)) WaterMl += ml;
+            if (param is string s && int.TryParse(s, out var ml)) { WaterMl += ml; EntrySaved?.Invoke(); }
         });
         AddStepsQuickCommand = new RelayCommand(param =>
         {
@@ -939,6 +944,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         if (wasSaved)
         {
+            EntrySaved?.Invoke();
             await RefreshTrainingAsync();
             await RefreshWeekAsync();
             await RefreshTodayAsync();
@@ -955,6 +961,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         if (wasSaved)
         {
+            EntrySaved?.Invoke();
             await RefreshTodayAsync();
             if (SelectedDate == today)
             {
@@ -972,6 +979,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         if (wasSaved)
         {
+            EntrySaved?.Invoke();
             await RefreshTrainingAsync();
             await RefreshWeekAsync();
             await RefreshTodayAsync();
@@ -1047,6 +1055,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         if (wasSaved)
         {
+            EntrySaved?.Invoke();
             await RefreshTrainingAsync();
             await RefreshWeekAsync();
             await RefreshTodayAsync();
@@ -1062,6 +1071,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         if (wasSaved)
         {
+            EntrySaved?.Invoke();
             await RefreshTodayAsync();
             if (SelectedDate == today) await RefreshTrainingAsync();
             await RefreshWeekAsync();
@@ -1083,6 +1093,7 @@ public class MainViewModel : INotifyPropertyChanged
         if (result.Confirmed && result.Food is not null)
         {
             await _diaryService.AddEntryAsync(_profile.Id, result.Food.Id, result.AmountGrams, meal, SelectedDate);
+            EntrySaved?.Invoke();
             await RefreshDiaryAsync();
             await RefreshWeekAsync();
         }

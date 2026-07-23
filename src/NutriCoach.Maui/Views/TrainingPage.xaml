@@ -2,6 +2,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:NutriCoach.Maui"
+             xmlns:behaviors="clr-namespace:NutriCoach.Maui.Behaviors"
              x:Class="NutriCoach.Maui.Views.TrainingPage"
              BackgroundColor="{StaticResource ColorBackground}">
 
@@ -55,6 +56,7 @@
         </DataTemplate>
     </ContentView.Resources>
 
+    <Grid>
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
 
@@ -180,7 +182,11 @@
                                 </Button.ImageSource>
                             </Button>
                         </Grid>
-                        <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <ProgressBar ProgressColor="{StaticResource ColorAccent}">
+                            <ProgressBar.Behaviors>
+                                <behaviors:AnimatedProgressBehavior AnimatedProgress="{Binding TrainingProgressRatioMaui}"/>
+                            </ProgressBar.Behaviors>
+                        </ProgressBar>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasNoWeeklyGoal}">
@@ -238,4 +244,9 @@
 
         </VerticalStackLayout>
     </ScrollView>
+
+        <Label x:Name="SuccessCheckmark" Text="&#xf058;" FontFamily="FontAwesomeSolid" FontSize="64"
+               TextColor="{StaticResource ColorSuccess}" HorizontalOptions="Center" VerticalOptions="Center"
+               Opacity="0" Scale="0.6" InputTransparent="True"/>
+    </Grid>
 </ContentView>

@@ -17,4 +17,11 @@ public partial class QuickSetupPage : ContentPage
         };
         BindingContext = _viewModel;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        Opacity = 0;
+        await this.FadeTo(1, 220, Easing.CubicOut);
+    }
 }
