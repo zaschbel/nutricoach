@@ -18,18 +18,28 @@ public class AnimatedProgressBehavior : Behavior<ProgressBar>
 
     private ProgressBar? _progressBar;
 
+    // Behaviors sind KEIN Teil des visuellen Baums und erben deshalb NICHT automatisch den
+    // BindingContext des Elements, an das sie angehängt sind - "{Binding X}" auf AnimatedProgress
+    // lief dadurch ins Leere (kein Kontext = kein Wert, Balken blieb bei 0). Muss man manuell
+    // durchreichen, inkl. Nachziehen, falls sich der BindingContext später nochmal ändert.
     protected override void OnAttachedTo(ProgressBar bindable)
     {
         base.OnAttachedTo(bindable);
         _progressBar = bindable;
+        bindable.BindingContextChanged += OnBindableBindingContextChanged;
+        BindingContext = bindable.BindingContext;
         bindable.Progress = AnimatedProgress;
     }
 
     protected override void OnDetachingFrom(ProgressBar bindable)
     {
         base.OnDetachingFrom(bindable);
+        bindable.BindingContextChanged -= OnBindableBindingContextChanged;
         _progressBar = null;
     }
+
+    private void OnBindableBindingContextChanged(object? sender, EventArgs e) =>
+        BindingContext = _progressBar?.BindingContext;
 
     private static void OnAnimatedProgressChanged(BindableObject bindable, object oldValue, object newValue)
     {
