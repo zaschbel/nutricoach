@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace NutriCoach.Maui.Views;
 
 public partial class HomePage : ContentView
@@ -10,6 +12,21 @@ public partial class HomePage : ContentView
         BindingContext = AppState.MainViewModel;
         Loaded += (_, _) => StartFlameAnimation();
         Unloaded += (_, _) => _flameAnimationCts?.Cancel();
+
+        // Fortschrittsbalken bewusst NICHT mehr per XAML-Binding an Progress gebunden (siehe
+        // AnimatedProgressBehavior - zweimal versucht, hat nicht zuverlässig funktioniert), sondern
+        // direkt hier per PropertyChanged angesteuert - gleiches erprobtes Muster wie die Flamme oben.
+        AppState.MainViewModel.PropertyChanged += OnMainViewModelPropertyChanged;
+        _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
+        _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
+    }
+
+    private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.StepsProgressRatio))
+            _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
+        else if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.CalorieProgressRatio))
+            _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
     }
 
     /// <summary>

@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace NutriCoach.Maui.Views;
 
 public partial class TrainingPage : ContentView
@@ -7,6 +9,15 @@ public partial class TrainingPage : ContentView
         InitializeComponent();
         BindingContext = AppState.MainViewModel;
         AppState.MainViewModel.EntrySaved += () => _ = AnimateSuccessCheckmarkAsync();
+
+        // Direkt per PropertyChanged angesteuert statt per XAML-Behavior (siehe HomePage.xaml.cs
+        // für die Begründung - das Behavior hat trotz zweier Fixversuche nicht zuverlässig funktioniert).
+        AppState.MainViewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.TrainingProgressRatioMaui))
+                _ = WeeklyGoalProgressBar.ProgressTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
+        };
+        _ = WeeklyGoalProgressBar.ProgressTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
     }
 
     /// <summary>Kurzes Häkchen-Aufblitzen als Bestätigung, dass ein Training gespeichert wurde.</summary>
