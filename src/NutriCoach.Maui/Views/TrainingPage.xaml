@@ -182,7 +182,11 @@
                                 </Button.ImageSource>
                             </Button>
                         </Grid>
-                        <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <Grid x:Name="WeeklyGoalBarTrack" HeightRequest="6">
+                            <BoxView BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView BackgroundColor="{StaticResource ColorAccent}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView x:Name="WeeklyGoalBarMask" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                        </Grid>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasNoWeeklyGoal}">

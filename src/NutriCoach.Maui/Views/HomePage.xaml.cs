@@ -1,8 +1,12 @@
+using System.ComponentModel;
+
 namespace NutriCoach.Maui.Views;
 
 public partial class HomePage : ContentView
 {
     private CancellationTokenSource? _flameAnimationCts;
+    private double _stepsBarWidth;
+    private double _caloriesBarWidth;
 
     public HomePage()
     {
@@ -10,6 +14,50 @@ public partial class HomePage : ContentView
         BindingContext = AppState.MainViewModel;
         Loaded += (_, _) => StartFlameAnimation();
         Unloaded += (_, _) => _flameAnimationCts?.Cancel();
+
+        // Siebter Versuch fuer die Balken-Animation (siehe Commit-Historie): ProgressBar.ProgressTo
+        // und ScaleXTo auf einem BoxView haben beide nicht sichtbar animiert bzw. das Element sogar
+        // unsichtbar gemacht. Neuer Ansatz: eine Maske (gleiche Farbe wie der Hintergrund) liegt ueber
+        // einem voll eingefaerbten Balken und wird per TranslateTo nach rechts verschoben, um den
+        // Balken von links nach rechts "freizulegen" - TranslateTo ist derselbe Animationsmechanismus
+        // (Transform-Animation), der bei der Flamme und dem Erfolgs-Haekchen bereits bestaetigt
+        // funktioniert (ScaleTo/FadeTo), nur mit Verschieben statt Skalieren. Ausserdem wird die
+        // Balkenbreite ueber SizeChanged erfasst statt ueber Loaded anzunehmen, wann die Ansicht bereit ist.
+        StepsBarTrack.SizeChanged += (_, _) =>
+        {
+            _stepsBarWidth = StepsBarTrack.Width;
+            UpdateStepsBarMask(animate: false);
+        };
+        CaloriesBarTrack.SizeChanged += (_, _) =>
+        {
+            _caloriesBarWidth = CaloriesBarTrack.Width;
+            UpdateCaloriesBarMask(animate: false);
+        };
+        AppState.MainViewModel.PropertyChanged += OnMainViewModelPropertyChanged;
+    }
+
+    private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.StepsProgressRatio))
+            UpdateStepsBarMask(animate: true);
+        else if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.CalorieProgressRatio))
+            UpdateCaloriesBarMask(animate: true);
+    }
+
+    private void UpdateStepsBarMask(bool animate)
+    {
+        if (_stepsBarWidth <= 0) return;
+        var targetX = _stepsBarWidth * AppState.MainViewModel.StepsProgressRatio;
+        if (animate) _ = StepsBarMask.TranslateTo(targetX, 0, 500, Easing.CubicOut);
+        else StepsBarMask.TranslationX = targetX;
+    }
+
+    private void UpdateCaloriesBarMask(bool animate)
+    {
+        if (_caloriesBarWidth <= 0) return;
+        var targetX = _caloriesBarWidth * AppState.MainViewModel.CalorieProgressRatio;
+        if (animate) _ = CaloriesBarMask.TranslateTo(targetX, 0, 500, Easing.CubicOut);
+        else CaloriesBarMask.TranslationX = targetX;
     }
 
     /// <summary>

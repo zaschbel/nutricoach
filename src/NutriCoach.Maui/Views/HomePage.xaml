@@ -65,7 +65,11 @@
                         <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="26"
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
+                        <Grid x:Name="StepsBarTrack" HeightRequest="6" Margin="0,6,0,0">
+                            <BoxView BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView BackgroundColor="{StaticResource ColorAccent}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView x:Name="StepsBarMask" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                        </Grid>
                         <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
                                BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
                             <Label.FormattedText>
@@ -104,7 +108,11 @@
                         <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
                                TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
                         <Label Text="kcal gegessen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorTertiary}" Margin="0,6,0,0"/>
+                        <Grid x:Name="CaloriesBarTrack" HeightRequest="6" Margin="0,6,0,0">
+                            <BoxView BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView BackgroundColor="{StaticResource ColorTertiary}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                            <BoxView x:Name="CaloriesBarMask" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="3" HeightRequest="6" HorizontalOptions="Fill"/>
+                        </Grid>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>
