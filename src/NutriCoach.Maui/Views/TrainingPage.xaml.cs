@@ -17,7 +17,11 @@ public partial class TrainingPage : ContentView
             if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.TrainingProgressRatioMaui))
                 _ = WeeklyGoalProgressBar.ProgressTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
         };
-        _ = WeeklyGoalProgressBar.ProgressTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
+
+        // Wie bei HomePage: die allererste Animation NICHT im Konstruktor ausloesen, sondern erst,
+        // wenn die native Ansicht tatsaechlich existiert (Loaded) - sonst laeuft sie ins Leere.
+        Loaded += (_, _) =>
+            _ = WeeklyGoalProgressBar.ProgressTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
     }
 
     /// <summary>Kurzes Häkchen-Aufblitzen als Bestätigung, dass ein Training gespeichert wurde.</summary>

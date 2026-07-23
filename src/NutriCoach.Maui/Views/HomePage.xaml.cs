@@ -17,8 +17,17 @@ public partial class HomePage : ContentView
         // AnimatedProgressBehavior - zweimal versucht, hat nicht zuverlässig funktioniert), sondern
         // direkt hier per PropertyChanged angesteuert - gleiches erprobtes Muster wie die Flamme oben.
         AppState.MainViewModel.PropertyChanged += OnMainViewModelPropertyChanged;
-        _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
-        _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
+
+        // WICHTIG: Die allererste ProgressTo-Animation NICHT hier im Konstruktor auslösen - an dieser
+        // Stelle existiert die native iOS-Ansicht des ProgressBar noch gar nicht (die entsteht erst,
+        // wenn das Element tatsächlich im sichtbaren Baum ankommt, ungefähr beim Loaded-Event), eine
+        // Animation auf eine noch nicht gerenderte Ansicht läuft entweder ins Leere oder springt ohne
+        // sichtbaren Übergang direkt zum Zielwert. Exakt wie die Flamme oben deshalb über Loaded starten.
+        Loaded += (_, _) =>
+        {
+            _ = StepsProgressBar.ProgressTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
+            _ = CaloriesProgressBar.ProgressTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
+        };
     }
 
     private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
