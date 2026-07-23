@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace NutriCoach.Maui.Views;
 
 public partial class HomePage : ContentView
@@ -12,27 +10,6 @@ public partial class HomePage : ContentView
         BindingContext = AppState.MainViewModel;
         Loaded += (_, _) => StartFlameAnimation();
         Unloaded += (_, _) => _flameAnimationCts?.Cancel();
-
-        // ProgressBar.ProgressTo() animiert auf diesem Geraet/dieser MAUI-Version offenbar gar nicht
-        // (bestaetigt durch mehrere Live-Tests direkt auf derselben Seite, ganz ohne Tab-Wechsel oder
-        // Konstruktor-Timing-Verdacht) - deshalb komplett ersetzt durch zwei BoxViews (Hintergrund +
-        // Fuellbalken), deren Fuellbalken per ScaleX/AnchorX skaliert wird. ScaleXTo nutzt denselben
-        // Animationsmechanismus wie ScaleTo bei der Flamme oben, der nachweislich funktioniert.
-        AppState.MainViewModel.PropertyChanged += OnMainViewModelPropertyChanged;
-
-        Loaded += (_, _) =>
-        {
-            _ = StepsFillBar.ScaleXTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
-            _ = CaloriesFillBar.ScaleXTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
-        };
-    }
-
-    private void OnMainViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.StepsProgressRatio))
-            _ = StepsFillBar.ScaleXTo(AppState.MainViewModel.StepsProgressRatio, 500, Easing.CubicOut);
-        else if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.CalorieProgressRatio))
-            _ = CaloriesFillBar.ScaleXTo(AppState.MainViewModel.CalorieProgressRatio, 500, Easing.CubicOut);
     }
 
     /// <summary>

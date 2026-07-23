@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace NutriCoach.Maui.Views;
 
 public partial class TrainingPage : ContentView
@@ -9,17 +7,6 @@ public partial class TrainingPage : ContentView
         InitializeComponent();
         BindingContext = AppState.MainViewModel;
         AppState.MainViewModel.EntrySaved += () => _ = AnimateSuccessCheckmarkAsync();
-
-        // ProgressBar.ProgressTo() animiert offenbar gar nicht auf diesem Geraet (siehe HomePage.xaml.cs
-        // fuer die vollstaendige Begruendung) - ersetzt durch zwei BoxViews, Fuellbalken per ScaleX/AnchorX.
-        AppState.MainViewModel.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(NutriCoach.App.ViewModels.MainViewModel.TrainingProgressRatioMaui))
-                _ = WeeklyGoalFillBar.ScaleXTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
-        };
-
-        Loaded += (_, _) =>
-            _ = WeeklyGoalFillBar.ScaleXTo(AppState.MainViewModel.TrainingProgressRatioMaui, 500, Easing.CubicOut);
     }
 
     /// <summary>Kurzes Häkchen-Aufblitzen als Bestätigung, dass ein Training gespeichert wurde.</summary>
