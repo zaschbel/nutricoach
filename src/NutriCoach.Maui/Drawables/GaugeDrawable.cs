@@ -28,9 +28,14 @@ public class GaugeDrawable : IDrawable
     {
         float cx = dirtyRect.Width / 2f;
         float cy = _centered ? dirtyRect.Height / 2f : dirtyRect.Height - 6f;
-        float radius = _centered ? Math.Min(cx, cy) - 12f : Math.Min(cx, dirtyRect.Height) - 12f;
+        // Im zentrierten Ring-Modus ist der Strich schmaler, damit der Kreis bei gleichem Platz
+        // groesser wirken kann, ohne an den Kartenraendern anzustossen.
+        var strokeSize = _centered ? 10f : 14f;
+        float radius = _centered
+            ? Math.Min(cx, cy) - strokeSize / 2f - 2f
+            : Math.Min(cx, dirtyRect.Height) - 12f;
 
-        canvas.StrokeSize = 14;
+        canvas.StrokeSize = strokeSize;
         canvas.StrokeLineCap = LineCap.Round;
 
         var endDeg = _startDeg + _sweepDeg;

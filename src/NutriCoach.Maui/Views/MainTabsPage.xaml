@@ -32,7 +32,7 @@
                         <TapGestureRecognizer Tapped="OnTabHomeTapped"/>
                     </VerticalStackLayout.GestureRecognizers>
                     <GraphicsView x:Name="IconHome" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center"/>
-                    <Label x:Name="LabelHome" Text="Home" FontSize="10" FontFamily="InterMedium" HorizontalTextAlignment="Center"
+                    <Label x:Name="LabelHome" Text="HOME" FontSize="9" CharacterSpacing="0.6" FontFamily="InterMedium" HorizontalTextAlignment="Center"
                            TextColor="{StaticResource ColorAccent}"/>
                 </VerticalStackLayout>
 
@@ -41,7 +41,7 @@
                         <TapGestureRecognizer Tapped="OnTabTrainingTapped"/>
                     </VerticalStackLayout.GestureRecognizers>
                     <GraphicsView x:Name="IconTraining" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center"/>
-                    <Label x:Name="LabelTraining" Text="Training" FontSize="10" FontFamily="InterMedium" HorizontalTextAlignment="Center"
+                    <Label x:Name="LabelTraining" Text="TRAINING" FontSize="9" CharacterSpacing="0.6" FontFamily="InterMedium" HorizontalTextAlignment="Center"
                            TextColor="{StaticResource ColorTextSecondary}"/>
                 </VerticalStackLayout>
 
@@ -50,7 +50,7 @@
                         <TapGestureRecognizer Tapped="OnTabErnaehrungTapped"/>
                     </VerticalStackLayout.GestureRecognizers>
                     <GraphicsView x:Name="IconErnaehrung" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center"/>
-                    <Label x:Name="LabelErnaehrung" Text="Ernährung" FontSize="10" FontFamily="InterMedium" HorizontalTextAlignment="Center"
+                    <Label x:Name="LabelErnaehrung" Text="ERNÄHRUNG" FontSize="9" CharacterSpacing="0.6" FontFamily="InterMedium" HorizontalTextAlignment="Center"
                            TextColor="{StaticResource ColorTextSecondary}"/>
                 </VerticalStackLayout>
 
@@ -59,7 +59,7 @@
                         <TapGestureRecognizer Tapped="OnTabStatistikenTapped"/>
                     </VerticalStackLayout.GestureRecognizers>
                     <GraphicsView x:Name="IconStatistiken" WidthRequest="22" HeightRequest="22" HorizontalOptions="Center"/>
-                    <Label x:Name="LabelStatistiken" Text="Statistiken" FontSize="10" FontFamily="InterMedium" HorizontalTextAlignment="Center"
+                    <Label x:Name="LabelStatistiken" Text="STATISTIKEN" FontSize="9" CharacterSpacing="0.6" FontFamily="InterMedium" HorizontalTextAlignment="Center"
                            TextColor="{StaticResource ColorTextSecondary}"/>
                 </VerticalStackLayout>
 

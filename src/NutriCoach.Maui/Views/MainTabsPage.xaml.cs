@@ -58,7 +58,9 @@ public partial class MainTabsPage : ContentPage
 
     private void UpdateTabVisuals(int index)
     {
-        var accent = (Color)Application.Current!.Resources["ColorAccent"];
+        // MCI hebt den aktiven Reiter nicht farbig, sondern durch reines Weiss gegen gedaempftes
+        // Grau hervor - das wirkt in der fast schwarzen Leiste deutlich ruhiger als ein Akzentton.
+        var accent = (Color)Application.Current!.Resources["ColorTextPrimary"];
         var muted = (Color)Application.Current!.Resources["ColorTextSecondary"];
 
         LabelHome.TextColor = index == 0 ? accent : muted;

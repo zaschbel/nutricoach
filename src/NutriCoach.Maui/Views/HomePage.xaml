@@ -126,7 +126,7 @@
                             <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='{0:N0}'}" FontSize="10"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="End"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="#8B5CF6"/>
                         <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
                             <VerticalStackLayout Grid.Column="0">
                                 <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="22"
@@ -173,8 +173,8 @@
                             <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Start"/>
                         </Grid>
-                        <Grid HeightRequest="90" Margin="0,4,0,0" HorizontalOptions="Center">
-                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}" WidthRequest="90" HeightRequest="90"/>
+                        <Grid HeightRequest="112" Margin="0,4,0,0" HorizontalOptions="Center">
+                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}" WidthRequest="112" HeightRequest="112"/>
                             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                                 <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="18"
                                        TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
