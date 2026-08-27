@@ -209,9 +209,9 @@ public class MainViewModel : INotifyPropertyChanged
     public IDrawable WeeklyActivityDrawable => new BarChartDrawable(
         WeeklyActivity.Select(b => new Bar3DData(b.DayAbbrev, Math.Clamp(b.HeightRatio / 80.0, 0, 1), b.IsToday)).ToList(),
         Color.FromArgb("#E2E2E4"),
-        Color.FromArgb("#0058BC"),
+        Color.FromArgb("#8B5CF6"),
         Color.FromArgb("#717786"),
-        Color.FromArgb("#0058BC"));
+        Color.FromArgb("#8B5CF6"));
 
     private int _averageStepsThisWeek;
     public int AverageStepsThisWeek { get => _averageStepsThisWeek; set { _averageStepsThisWeek = value; OnPropertyChanged(); } }
