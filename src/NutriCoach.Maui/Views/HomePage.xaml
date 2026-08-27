@@ -28,82 +28,9 @@
                  Dashboard gar kein Datum, wir behalten es minimal fuer die Orientierung). -->
             <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
 
-            <!-- Bento: Schritte + Kalorien -->
-            <Label Text="GEWOHNHEITEN" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnStepsCardTapped"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="Schritte" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
-                            <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='{0:N0}'}" FontSize="10"
-                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="End"/>
-                        </Grid>
-                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-                            <VerticalStackLayout Grid.Column="0">
-                                <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="22"
-                                       TextColor="{StaticResource ColorTextPrimary}"/>
-                                <Label Text="Schritte" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </VerticalStackLayout>
-                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
-                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
-                        </Grid>
-                        <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
-                               BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorAccent}"/>
-                                    <Span Text=" Schrittzähler aktivieren" TextColor="{StaticResource ColorAccent}"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ConnectHealthKitCommand}"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <Label FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
-                               IsVisible="{Binding IsHealthKitConnected}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorSuccess}"/>
-                                    <Span Text=" Schrittzähler aktiv" TextColor="{StaticResource ColorSuccess}"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                    </VerticalStackLayout>
-                </Frame>
-
-                <Frame Grid.Column="1" Style="{StaticResource CardStyle}">
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnCaloriesCardTapped"/>
-                    </Frame.GestureRecognizers>
-                    <VerticalStackLayout Spacing="4">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0">
-                                <Label Text="Kalorien" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                                <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </VerticalStackLayout>
-                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
-                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Start"/>
-                        </Grid>
-                        <Grid HeightRequest="96" Margin="0,4,0,0">
-                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}"/>
-                            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                                <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="20"
-                                       TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
-                                <Label Text="{Binding RemainingKcal, StringFormat='/ {0:0}'}" FontSize="10"
-                                       TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                    </VerticalStackLayout>
-                </Frame>
-            </Grid>
-
-            <!-- KI-Optimierung: rein dekorativ, keine echte KI-Anbindung (das wäre ein eigenes Feature) -->
-            <Label Text="KI-OPTIMIERUNG" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
+            <!-- KI-Optimierung als Hero-Karte direkt unter dem Header, nach MCI-Vorbild (dort:
+                 schwipbare "Trainingsplan optimieren"-Karte) - rein dekorativ/echte KI-Anbindung
+                 bereits vorhanden, hier nur die Position/Optik geändert. -->
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="8">
                     <!-- Kein API-Key hinterlegt -->
@@ -184,6 +111,98 @@
                             Command="{Binding LoadAiSuggestionCommand}" IsVisible="{Binding HasAiError}"/>
                 </VerticalStackLayout>
             </Frame>
+
+            <!-- Bento: Schritte + Kalorien + Trainings + Gewicht, echtes 2x2-Raster wie bei MCI -->
+            <Label Text="GEWOHNHEITEN" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+                <Frame Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnStepsCardTapped"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Schritte" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                            <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='{0:N0}'}" FontSize="10"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="End"/>
+                        </Grid>
+                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="22"
+                                       TextColor="{StaticResource ColorTextPrimary}"/>
+                                <Label Text="Schritte" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </Grid>
+                        <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
+                               BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorAccent}"/>
+                                    <Span Text=" Schrittzähler aktivieren" TextColor="{StaticResource ColorAccent}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ConnectHealthKitCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label FontSize="10" TextColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"
+                               IsVisible="{Binding IsHealthKitConnected}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf554;" TextColor="{StaticResource ColorSuccess}"/>
+                                    <Span Text=" Schrittzähler aktiv" TextColor="{StaticResource ColorSuccess}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCaloriesCardTapped"/>
+                    </Frame.GestureRecognizers>
+                    <VerticalStackLayout Spacing="4">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Kalorien" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                                <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Start"/>
+                        </Grid>
+                        <Grid HeightRequest="96" Margin="0,4,0,0">
+                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}"/>
+                            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="20"
+                                       TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding RemainingKcal, StringFormat='/ {0:0}'}" FontSize="10"
+                                       TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Trainings" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Diese Woche" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Label Text="{Binding TrainingProgressLabel}" FontFamily="InterBold" FontSize="20"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,14,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Frame Grid.Row="1" Grid.Column="1" Style="{StaticResource CardStyle}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Gewicht" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Aktuell" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Label Text="{Binding CurrentWeightKg, StringFormat='{0:0.0} kg'}" FontFamily="InterBold" FontSize="20"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,14,0,0"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
 
             <!-- Heutiges Training laut Plan -->
             <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0" IsVisible="{Binding HasNoTodayTraining}"/>
