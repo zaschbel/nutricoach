@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:models="clr-namespace:NutriCoach.App.Models;assembly=NutriCoach.Maui"
+             xmlns:models="clr-namespace:NutriCoach.App.Models;assembly=NutriCoach"
              xmlns:local="clr-namespace:NutriCoach.Maui"
              x:Class="NutriCoach.Maui.Views.ErnaehrungPage"
              BackgroundColor="{StaticResource ColorBackground}">
