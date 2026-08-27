@@ -44,6 +44,32 @@ CREATE TABLE IF NOT EXISTS ""WorkoutTemplateExercises"" (
             // ein erneuter Absturz-Loop wie beim Schrittzähler-Feature zuvor in dieser Session.
         }
 
+        // Neue Naehrwert-Spalten (Vitamine, Mineralstoffe, Weitere) fuer Bestandsinstallationen
+        // nachruesten - SQLite kennt kein "ADD COLUMN IF NOT EXISTS", daher jede Spalte einzeln
+        // versuchen und einen Fehler (Spalte existiert schon) stillschweigend ignorieren.
+        string[] newFoodItemColumns =
+        {
+            "VitaminAPer100", "VitaminB1Per100", "VitaminB2Per100", "VitaminB3Per100", "VitaminB5Per100",
+            "VitaminB6Per100", "VitaminB7Per100", "VitaminB9Per100", "VitaminB12Per100", "VitaminCPer100",
+            "VitaminDPer100", "VitaminEPer100", "VitaminKPer100",
+            "CalciumPer100", "MagnesiumPer100", "PotassiumPer100", "SodiumPer100", "PhosphorusPer100",
+            "ChloridePer100", "SulfurPer100", "IronPer100", "ZincPer100", "SeleniumPer100", "CopperPer100",
+            "ManganesePer100", "IodinePer100", "FluoridePer100", "ChromiumPer100", "MolybdenumPer100",
+            "CobaltPer100", "SiliconPer100",
+            "SugarAlcoholsPer100", "AlcoholPer100", "Omega3Per100", "Omega6Per100", "Omega9Per100"
+        };
+        foreach (var column in newFoodItemColumns)
+        {
+            try
+            {
+                context.Database.ExecuteSqlRaw($@"ALTER TABLE ""FoodItems"" ADD COLUMN ""{column}"" REAL NOT NULL DEFAULT 0;");
+            }
+            catch
+            {
+                // Spalte existiert bereits aus einem frueheren Start - erwarteter No-Op-Fall.
+            }
+        }
+
         // Übungsdatenbank befüllen bzw. um neue Übungen ergänzen - so muss die Datenbank
         // nicht mehr gelöscht werden, nur weil neue Übungen zur Liste hinzukommen.
         var existingNames = context.Exercises.Select(e => e.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);

@@ -144,6 +144,8 @@ public class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(CalorieProgressLabel));
             OnPropertyChanged(nameof(CalorieRingForegroundPath));
             OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable));
+            OnPropertyChanged(nameof(ExtraMacroCards)); OnPropertyChanged(nameof(VitaminCards));
+            OnPropertyChanged(nameof(MineralCards)); OnPropertyChanged(nameof(OtherNutrientCards));
         };
         Breakfast.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasBreakfastEntries));
         Lunch.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasLunchEntries));
@@ -435,6 +437,12 @@ public class MainViewModel : INotifyPropertyChanged
         Color.FromArgb("#4C8DFF"),
         startDeg: -90, sweepDeg: 270, centered: true);
 
+    // ---------------- Vitamine/Mineralstoffe/Weitere für die Ernährungs-Übersicht ----------------
+    public List<NutrientCardDisplay> ExtraMacroCards => NutrientCardBuilder.BuildExtraMacros(Totals);
+    public List<NutrientCardDisplay> VitaminCards => NutrientCardBuilder.BuildVitamins(Totals);
+    public List<NutrientCardDisplay> MineralCards => NutrientCardBuilder.BuildMinerals(Totals);
+    public List<NutrientCardDisplay> OtherNutrientCards => NutrientCardBuilder.BuildOthers(Totals);
+
     /// <summary>Voller Hintergrund-Ring für die kompakte Kalorien-Anzeige im Dashboard (Home-Reiter).</summary>
     public string CalorieRingBackgroundPath => PieChartHelper.BuildArc(-90, 269.999, 60, 64, 64);
 
@@ -631,6 +639,8 @@ public class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsOverTarget));
             OnPropertyChanged(nameof(CalorieRingForegroundPath));
             OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable));
+            OnPropertyChanged(nameof(ExtraMacroCards)); OnPropertyChanged(nameof(VitaminCards));
+            OnPropertyChanged(nameof(MineralCards)); OnPropertyChanged(nameof(OtherNutrientCards));
 
             // Direkt ins Feld schreiben statt über die Property, damit das Laden
             // aus der Datenbank nicht sofort wieder einen Speichervorgang auslöst.

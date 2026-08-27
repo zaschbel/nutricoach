@@ -43,6 +43,35 @@
                 </Grid>
             </Frame>
         </DataTemplate>
+        <DataTemplate x:Key="NutrientCardTemplate">
+            <Frame Style="{StaticResource CardStyle}" Padding="14" Margin="0,0,0,12" WidthRequest="164" FlexLayout.Basis="48%">
+                <VerticalStackLayout Spacing="8">
+                    <Label FontSize="13" LineBreakMode="TailTruncation">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="{Binding Icon}" TextColor="{StaticResource ColorTextPrimary}"/>
+                                <Span Text="  "/>
+                                <Span Text="{Binding Name}" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextPrimary}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <ProgressBar Progress="{Binding ProgressRatio}" ProgressColor="{StaticResource ColorSuccess}"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" LineBreakMode="NoWrap">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Current, StringFormat='{0:0.0}'}" FontFamily="InterBold" FontSize="16" TextColor="{StaticResource ColorTextPrimary}"/>
+                                    <Span Text="{Binding Goal, StringFormat=' / {0:0.#}'}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                                    <Span Text="{Binding Unit, StringFormat=' {0}'}" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="14"
+                               TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+        </DataTemplate>
     </ContentView.Resources>
 
     <Grid>
@@ -175,8 +204,43 @@
                         </Grid>
                         <ProgressBar Progress="{Binding FatProgressRatio}" ProgressColor="#F5A623" HeightRequest="6"/>
                     </VerticalStackLayout>
+
+                    <Border BackgroundColor="White" StrokeThickness="0" Padding="0,14">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="999"/>
+                        </Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOptimizeCalorieCalculationTapped"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="Kalorienberechnung optimieren" FontFamily="InterBold" FontSize="14"
+                               TextColor="Black" HorizontalTextAlignment="Center"/>
+                    </Border>
                 </VerticalStackLayout>
             </Frame>
+
+            <!-- Makros: zusätzliche Werte neben den drei Haupt-Makros oben -->
+            <Label Text="MAKROS" Style="{StaticResource SectionLabelStyle}" Margin="2,10,0,0"/>
+            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween"
+                        BindableLayout.ItemsSource="{Binding ExtraMacroCards}"
+                        BindableLayout.ItemTemplate="{StaticResource NutrientCardTemplate}"/>
+
+            <!-- Vitamine -->
+            <Label Text="VITAMINE" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
+            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween"
+                        BindableLayout.ItemsSource="{Binding VitaminCards}"
+                        BindableLayout.ItemTemplate="{StaticResource NutrientCardTemplate}"/>
+
+            <!-- Mineralstoffe -->
+            <Label Text="MINERALSTOFFE" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
+            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween"
+                        BindableLayout.ItemsSource="{Binding MineralCards}"
+                        BindableLayout.ItemTemplate="{StaticResource NutrientCardTemplate}"/>
+
+            <!-- Weitere -->
+            <Label Text="WEITERE" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
+            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="SpaceBetween"
+                        BindableLayout.ItemsSource="{Binding OtherNutrientCards}"
+                        BindableLayout.ItemTemplate="{StaticResource NutrientCardTemplate}"/>
 
             <!-- Wochennavigation -->
             <Frame Style="{StaticResource CardStyle}" Padding="12,10" HeightRequest="76" VerticalOptions="Start">
@@ -238,26 +302,6 @@
                     <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
                             Command="{Binding NextWeekCommand}"/>
                 </Grid>
-            </Frame>
-
-            <!-- Hydration -->
-            <Frame Style="{StaticResource CardStyle}">
-                <VerticalStackLayout Spacing="10">
-                    <Grid ColumnDefinitions="*,Auto,Auto">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="Hydration" FontFamily="InterSemiBold" FontSize="16"/>
-                            <Label Text="{Binding WaterLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
-                        </VerticalStackLayout>
-                        <Button Grid.Column="1" Text="+ 250ml" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" FontSize="11"
-                                Command="{Binding AddWaterQuickCommand}" CommandParameter="250" Margin="0,0,6,0"/>
-                        <Button Grid.Column="2" Text="+ 500ml" Style="{StaticResource PrimaryButtonStyle}" Padding="10,6" FontSize="11"
-                                Command="{Binding AddWaterQuickCommand}" CommandParameter="500"/>
-                    </Grid>
-                    <GraphicsView Drawable="{Binding WaterBottleDrawable}" HorizontalOptions="Center" WidthRequest="80" HeightRequest="150" Margin="0,4,0,4"/>
-                    <Label Text="{Binding WaterPercentLabel}" FontFamily="InterBold" FontSize="16" TextColor="{StaticResource ColorAccent}" HorizontalOptions="Center"/>
-                    <Label Text="{Binding WaterRemainingLabel}" FontSize="11" TextColor="{StaticResource ColorAccent}" HorizontalOptions="Center"/>
-                    <ProgressBar Progress="{Binding WaterProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
-                </VerticalStackLayout>
             </Frame>
 
             <!-- Heutige Mahlzeiten -->

@@ -20,6 +20,49 @@ public class NutritionEntryDisplay
     public string? PhotoPath { get; set; }
     public bool HasPhoto => !string.IsNullOrWhiteSpace(PhotoPath);
     public string Icon => FoodIconHelper.GetIcon(Name);
+
+    // Zusaetzliche Makros + Mikronaehrstoffe fuer diesen Eintrag (bereits auf die tatsaechlich
+    // gegessene Menge hochgerechnet, nicht mehr "je 100g" wie im FoodItem).
+    public double Sugar { get; set; }
+    public double SaturatedFat { get; set; }
+    public double Fiber { get; set; }
+    public double Salt { get; set; }
+    public double VitaminA { get; set; }
+    public double VitaminB1 { get; set; }
+    public double VitaminB2 { get; set; }
+    public double VitaminB3 { get; set; }
+    public double VitaminB5 { get; set; }
+    public double VitaminB6 { get; set; }
+    public double VitaminB7 { get; set; }
+    public double VitaminB9 { get; set; }
+    public double VitaminB12 { get; set; }
+    public double VitaminC { get; set; }
+    public double VitaminD { get; set; }
+    public double VitaminE { get; set; }
+    public double VitaminK { get; set; }
+    public double Calcium { get; set; }
+    public double Magnesium { get; set; }
+    public double Potassium { get; set; }
+    public double Sodium { get; set; }
+    public double Phosphorus { get; set; }
+    public double Chloride { get; set; }
+    public double Sulfur { get; set; }
+    public double Iron { get; set; }
+    public double Zinc { get; set; }
+    public double Selenium { get; set; }
+    public double Copper { get; set; }
+    public double Manganese { get; set; }
+    public double Iodine { get; set; }
+    public double Fluoride { get; set; }
+    public double Chromium { get; set; }
+    public double Molybdenum { get; set; }
+    public double Cobalt { get; set; }
+    public double Silicon { get; set; }
+    public double SugarAlcohols { get; set; }
+    public double Alcohol { get; set; }
+    public double Omega3 { get; set; }
+    public double Omega6 { get; set; }
+    public double Omega9 { get; set; }
 }
 
 /// <summary>Aufsummierte Tageswerte, z. B. für die Kopfzeile des Ernährungstagebuchs.</summary>
@@ -30,6 +73,47 @@ public class DailyTotals
     public double Carbs { get; set; }
     public double Fat { get; set; }
     public int WaterMl { get; set; }
+
+    public double Sugar { get; set; }
+    public double SaturatedFat { get; set; }
+    public double Fiber { get; set; }
+    public double Salt { get; set; }
+    public double VitaminA { get; set; }
+    public double VitaminB1 { get; set; }
+    public double VitaminB2 { get; set; }
+    public double VitaminB3 { get; set; }
+    public double VitaminB5 { get; set; }
+    public double VitaminB6 { get; set; }
+    public double VitaminB7 { get; set; }
+    public double VitaminB9 { get; set; }
+    public double VitaminB12 { get; set; }
+    public double VitaminC { get; set; }
+    public double VitaminD { get; set; }
+    public double VitaminE { get; set; }
+    public double VitaminK { get; set; }
+    public double Calcium { get; set; }
+    public double Magnesium { get; set; }
+    public double Potassium { get; set; }
+    public double Sodium { get; set; }
+    public double Phosphorus { get; set; }
+    public double Chloride { get; set; }
+    public double Sulfur { get; set; }
+    public double Iron { get; set; }
+    public double Zinc { get; set; }
+    public double Selenium { get; set; }
+    public double Copper { get; set; }
+    public double Manganese { get; set; }
+    public double Iodine { get; set; }
+    public double Fluoride { get; set; }
+    public double Chromium { get; set; }
+    public double Molybdenum { get; set; }
+    public double Cobalt { get; set; }
+    public double Silicon { get; set; }
+    public double SugarAlcohols { get; set; }
+    public double Alcohol { get; set; }
+    public double Omega3 { get; set; }
+    public double Omega6 { get; set; }
+    public double Omega9 { get; set; }
 }
 
 /// <summary>Ein zuletzt verwendetes Lebensmittel mit der Menge, die beim letzten Mal eingetragen wurde.</summary>
@@ -57,7 +141,47 @@ public class NutritionDiaryService
             Protein = Math.Round(food.ProteinPer100 * factor, 1),
             Carbs = Math.Round(food.CarbsPer100 * factor, 1),
             Fat = Math.Round(food.FatPer100 * factor, 1),
-            PhotoPath = food.PhotoPath
+            PhotoPath = food.PhotoPath,
+            Sugar = food.SugarPer100 * factor,
+            SaturatedFat = food.SaturatedFatPer100 * factor,
+            Fiber = food.FiberPer100 * factor,
+            Salt = food.SaltPer100 * factor,
+            VitaminA = food.VitaminAPer100 * factor,
+            VitaminB1 = food.VitaminB1Per100 * factor,
+            VitaminB2 = food.VitaminB2Per100 * factor,
+            VitaminB3 = food.VitaminB3Per100 * factor,
+            VitaminB5 = food.VitaminB5Per100 * factor,
+            VitaminB6 = food.VitaminB6Per100 * factor,
+            VitaminB7 = food.VitaminB7Per100 * factor,
+            VitaminB9 = food.VitaminB9Per100 * factor,
+            VitaminB12 = food.VitaminB12Per100 * factor,
+            VitaminC = food.VitaminCPer100 * factor,
+            VitaminD = food.VitaminDPer100 * factor,
+            VitaminE = food.VitaminEPer100 * factor,
+            VitaminK = food.VitaminKPer100 * factor,
+            Calcium = food.CalciumPer100 * factor,
+            Magnesium = food.MagnesiumPer100 * factor,
+            Potassium = food.PotassiumPer100 * factor,
+            Sodium = food.SodiumPer100 * factor,
+            Phosphorus = food.PhosphorusPer100 * factor,
+            Chloride = food.ChloridePer100 * factor,
+            Sulfur = food.SulfurPer100 * factor,
+            Iron = food.IronPer100 * factor,
+            Zinc = food.ZincPer100 * factor,
+            Selenium = food.SeleniumPer100 * factor,
+            Copper = food.CopperPer100 * factor,
+            Manganese = food.ManganesePer100 * factor,
+            Iodine = food.IodinePer100 * factor,
+            Fluoride = food.FluoridePer100 * factor,
+            Chromium = food.ChromiumPer100 * factor,
+            Molybdenum = food.MolybdenumPer100 * factor,
+            Cobalt = food.CobaltPer100 * factor,
+            Silicon = food.SiliconPer100 * factor,
+            SugarAlcohols = food.SugarAlcoholsPer100 * factor,
+            Alcohol = food.AlcoholPer100 * factor,
+            Omega3 = food.Omega3Per100 * factor,
+            Omega6 = food.Omega6Per100 * factor,
+            Omega9 = food.Omega9Per100 * factor
         };
     }
 
@@ -125,7 +249,47 @@ public class NutritionDiaryService
             Protein = entries.Sum(e => e.Protein),
             Carbs = entries.Sum(e => e.Carbs),
             Fat = entries.Sum(e => e.Fat),
-            WaterMl = waterMl
+            WaterMl = waterMl,
+            Sugar = entries.Sum(e => e.Sugar),
+            SaturatedFat = entries.Sum(e => e.SaturatedFat),
+            Fiber = entries.Sum(e => e.Fiber),
+            Salt = entries.Sum(e => e.Salt),
+            VitaminA = entries.Sum(e => e.VitaminA),
+            VitaminB1 = entries.Sum(e => e.VitaminB1),
+            VitaminB2 = entries.Sum(e => e.VitaminB2),
+            VitaminB3 = entries.Sum(e => e.VitaminB3),
+            VitaminB5 = entries.Sum(e => e.VitaminB5),
+            VitaminB6 = entries.Sum(e => e.VitaminB6),
+            VitaminB7 = entries.Sum(e => e.VitaminB7),
+            VitaminB9 = entries.Sum(e => e.VitaminB9),
+            VitaminB12 = entries.Sum(e => e.VitaminB12),
+            VitaminC = entries.Sum(e => e.VitaminC),
+            VitaminD = entries.Sum(e => e.VitaminD),
+            VitaminE = entries.Sum(e => e.VitaminE),
+            VitaminK = entries.Sum(e => e.VitaminK),
+            Calcium = entries.Sum(e => e.Calcium),
+            Magnesium = entries.Sum(e => e.Magnesium),
+            Potassium = entries.Sum(e => e.Potassium),
+            Sodium = entries.Sum(e => e.Sodium),
+            Phosphorus = entries.Sum(e => e.Phosphorus),
+            Chloride = entries.Sum(e => e.Chloride),
+            Sulfur = entries.Sum(e => e.Sulfur),
+            Iron = entries.Sum(e => e.Iron),
+            Zinc = entries.Sum(e => e.Zinc),
+            Selenium = entries.Sum(e => e.Selenium),
+            Copper = entries.Sum(e => e.Copper),
+            Manganese = entries.Sum(e => e.Manganese),
+            Iodine = entries.Sum(e => e.Iodine),
+            Fluoride = entries.Sum(e => e.Fluoride),
+            Chromium = entries.Sum(e => e.Chromium),
+            Molybdenum = entries.Sum(e => e.Molybdenum),
+            Cobalt = entries.Sum(e => e.Cobalt),
+            Silicon = entries.Sum(e => e.Silicon),
+            SugarAlcohols = entries.Sum(e => e.SugarAlcohols),
+            Alcohol = entries.Sum(e => e.Alcohol),
+            Omega3 = entries.Sum(e => e.Omega3),
+            Omega6 = entries.Sum(e => e.Omega6),
+            Omega9 = entries.Sum(e => e.Omega9)
         };
     }
 

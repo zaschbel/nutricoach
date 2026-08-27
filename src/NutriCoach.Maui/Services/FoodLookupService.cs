@@ -187,6 +187,36 @@ public class FoodLookupService
             SaturatedFatPer100 = p.Nutriments?.SaturatedFat100g ?? 0,
             FiberPer100 = p.Nutriments?.Fiber100g ?? 0,
             SaltPer100 = p.Nutriments?.Salt100g ?? 0,
+            // Vitamine/Mineralstoffe: Open Food Facts liefert sie in g (nicht mg/µg wie auf dem
+            // Etikett üblich) - deshalb hier auf die in der App verwendeten Einheiten umgerechnet.
+            VitaminAPer100 = (p.Nutriments?.VitaminA100g ?? 0) * 1_000_000,
+            VitaminB1Per100 = (p.Nutriments?.VitaminB1100g ?? 0) * 1_000,
+            VitaminB2Per100 = (p.Nutriments?.VitaminB2100g ?? 0) * 1_000,
+            VitaminB3Per100 = (p.Nutriments?.VitaminPP100g ?? 0) * 1_000,
+            VitaminB5Per100 = (p.Nutriments?.PantothenicAcid100g ?? 0) * 1_000,
+            VitaminB6Per100 = (p.Nutriments?.VitaminB6100g ?? 0) * 1_000,
+            VitaminB7Per100 = (p.Nutriments?.Biotin100g ?? 0) * 1_000_000,
+            VitaminB9Per100 = (p.Nutriments?.VitaminB9100g ?? 0) * 1_000_000,
+            VitaminB12Per100 = (p.Nutriments?.VitaminB12100g ?? 0) * 1_000_000,
+            VitaminCPer100 = (p.Nutriments?.VitaminC100g ?? 0) * 1_000,
+            VitaminDPer100 = (p.Nutriments?.VitaminD100g ?? 0) * 1_000_000,
+            VitaminEPer100 = (p.Nutriments?.VitaminE100g ?? 0) * 1_000,
+            VitaminKPer100 = (p.Nutriments?.VitaminK100g ?? 0) * 1_000_000,
+            CalciumPer100 = (p.Nutriments?.Calcium100g ?? 0) * 1_000,
+            MagnesiumPer100 = (p.Nutriments?.Magnesium100g ?? 0) * 1_000,
+            PotassiumPer100 = (p.Nutriments?.Potassium100g ?? 0) * 1_000,
+            SodiumPer100 = (p.Nutriments?.Sodium100g ?? 0) * 1_000,
+            PhosphorusPer100 = (p.Nutriments?.Phosphorus100g ?? 0) * 1_000,
+            IronPer100 = (p.Nutriments?.Iron100g ?? 0) * 1_000,
+            ZincPer100 = (p.Nutriments?.Zinc100g ?? 0) * 1_000,
+            SeleniumPer100 = (p.Nutriments?.Selenium100g ?? 0) * 1_000_000,
+            CopperPer100 = (p.Nutriments?.Copper100g ?? 0) * 1_000,
+            ManganesePer100 = (p.Nutriments?.Manganese100g ?? 0) * 1_000,
+            IodinePer100 = (p.Nutriments?.Iodine100g ?? 0) * 1_000_000,
+            AlcoholPer100 = p.Nutriments?.Alcohol100g ?? 0,
+            Omega3Per100 = (p.Nutriments?.Omega3Fat100g ?? 0) * 1_000,
+            Omega6Per100 = p.Nutriments?.Omega6Fat100g ?? 0,
+            Omega9Per100 = p.Nutriments?.Omega9Fat100g ?? 0,
             Source = "OpenFoodFacts"
         };
     }
@@ -266,5 +296,62 @@ public class FoodLookupService
         public double? Fiber100g { get; set; }
         [JsonPropertyName("salt_100g")]
         public double? Salt100g { get; set; }
+
+        [JsonPropertyName("vitamin-a_100g")]
+        public double? VitaminA100g { get; set; }
+        [JsonPropertyName("vitamin-b1_100g")]
+        public double? VitaminB1100g { get; set; }
+        [JsonPropertyName("vitamin-b2_100g")]
+        public double? VitaminB2100g { get; set; }
+        [JsonPropertyName("vitamin-pp_100g")]
+        public double? VitaminPP100g { get; set; }
+        [JsonPropertyName("pantothenic-acid_100g")]
+        public double? PantothenicAcid100g { get; set; }
+        [JsonPropertyName("vitamin-b6_100g")]
+        public double? VitaminB6100g { get; set; }
+        [JsonPropertyName("biotin_100g")]
+        public double? Biotin100g { get; set; }
+        [JsonPropertyName("vitamin-b9_100g")]
+        public double? VitaminB9100g { get; set; }
+        [JsonPropertyName("vitamin-b12_100g")]
+        public double? VitaminB12100g { get; set; }
+        [JsonPropertyName("vitamin-c_100g")]
+        public double? VitaminC100g { get; set; }
+        [JsonPropertyName("vitamin-d_100g")]
+        public double? VitaminD100g { get; set; }
+        [JsonPropertyName("vitamin-e_100g")]
+        public double? VitaminE100g { get; set; }
+        [JsonPropertyName("vitamin-k_100g")]
+        public double? VitaminK100g { get; set; }
+        [JsonPropertyName("calcium_100g")]
+        public double? Calcium100g { get; set; }
+        [JsonPropertyName("magnesium_100g")]
+        public double? Magnesium100g { get; set; }
+        [JsonPropertyName("potassium_100g")]
+        public double? Potassium100g { get; set; }
+        [JsonPropertyName("sodium_100g")]
+        public double? Sodium100g { get; set; }
+        [JsonPropertyName("phosphorus_100g")]
+        public double? Phosphorus100g { get; set; }
+        [JsonPropertyName("iron_100g")]
+        public double? Iron100g { get; set; }
+        [JsonPropertyName("zinc_100g")]
+        public double? Zinc100g { get; set; }
+        [JsonPropertyName("selenium_100g")]
+        public double? Selenium100g { get; set; }
+        [JsonPropertyName("copper_100g")]
+        public double? Copper100g { get; set; }
+        [JsonPropertyName("manganese_100g")]
+        public double? Manganese100g { get; set; }
+        [JsonPropertyName("iodine_100g")]
+        public double? Iodine100g { get; set; }
+        [JsonPropertyName("alcohol_100g")]
+        public double? Alcohol100g { get; set; }
+        [JsonPropertyName("omega-3-fat_100g")]
+        public double? Omega3Fat100g { get; set; }
+        [JsonPropertyName("omega-6-fat_100g")]
+        public double? Omega6Fat100g { get; set; }
+        [JsonPropertyName("omega-9-fat_100g")]
+        public double? Omega9Fat100g { get; set; }
     }
 }
