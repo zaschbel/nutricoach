@@ -2,37 +2,46 @@ using Microsoft.Maui.Graphics;
 
 namespace NutriCoach.Maui.Drawables;
 
-/// <summary>Zeichnet den Kalorien-Bogen (Halbkreis, wächst mit dem Fortschritt) für die Ernährungs-Übersicht.</summary>
+/// <summary>Zeichnet einen Fortschritts-Bogen (Halbkreis für die Ernährungs-Übersicht, oder ein
+/// nahezu voller Ring für die kompakte Dashboard-Anzeige) - wächst mit dem Fortschritt.</summary>
 public class GaugeDrawable : IDrawable
 {
     private readonly double _percent;
     private readonly Color _backgroundColor;
     private readonly Color _foregroundColor;
+    private readonly double _startDeg;
+    private readonly double _sweepDeg;
+    private readonly bool _centered;
 
-    public GaugeDrawable(double percent, Color backgroundColor, Color foregroundColor)
+    public GaugeDrawable(double percent, Color backgroundColor, Color foregroundColor,
+        double startDeg = 180, double sweepDeg = 180, bool centered = false)
     {
         _percent = Math.Clamp(percent, 0, 100);
         _backgroundColor = backgroundColor;
         _foregroundColor = foregroundColor;
+        _startDeg = startDeg;
+        _sweepDeg = sweepDeg;
+        _centered = centered;
     }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         float cx = dirtyRect.Width / 2f;
-        float cy = dirtyRect.Height - 6f;
+        float cy = _centered ? dirtyRect.Height / 2f : dirtyRect.Height - 6f;
         float radius = Math.Min(cx, dirtyRect.Height) - 12f;
 
         canvas.StrokeSize = 14;
         canvas.StrokeLineCap = LineCap.Round;
 
-        DrawArcStroke(canvas, cx, cy, radius, 180, 360, _backgroundColor);
+        var endDeg = _startDeg + _sweepDeg;
+        DrawArcStroke(canvas, cx, cy, radius, _startDeg, endDeg, _backgroundColor);
 
-        var sweepEndDeg = 180 + _percent / 100.0 * 180.0;
-        if (sweepEndDeg > 180.5)
+        var sweepEndDeg = _startDeg + _percent / 100.0 * _sweepDeg;
+        if (sweepEndDeg > _startDeg + 0.5)
         {
             canvas.SaveState();
             canvas.SetShadow(new SizeF(0, 2), 6, Color.FromRgba(0, 0, 0, 50));
-            DrawArcStroke(canvas, cx, cy, radius, 180, sweepEndDeg, _foregroundColor);
+            DrawArcStroke(canvas, cx, cy, radius, _startDeg, sweepEndDeg, _foregroundColor);
             canvas.RestoreState();
         }
     }

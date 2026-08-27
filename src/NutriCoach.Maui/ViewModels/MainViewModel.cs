@@ -143,7 +143,7 @@ public class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(CalorieRemainingLabel));
             OnPropertyChanged(nameof(CalorieProgressLabel));
             OnPropertyChanged(nameof(CalorieRingForegroundPath));
-            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable));
+            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable));
         };
         Breakfast.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasBreakfastEntries));
         Lunch.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasLunchEntries));
@@ -298,7 +298,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private double _calorieTarget;
     public double CalorieTarget { get => _calorieTarget; set { _calorieTarget = value; OnPropertyChanged(); OnPropertyChanged(nameof(CalorieProgressLabel)); OnPropertyChanged(nameof(CalorieRemainingLabel)); OnPropertyChanged(nameof(GaugeForegroundPath)); OnPropertyChanged(nameof(RemainingKcal)); OnPropertyChanged(nameof(IsOverTarget)); OnPropertyChanged(nameof(AdjustedCalorieTarget)); OnPropertyChanged(nameof(HasTrainingKcalToday)); OnPropertyChanged(nameof(CalorieRingForegroundPath));
-            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); } }
+            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable)); } }
 
     // ---------------- Dashboard (Home): Streak, Schritte, heutiges Training ----------------
 
@@ -425,6 +425,15 @@ public class MainViewModel : INotifyPropertyChanged
         CalorieProgressRatio * 100,
         Color.FromArgb("#E2E2E4"),
         Color.FromArgb("#0058BC"));
+
+    /// <summary>Kompakter, nahezu voller Ring für die Kalorien-Karte im Dashboard (Home-Reiter),
+    /// analog zur MCI-App-Vorlage. Nutzt die tatsächlichen Dunkelmodus-Farbwerte aus App.xaml.cs,
+    /// da die App dauerhaft im Dunkelmodus läuft.</summary>
+    public IDrawable HomeCalorieGaugeDrawable => new GaugeDrawable(
+        CalorieProgressRatio * 100,
+        Color.FromArgb("#282B31"),
+        Color.FromArgb("#4C8DFF"),
+        startDeg: -90, sweepDeg: 270, centered: true);
 
     /// <summary>Voller Hintergrund-Ring für die kompakte Kalorien-Anzeige im Dashboard (Home-Reiter).</summary>
     public string CalorieRingBackgroundPath => PieChartHelper.BuildArc(-90, 269.999, 60, 64, 64);
@@ -616,12 +625,12 @@ public class MainViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(ProteinProgressRatio));
             OnPropertyChanged(nameof(CarbsProgressRatio));
             OnPropertyChanged(nameof(FatProgressRatio));
-            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable));
+            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable));
             OnPropertyChanged(nameof(GaugeForegroundPath));
             OnPropertyChanged(nameof(RemainingKcal));
             OnPropertyChanged(nameof(IsOverTarget));
             OnPropertyChanged(nameof(CalorieRingForegroundPath));
-            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable));
+            OnPropertyChanged(nameof(CalorieProgressRatio)); OnPropertyChanged(nameof(CalorieGaugeDrawable)); OnPropertyChanged(nameof(HomeCalorieGaugeDrawable));
 
             // Direkt ins Feld schreiben statt über die Property, damit das Laden
             // aus der Datenbank nicht sofort wieder einen Speichervorgang auslöst.

@@ -9,22 +9,14 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="16">
 
-            <!-- Kopfzeile -->
-            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
-                <Border Grid.Column="0" WidthRequest="36" HeightRequest="36" StrokeThickness="0" BackgroundColor="{StaticResource ColorSurfaceElevated}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="18"/>
-                    </Border.StrokeShape>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnSettingsTapped"/>
-                    </Border.GestureRecognizers>
-                    <Grid>
-                        <Image Source="{Binding ProfilePicturePath}" Aspect="AspectFill" IsVisible="{Binding HasProfilePicture}"/>
-                        <Label Text="&#xf007;" FontFamily="FontAwesomeSolid" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding HasProfilePicture, Converter={StaticResource InverseBoolConverter}}"/>
-                    </Grid>
-                </Border>
-                <Label Grid.Column="1" Text="Nitrocoach" FontFamily="InterBold" FontSize="22"
-                       TextColor="{StaticResource ColorAccent}" VerticalOptions="Center"/>
+            <!-- Kopfzeile: fette Großbuchstaben-Seitentitel + Streak + Einstellungen, nach MCI-Vorbild -->
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="14">
+                <Label Grid.Column="0" Text="DASHBOARD" FontFamily="InterBold" FontSize="22"
+                       CharacterSpacing="0.5" TextColor="{StaticResource ColorTextPrimary}" VerticalOptions="Center"/>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                    <Label x:Name="StreakFlameIcon" Text="&#xf06d;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="#FF7A45" VerticalOptions="Center" AnchorX="0.5" AnchorY="0.5"/>
+                    <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorTextPrimary}" FontFamily="InterBold" FontSize="15" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
                 <Label Grid.Column="2" Text="&#xf013;" FontFamily="FontAwesomeSolid" FontSize="20" VerticalOptions="Center" BackgroundColor="Transparent">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSettingsTapped"/>
@@ -32,40 +24,36 @@
                 </Label>
             </Grid>
 
-            <!-- Datum + Streak -->
-            <Grid ColumnDefinitions="*,Auto">
-                <VerticalStackLayout Grid.Column="0">
-                    <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
-                    <Label Text="Tagesübersicht" Style="{StaticResource HeadlineLabelStyle}"/>
-                </VerticalStackLayout>
-                <Frame Grid.Column="1" BackgroundColor="{StaticResource ColorSurfaceElevated}" CornerRadius="20"
-                       Padding="12,6" HasShadow="False" BorderColor="Transparent" VerticalOptions="Center"
-                       HeightRequest="34" MinimumWidthRequest="72" HorizontalOptions="End">
-                    <HorizontalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
-                        <Label x:Name="StreakFlameIcon" Text="&#xf06d;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="#FF7A45" VerticalOptions="Center" AnchorX="0.5" AnchorY="0.5"/>
-                        <Label Text="{Binding CurrentStreakDays}" TextColor="{StaticResource ColorAccent}" FontFamily="InterBold" FontSize="13" VerticalOptions="Center"/>
-                        <Label Text="Tage" TextColor="{StaticResource ColorAccent}" FontFamily="InterMedium" FontSize="13" VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
-                </Frame>
-            </Grid>
+            <!-- Datum -->
+            <VerticalStackLayout>
+                <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
+                <Label Text="Tagesübersicht" Style="{StaticResource HeadlineLabelStyle}"/>
+            </VerticalStackLayout>
 
             <!-- Bento: Schritte + Kalorien -->
+            <Label Text="GEWOHNHEITEN" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
                     <Frame.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnStepsCardTapped"/>
                     </Frame.GestureRecognizers>
                     <VerticalStackLayout Spacing="4">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="&#xf554;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="#0058BC1A"
-                                   WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='Ziel: {0}'}" FontSize="10"
+                        <Label Text="Schritte" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                            <Label Grid.Column="1" Text="{Binding StepsGoal, StringFormat='{0:N0}'}" FontSize="10"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="End"/>
+                        </Grid>
+                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="22"
+                                       TextColor="{StaticResource ColorTextPrimary}"/>
+                                <Label Text="Schritte" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
                         </Grid>
-                        <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0}'}" FontFamily="InterBold" FontSize="26"
-                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
-                        <Label Text="Schritte heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding StepsProgressRatio}" ProgressColor="{StaticResource ColorAccent}" Margin="0,6,0,0"/>
                         <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0"
                                BackgroundColor="Transparent" IsVisible="{Binding ShowHealthKitConnectButton}">
                             <Label.FormattedText>
@@ -96,15 +84,22 @@
                     </Frame.GestureRecognizers>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Label Grid.Column="0" Text="&#xf2e7;" FontFamily="FontAwesomeSolid" FontSize="18" BackgroundColor="#8F6E531A"
-                                   WidthRequest="34" HeightRequest="34" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="1" Text="{Binding RemainingKcal, StringFormat='Rest: {0:0}'}" FontSize="10"
-                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                            <VerticalStackLayout Grid.Column="0">
+                                <Label Text="Kalorien" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                                <Label Text="Heute" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Start"/>
                         </Grid>
-                        <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
-                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,6,0,0"/>
-                        <Label Text="kcal gegessen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorTertiary}" Margin="0,6,0,0"/>
+                        <Grid HeightRequest="96" Margin="0,4,0,0">
+                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}"/>
+                            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="20"
+                                       TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding RemainingKcal, StringFormat='/ {0:0}'}" FontSize="10"
+                                       TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>
