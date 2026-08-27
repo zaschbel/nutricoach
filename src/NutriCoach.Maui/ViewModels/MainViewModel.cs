@@ -804,7 +804,7 @@ public class MainViewModel : INotifyPropertyChanged
     public int TrainingDaysThisWeek
     {
         get => _trainingDaysThisWeek;
-        set { _trainingDaysThisWeek = value; OnPropertyChanged(); OnPropertyChanged(nameof(TrainingProgressLabel)); OnPropertyChanged(nameof(TrainingProgressRatio)); OnPropertyChanged(nameof(TrainingProgressRatioMaui)); }
+        set { _trainingDaysThisWeek = value; OnPropertyChanged(); OnPropertyChanged(nameof(TrainingProgressLabel)); OnPropertyChanged(nameof(TrainingProgressRatio)); OnPropertyChanged(nameof(TrainingProgressRatioMaui)); OnPropertyChanged(nameof(TrainingThisWeekHeatmapLabel)); OnPropertyChanged(nameof(TrainingThisWeekHeatmapRatio)); }
     }
 
     public string TrainingProgressLabel => $"{TrainingDaysThisWeek}/{WeeklyTrainingGoal} Trainingstage";
@@ -813,6 +813,27 @@ public class MainViewModel : INotifyPropertyChanged
     /// <summary>0-1-Variante von TrainingProgressRatio für MAUI-ProgressBar (die WPF-Version nutzt 0-100).</summary>
     public double TrainingProgressRatioMaui => TrainingProgressRatio / 100.0;
     public bool ShowTrainingProgress => HasWeeklyGoal && HasWeeklyPlan;
+
+    // ---------------- Dashboard-Kalenderraster (letzte 30 Tage), nach MCI-App-Vorbild ----------------
+    private bool[] _weighInLast30Days = new bool[30];
+    private bool[] _trainingLast30Days = new bool[30];
+
+    public IDrawable WeighInHeatmapDrawable => new HeatmapDrawable(
+        _weighInLast30Days, Color.FromArgb("#34C77A"), Color.FromArgb("#212123"));
+    public IDrawable TrainingHeatmapDrawable => new HeatmapDrawable(
+        _trainingLast30Days, Color.FromArgb("#34C77A"), Color.FromArgb("#212123"));
+
+    private int _weighInDaysThisWeek;
+    public int WeighInDaysThisWeek
+    {
+        get => _weighInDaysThisWeek;
+        set { _weighInDaysThisWeek = value; OnPropertyChanged(); OnPropertyChanged(nameof(WeighInThisWeekLabel)); OnPropertyChanged(nameof(WeighInProgressRatio)); }
+    }
+    public string WeighInThisWeekLabel => $"{WeighInDaysThisWeek}/7 diese Woche";
+    public double WeighInProgressRatio => WeighInDaysThisWeek / 7.0;
+
+    public string TrainingThisWeekHeatmapLabel => $"{TrainingDaysThisWeek}/7 diese Woche";
+    public double TrainingThisWeekHeatmapRatio => TrainingDaysThisWeek / 7.0;
 
     // ---------------- Wochenplan ----------------
     private bool _hasWeeklyPlan;
@@ -891,6 +912,24 @@ public class MainViewModel : INotifyPropertyChanged
         var lastSession = await _trainingService.GetMostRecentSessionBeforeAsync(_profile.Id, today, _profile.CurrentWeightKg);
         LastSession = lastSession;
         LastSessionDate = lastSession is not null ? lastSession.Date : null;
+
+        await RefreshDashboardHeatmapsAsync(today);
+    }
+
+    /// <summary>Lädt die Kalenderraster für die Dashboard-Karten "Weigh-In" und "Trainings" (letzte 30 Tage).</summary>
+    private async Task RefreshDashboardHeatmapsAsync(DateOnly today)
+    {
+        if (_profile is null) return;
+        var thirtyDaysAgo = today.AddDays(-29);
+
+        var weightHistory = await _profileService.GetWeightHistoryAsync(_profile.Id, 30);
+        _weighInLast30Days = weightHistory.Select(w => w.WeightKg.HasValue).ToArray();
+        WeighInDaysThisWeek = weightHistory.TakeLast(7).Count(w => w.WeightKg.HasValue);
+        OnPropertyChanged(nameof(WeighInHeatmapDrawable));
+
+        var datesWithTraining = await _trainingService.GetDatesWithSessionsAsync(_profile.Id, thirtyDaysAgo, today);
+        _trainingLast30Days = Enumerable.Range(0, 30).Select(i => datesWithTraining.Contains(thirtyDaysAgo.AddDays(i))).ToArray();
+        OnPropertyChanged(nameof(TrainingHeatmapDrawable));
     }
 
     private async Task RefreshDiaryAsync()

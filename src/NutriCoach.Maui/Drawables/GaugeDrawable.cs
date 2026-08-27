@@ -28,7 +28,7 @@ public class GaugeDrawable : IDrawable
     {
         float cx = dirtyRect.Width / 2f;
         float cy = _centered ? dirtyRect.Height / 2f : dirtyRect.Height - 6f;
-        float radius = Math.Min(cx, dirtyRect.Height) - 12f;
+        float radius = _centered ? Math.Min(cx, cy) - 12f : Math.Min(cx, dirtyRect.Height) - 12f;
 
         canvas.StrokeSize = 14;
         canvas.StrokeLineCap = LineCap.Round;

@@ -173,10 +173,10 @@
                             <Label Grid.Column="1" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
                                    TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Start"/>
                         </Grid>
-                        <Grid HeightRequest="96" Margin="0,4,0,0">
-                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}"/>
+                        <Grid HeightRequest="90" Margin="0,4,0,0" HorizontalOptions="Center">
+                            <GraphicsView Drawable="{Binding HomeCalorieGaugeDrawable}" WidthRequest="90" HeightRequest="90"/>
                             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                                <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="20"
+                                <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="18"
                                        TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
                                 <Label Text="{Binding RemainingKcal, StringFormat='/ {0:0}'}" FontSize="10"
                                        TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
@@ -187,19 +187,23 @@
 
                 <Frame Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Trainings" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="Diese Woche" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <Label Text="{Binding TrainingProgressLabel}" FontFamily="InterBold" FontSize="20"
-                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,14,0,0"/>
+                        <Label Text="Weigh-In" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Letzte 30 Tage" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <GraphicsView Drawable="{Binding WeighInHeatmapDrawable}" HeightRequest="52" Margin="0,8,0,0"/>
+                        <ProgressBar Progress="{Binding WeighInProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"/>
+                        <Label Text="{Binding WeighInThisWeekLabel}" FontFamily="InterBold" FontSize="15"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,4,0,0"/>
                     </VerticalStackLayout>
                 </Frame>
 
                 <Frame Grid.Row="1" Grid.Column="1" Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Gewicht" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="Aktuell" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                        <Label Text="{Binding CurrentWeightKg, StringFormat='{0:0.0} kg'}" FontFamily="InterBold" FontSize="20"
-                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,14,0,0"/>
+                        <Label Text="Trainings" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Letzte 30 Tage" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <GraphicsView Drawable="{Binding TrainingHeatmapDrawable}" HeightRequest="52" Margin="0,8,0,0"/>
+                        <ProgressBar Progress="{Binding TrainingThisWeekHeatmapRatio}" ProgressColor="{StaticResource ColorSuccess}" Margin="0,6,0,0"/>
+                        <Label Text="{Binding TrainingThisWeekHeatmapLabel}" FontFamily="InterBold" FontSize="15"
+                               TextColor="{StaticResource ColorTextPrimary}" Margin="0,4,0,0"/>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>
