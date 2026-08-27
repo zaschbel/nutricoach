@@ -18,16 +18,13 @@
             </CarouselView.ItemTemplate>
         </CarouselView>
 
-        <!-- Freischwebende Navigationsleiste, exakt nach Stitch-Vorlage: volle Breite, nur obere Ecken
-             abgerundet, halbtransparenter Hintergrund (Annäherung an den Blur-Effekt aus dem Design,
-             echtes backdrop-blur gibt's in MAUI plattformübergreifend nicht ohne Zusatzaufwand). -->
-        <Border Grid.Row="1" BackgroundColor="{StaticResource ColorSurface}" StrokeThickness="0">
+        <!-- Navigationsleiste verschmilzt bewusst mit dem Seitenhintergrund (keine eigene Kartenfarbe,
+             keine Rundung, kein Schatten) - so wie bei der MCI-App als Vorbild: eine durchgehende Fläche
+             ohne sichtbaren Farbbruch zwischen Inhalt, Leiste und dem Bereich unter dem Home-Indicator. -->
+        <Border Grid.Row="1" BackgroundColor="{StaticResource ColorBackground}" StrokeThickness="0">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="20,20,0,0"/>
+                <RoundRectangle CornerRadius="0"/>
             </Border.StrokeShape>
-            <Border.Shadow>
-                <Shadow Brush="Black" Opacity="0.06" Radius="20" Offset="0,-6"/>
-            </Border.Shadow>
             <Grid ColumnDefinitions="*,*,*,*" Padding="8,10,8,26">
 
                 <VerticalStackLayout Grid.Column="0" x:Name="TabHome" Spacing="2" HorizontalOptions="Center" BackgroundColor="Transparent">
