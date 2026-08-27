@@ -60,7 +60,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
 
-            <Label Text="TRAINING" FontFamily="InterBold" FontSize="13" TextColor="{StaticResource ColorAccent}"/>
+            <Label Text="TRAINING" FontFamily="InterBold" FontSize="22" CharacterSpacing="0.5" TextColor="{StaticResource ColorTextPrimary}"/>
 
             <!-- Aktiver Plan -->
             <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasTodayPlan}">
@@ -121,7 +121,7 @@
                                             <Setter Property="BackgroundColor" Value="Transparent"/>
                                             <Style.Triggers>
                                                 <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorAccent}"/>
+                                                    <Setter Property="BackgroundColor" Value="#8B5CF6"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -157,7 +157,7 @@
                                         </Label>
                                         <Label Text="&#xf236;" FontFamily="FontAwesomeSolid" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
                                         <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
-                                                 Color="{StaticResource ColorAccent}" IsVisible="{Binding HasEntries}"/>
+                                                 Color="#8B5CF6" IsVisible="{Binding HasEntries}"/>
                                     </VerticalStackLayout>
                                 </Grid>
                             </DataTemplate>
@@ -182,7 +182,7 @@
                                 </Button.ImageSource>
                             </Button>
                         </Grid>
-                        <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="{StaticResource ColorAccent}"/>
+                        <ProgressBar Progress="{Binding TrainingProgressRatioMaui}" ProgressColor="#8B5CF6"/>
                     </VerticalStackLayout>
 
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasNoWeeklyGoal}">
