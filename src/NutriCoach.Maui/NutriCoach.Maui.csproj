@@ -9,6 +9,10 @@
          "Fehlerliste" nachsehen, welche Version explizit verlangt wird, und hier anpassen. -->
     <OutputType>Exe</OutputType>
     <RootNamespace>NutriCoach.Maui</RootNamespace>
+    <!-- Ohne diese Zeile übernimmt iOS den CFBundleName vom Projektnamen "NutriCoach.Maui" -
+         der Punkt darin lässt Sideloading-Tools (iloader/isideload) beim automatischen
+         Registrieren der App-ID bei Apple mit "not a valid name for an app id" fehlschlagen. -->
+    <AssemblyName>NutriCoach</AssemblyName>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
