@@ -9,9 +9,6 @@ public partial class ErnaehrungPage : ContentView
         AppState.MainViewModel.EntrySaved += () => _ = AnimateSuccessCheckmarkAsync();
     }
 
-    private async void OnOptimizeCalorieCalculationTapped(object? sender, EventArgs e) =>
-        await Application.Current!.MainPage!.Navigation.PushModalAsync(new SettingsPage());
-
     /// <summary>Kurzes Häkchen-Aufblitzen als Bestätigung, dass etwas gespeichert wurde (Essen/Wasser).</summary>
     private async Task AnimateSuccessCheckmarkAsync()
     {

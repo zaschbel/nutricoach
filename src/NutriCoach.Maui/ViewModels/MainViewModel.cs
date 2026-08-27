@@ -425,8 +425,8 @@ public class MainViewModel : INotifyPropertyChanged
     /// <summary>Zeichnung für den Kalorien-Bogen in der Ernährungs-Übersicht (aktualisiert sich bei jeder relevanten Änderung neu).</summary>
     public IDrawable CalorieGaugeDrawable => new GaugeDrawable(
         CalorieProgressRatio * 100,
-        Color.FromArgb("#E2E2E4"),
-        Color.FromArgb("#0058BC"));
+        Color.FromArgb("#282B31"),
+        Color.FromArgb("#34C77A"));
 
     /// <summary>Kompakter, nahezu voller Ring für die Kalorien-Karte im Dashboard (Home-Reiter),
     /// analog zur MCI-App-Vorlage. Nutzt die tatsächlichen Dunkelmodus-Farbwerte aus App.xaml.cs,

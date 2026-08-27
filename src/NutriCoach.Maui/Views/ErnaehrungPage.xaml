@@ -14,14 +14,14 @@
                         <TapGestureRecognizer Command="{Binding EditEntryCommand, Source={x:Static local:AppState.MainViewModel}}"
                                                CommandParameter="{Binding}"/>
                     </Grid.GestureRecognizers>
-                    <Border Grid.Column="0" WidthRequest="40" HeightRequest="40" StrokeThickness="0" Margin="0,0,10,0"
+                    <Border Grid.Column="0" WidthRequest="56" HeightRequest="56" Stroke="{StaticResource ColorSuccess}" StrokeThickness="2" Margin="0,0,10,0"
                             BackgroundColor="{StaticResource ColorSurfaceElevated}">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
+                            <RoundRectangle CornerRadius="28"/>
                         </Border.StrokeShape>
                         <Grid>
                             <Image Source="{Binding PhotoPath}" Aspect="AspectFill" IsVisible="{Binding HasPhoto}"/>
-                            <Label Text="{Binding Icon}" FontSize="20" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
+                            <Label Text="{Binding Icon}" FontSize="24" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
                                    IsVisible="{Binding HasPhoto, Converter={StaticResource InverseBoolConverter}}"/>
                         </Grid>
                     </Border>
@@ -39,7 +39,7 @@
                         </Label>
                     </VerticalStackLayout>
                     <Label Grid.Column="2" Text="{Binding Kcal, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="12"
-                           TextColor="{StaticResource ColorAccent}" VerticalOptions="Center"/>
+                           TextColor="{StaticResource ColorSuccess}" VerticalOptions="Center"/>
                 </Grid>
             </Frame>
         </DataTemplate>
@@ -74,75 +74,95 @@
         </DataTemplate>
     </ContentView.Resources>
 
-    <Grid>
-    <ScrollView>
-        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
+    <Grid RowDefinitions="Auto,*">
 
-            <Label Text="ERNÄHRUNG" FontFamily="InterBold" FontSize="13" TextColor="{StaticResource ColorAccent}"/>
-
-            <!-- Bento: Schritte + Kalorien + Training -->
-            <Frame Style="{StaticResource CardStyle}">
-                <Grid ColumnDefinitions="*,Auto">
-                    <VerticalStackLayout Grid.Column="0">
-                        <Label Text="TÄGLICHE AKTIVITÄT" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding StepsForSelectedDate, StringFormat='{0:N0} Schritte'}" FontFamily="InterSemiBold" FontSize="20" Margin="0,4,0,0"/>
-                    </VerticalStackLayout>
-                    <Label Grid.Column="1" Text="&#xf554;" FontFamily="FontAwesomeSolid" FontSize="20" BackgroundColor="#0058BC1A"
-                           WidthRequest="44" HeightRequest="44" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"
-                           VerticalOptions="Center"/>
-                </Grid>
-            </Frame>
-
-            <!-- Rezepte entdecken -->
-            <Frame Style="{StaticResource CardStyle}">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <Grid.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding OpenRecipesCommand}"/>
-                    </Grid.GestureRecognizers>
-                    <Label Grid.Column="0" Text="&#xf02d;" FontFamily="FontAwesomeSolid" FontSize="20" BackgroundColor="#0058BC1A"
-                           WidthRequest="44" HeightRequest="44" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Margin="0,0,12,0"/>
-                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                        <Label Text="Rezepte entdecken" FontFamily="InterSemiBold" FontSize="15"/>
-                        <Label Text="Echte Rezepte mit Zutaten &amp; Zubereitung durchsuchen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                    </VerticalStackLayout>
-                    <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
-                </Grid>
-            </Frame>
-
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <Frame Grid.Column="0" Style="{StaticResource CardStyle}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="KALORIEN" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding Totals.Kcal, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="14" LineBreakMode="NoWrap" Margin="0,4,0,8"/>
-                        <ProgressBar Progress="{Binding CalorieProgressRatio}" ProgressColor="{StaticResource ColorAccent}"/>
-                        <Label FontSize="10" TextColor="{StaticResource ColorAccent}" Margin="0,6,0,0" IsVisible="{Binding HasTrainingKcalToday}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span FontFamily="FontAwesomeSolid" Text="&#xf44b;" TextColor="{StaticResource ColorAccent}"/>
-                                    <Span Text="{Binding TrainingKcalBurnedToday, StringFormat=' +{0:0} durchs Training'}" TextColor="{StaticResource ColorAccent}"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                    </VerticalStackLayout>
-                </Frame>
-                <Frame Grid.Column="1" Style="{StaticResource CardStyle}">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}"/>
-                        <Label Text="{Binding TrainingKcalBurnedToday, StringFormat='{0:0} kcal'}" FontFamily="InterSemiBold" FontSize="14"
-                               LineBreakMode="NoWrap" Margin="0,4,0,8"/>
-                        <ProgressBar Progress="{Binding TrainingKcalProgressRatio}" ProgressColor="{StaticResource ColorTertiary}"/>
-                    </VerticalStackLayout>
-                </Frame>
+        <!-- Fixer Kopfbereich: Titel+Flamme, direkt darunter der Kalender ohne Seitenraender - beides
+             bleibt beim Scrollen sichtbar, wie bei der MCI-Vorlage "ganz oben mit dem Bildschirm verbunden". -->
+        <VerticalStackLayout Grid.Row="0" Spacing="0" BackgroundColor="{StaticResource ColorBackground}">
+            <Grid ColumnDefinitions="*,Auto" Padding="16,12,16,8">
+                <Label Grid.Column="0" Text="ERNÄHRUNG" FontFamily="InterBold" FontSize="22" CharacterSpacing="0.5" TextColor="{StaticResource ColorTextPrimary}" VerticalOptions="Center"/>
+                <HorizontalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                    <Label Text="&#xf06d;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="#FF7A45" VerticalOptions="Center"/>
+                    <Label Text="{Binding CurrentStreakDays}" FontFamily="InterBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
             </Grid>
+
+            <Border BackgroundColor="{StaticResource ColorSurface}" StrokeThickness="0" Padding="16,6,16,14">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,24,24"/>
+                </Border.StrokeShape>
+                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
+                            Command="{Binding PreviousWeekCommand}"/>
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4"
+                                           BindableLayout.ItemsSource="{Binding WeekDays}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="6,8" WidthRequest="42">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="BackgroundColor" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorSuccess}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding SelectDayCommand, Source={x:Static local:AppState.MainViewModel}}"
+                                                               CommandParameter="{Binding}"/>
+                                    </Grid.GestureRecognizers>
+                                    <VerticalStackLayout HorizontalOptions="Center">
+                                        <Label Text="{Binding DayAbbrev}" FontSize="10" HorizontalTextAlignment="Center">
+                                            <Label.Style>
+                                                <Style TargetType="Label">
+                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="TextColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <Label Text="{Binding DayNumber}" FontSize="14" FontFamily="InterSemiBold" HorizontalTextAlignment="Center">
+                                            <Label.Style>
+                                                <Style TargetType="Label">
+                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextPrimary}"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="TextColor" Value="White"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Label.Style>
+                                        </Label>
+                                        <Label Text="&#xf236;" FontFamily="FontAwesomeSolid" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
+                                        <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
+                                                 Color="{StaticResource ColorSuccess}" IsVisible="{Binding HasEntries}"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
+                            Command="{Binding NextWeekCommand}"/>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="14">
 
             <!-- Übersicht -->
             <Grid ColumnDefinitions="*,Auto" Margin="2,4,2,0">
                 <Label Grid.Column="0" Text="ÜBERSICHT" Style="{StaticResource SectionLabelStyle}" VerticalOptions="Center"/>
-                <Border Grid.Column="1" Stroke="{StaticResource ColorAccent}" StrokeThickness="1" BackgroundColor="Transparent" Padding="12,4">
+                <Border Grid.Column="1" Stroke="{StaticResource ColorSuccess}" StrokeThickness="1" BackgroundColor="Transparent" Padding="12,4">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="999"/>
                     </Border.StrokeShape>
-                    <Label Text="{Binding GoalBadgeText}" FontSize="10" FontFamily="InterBold" TextColor="{StaticResource ColorAccent}"/>
+                    <Label Text="{Binding GoalBadgeText}" FontSize="10" FontFamily="InterBold" TextColor="{StaticResource ColorSuccess}"/>
                 </Border>
             </Grid>
 
@@ -188,33 +208,134 @@
                             <Label Grid.Column="0" Text="Proteine" FontSize="12"/>
                             <Label Grid.Column="1" Text="{Binding ProteinLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding ProteinProgressRatio}" ProgressColor="#4AC0D9" HeightRequest="6"/>
+                        <ProgressBar Progress="{Binding ProteinProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" HeightRequest="6"/>
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0" Text="Kohlenhydrate" FontSize="12"/>
                             <Label Grid.Column="1" Text="{Binding CarbsLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding CarbsProgressRatio}" ProgressColor="{StaticResource ColorTertiary}" HeightRequest="6"/>
+                        <ProgressBar Progress="{Binding CarbsProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" HeightRequest="6"/>
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
                             <Label Grid.Column="0" Text="Fette" FontSize="12"/>
                             <Label Grid.Column="1" Text="{Binding FatLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding FatProgressRatio}" ProgressColor="#F5A623" HeightRequest="6"/>
+                        <ProgressBar Progress="{Binding FatProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" HeightRequest="6"/>
                     </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
 
-                    <Border BackgroundColor="White" StrokeThickness="0" Padding="0,14">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="999"/>
-                        </Border.StrokeShape>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnOptimizeCalorieCalculationTapped"/>
-                        </Border.GestureRecognizers>
-                        <Label Text="Kalorienberechnung optimieren" FontFamily="InterBold" FontSize="14"
-                               TextColor="Black" HorizontalTextAlignment="Center"/>
-                    </Border>
+            <!-- Heutige Mahlzeiten -->
+            <Label Text="Heutige Mahlzeiten" FontFamily="InterSemiBold" FontSize="16" Margin="0,6,0,0"/>
+
+            <VerticalStackLayout Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="&#xf7fb;" TextColor="{StaticResource ColorTextSecondary}"/>
+                                <Span Text=" Frühstück" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Grid.Column="1" Text="{Binding HasBreakfastEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorSuccess}"/>
+                </Grid>
+                <CollectionView ItemsSource="{Binding Breakfast}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasBreakfastEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasBreakfastEntries, Converter={StaticResource InverseBoolConverter}}"/>
+                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Frühstück}"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="&#xe4c6;" TextColor="{StaticResource ColorTextSecondary}"/>
+                                <Span Text=" Mittagessen" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Grid.Column="1" Text="{Binding HasLunchEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorSuccess}"/>
+                </Grid>
+                <CollectionView ItemsSource="{Binding Lunch}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasLunchEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasLunchEntries, Converter={StaticResource InverseBoolConverter}}"/>
+                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Mittagessen}"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="&#xf2e7;" TextColor="{StaticResource ColorTextSecondary}"/>
+                                <Span Text=" Abendessen" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Grid.Column="1" Text="{Binding HasDinnerEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorSuccess}"/>
+                </Grid>
+                <CollectionView ItemsSource="{Binding Dinner}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasDinnerEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasDinnerEntries, Converter={StaticResource InverseBoolConverter}}"/>
+                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Abendessen}"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="&#xf5d1;" TextColor="{StaticResource ColorTextSecondary}"/>
+                                <Span Text=" Snacks" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Grid.Column="1" Text="{Binding HasSnackEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorSuccess}"/>
+                </Grid>
+                <CollectionView ItemsSource="{Binding Snacks}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasSnackEntries}"/>
+                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasSnackEntries, Converter={StaticResource InverseBoolConverter}}"/>
+                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
+                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Snack}"/>
+            </VerticalStackLayout>
+
+            <!-- Rezepte entdecken -->
+            <Frame Style="{StaticResource CardStyle}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenRecipesCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Label Grid.Column="0" Text="&#xf02d;" FontFamily="FontAwesomeSolid" FontSize="20" BackgroundColor="#34C77A1A"
+                           WidthRequest="44" HeightRequest="44" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Margin="0,0,12,0"/>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Rezepte entdecken" FontFamily="InterSemiBold" FontSize="15"/>
+                        <Label Text="Echte Rezepte mit Zutaten &amp; Zubereitung durchsuchen" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16" TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                </Grid>
+            </Frame>
+
+            <!-- Körpergewicht - direkt vor den Nährwert-Detailkarten -->
+            <Frame Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="10">
+                    <Label FontFamily="InterSemiBold" FontSize="15">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span FontFamily="FontAwesomeSolid" Text="&#xf496;"/>
+                                <Span Text=" Aktuelles Körpergewicht" FontFamily="InterSemiBold"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                    <Label Text="In 100g-Schritten einstellbar, wird für die Gewichts-Grafik in den Statistiken verwendet."
+                           FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="{Binding CurrentWeightKg, StringFormat='{0:0.0} kg'}" FontFamily="InterBold" FontSize="20"
+                               VerticalOptions="Center" WidthRequest="90"/>
+                        <Stepper Grid.Column="1" Minimum="30" Maximum="300" Increment="0.1" Value="{Binding CurrentWeightKg}" HorizontalOptions="Start"/>
+                    </Grid>
                 </VerticalStackLayout>
             </Frame>
 
@@ -242,168 +363,10 @@
                         BindableLayout.ItemsSource="{Binding OtherNutrientCards}"
                         BindableLayout.ItemTemplate="{StaticResource NutrientCardTemplate}"/>
 
-            <!-- Wochennavigation -->
-            <Frame Style="{StaticResource CardStyle}" Padding="12,10" HeightRequest="76" VerticalOptions="Start">
-                <Grid ColumnDefinitions="Auto,Auto,Auto" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56">
-                    <Button Grid.Column="0" Text="◀" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
-                            Command="{Binding PreviousWeekCommand}"/>
-                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" HeightRequest="56" Spacing="4"
-                                           BindableLayout.ItemsSource="{Binding WeekDays}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Padding="6,8" WidthRequest="42">
-                                    <Grid.Style>
-                                        <Style TargetType="Grid">
-                                            <Setter Property="BackgroundColor" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorAccent}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Grid.Style>
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding SelectDayCommand, Source={x:Static local:AppState.MainViewModel}}"
-                                                               CommandParameter="{Binding}"/>
-                                    </Grid.GestureRecognizers>
-                                    <VerticalStackLayout HorizontalOptions="Center">
-                                        <Label Text="{Binding DayAbbrev}" FontSize="10" HorizontalTextAlignment="Center">
-                                            <Label.Style>
-                                                <Style TargetType="Label">
-                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextSecondary}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="TextColor" Value="White"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Label.Style>
-                                        </Label>
-                                        <Label Text="{Binding DayNumber}" FontSize="14" FontFamily="InterSemiBold" HorizontalTextAlignment="Center">
-                                            <Label.Style>
-                                                <Style TargetType="Label">
-                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextPrimary}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="TextColor" Value="White"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Label.Style>
-                                        </Label>
-                                        <Label Text="&#xf236;" FontFamily="FontAwesomeSolid" FontSize="9" HorizontalTextAlignment="Center" IsVisible="{Binding IsRestDay}"/>
-                                        <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
-                                                 Color="{StaticResource ColorAccent}" IsVisible="{Binding HasEntries}"/>
-                                    </VerticalStackLayout>
-                                </Grid>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </HorizontalStackLayout>
-                    <Button Grid.Column="2" Text="▶" Style="{StaticResource SecondaryButtonStyle}" Padding="10,6" VerticalOptions="Center"
-                            Command="{Binding NextWeekCommand}"/>
-                </Grid>
-            </Frame>
-
-            <!-- Heutige Mahlzeiten -->
-            <Label Text="Heutige Mahlzeiten" FontFamily="InterSemiBold" FontSize="16" Margin="0,6,0,0"/>
-
-            <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontFamily="FontAwesomeSolid" Text="&#xf7fb;" TextColor="{StaticResource ColorTextSecondary}"/>
-                                <Span Text=" Frühstück" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Grid.Column="1" Text="{Binding HasBreakfastEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
-                </Grid>
-                <CollectionView ItemsSource="{Binding Breakfast}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasBreakfastEntries}"/>
-                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasBreakfastEntries, Converter={StaticResource InverseBoolConverter}}"/>
-                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
-                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Frühstück}"/>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontFamily="FontAwesomeSolid" Text="&#xe4c6;" TextColor="{StaticResource ColorTextSecondary}"/>
-                                <Span Text=" Mittagessen" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Grid.Column="1" Text="{Binding HasLunchEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
-                </Grid>
-                <CollectionView ItemsSource="{Binding Lunch}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasLunchEntries}"/>
-                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasLunchEntries, Converter={StaticResource InverseBoolConverter}}"/>
-                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
-                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Mittagessen}"/>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontFamily="FontAwesomeSolid" Text="&#xf2e7;" TextColor="{StaticResource ColorTextSecondary}"/>
-                                <Span Text=" Abendessen" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Grid.Column="1" Text="{Binding HasDinnerEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
-                </Grid>
-                <CollectionView ItemsSource="{Binding Dinner}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasDinnerEntries}"/>
-                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasDinnerEntries, Converter={StaticResource InverseBoolConverter}}"/>
-                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
-                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Abendessen}"/>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontFamily="FontAwesomeSolid" Text="&#xf5d1;" TextColor="{StaticResource ColorTextSecondary}"/>
-                                <Span Text=" Snacks" FontFamily="InterSemiBold" TextColor="{StaticResource ColorTextSecondary}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Grid.Column="1" Text="{Binding HasSnackEntries, Converter={StaticResource CheckmarkConverter}}" FontSize="16" TextColor="{StaticResource ColorTertiary}"/>
-                </Grid>
-                <CollectionView ItemsSource="{Binding Snacks}" ItemTemplate="{StaticResource MealEntryTemplate}" ItemSizingStrategy="MeasureAllItems" IsVisible="{Binding HasSnackEntries}"/>
-                <Label Text="Noch nichts eingetragen" FontSize="12" TextColor="{StaticResource ColorTextSecondary}" Margin="0,6,0,0" IsVisible="{Binding HasSnackEntries, Converter={StaticResource InverseBoolConverter}}"/>
-                <Button Text="+ Hinzufügen" Style="{StaticResource SecondaryButtonStyle}" HorizontalOptions="Start"
-                        Command="{Binding AddFoodCommand}" CommandParameter="{x:Static models:MealType.Snack}"/>
-            </VerticalStackLayout>
-
-            <!-- Körpergewicht - ganz unten, damit's den Fortschritt in den Statistiken mit Leben füllt -->
-            <Frame Style="{StaticResource CardStyle}">
-                <VerticalStackLayout Spacing="10">
-                    <Label FontFamily="InterSemiBold" FontSize="15">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span FontFamily="FontAwesomeSolid" Text="&#xf496;"/>
-                                <Span Text=" Aktuelles Körpergewicht" FontFamily="InterSemiBold"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
-                    <Label Text="In 100g-Schritten einstellbar, wird für die Gewichts-Grafik in den Statistiken verwendet."
-                           FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
-                        <Label Grid.Column="0" Text="{Binding CurrentWeightKg, StringFormat='{0:0.0} kg'}" FontFamily="InterBold" FontSize="20"
-                               VerticalOptions="Center" WidthRequest="90"/>
-                        <Stepper Grid.Column="1" Minimum="30" Maximum="300" Increment="0.1" Value="{Binding CurrentWeightKg}" HorizontalOptions="Start"/>
-                    </Grid>
-                </VerticalStackLayout>
-            </Frame>
-
         </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
 
-        <Label x:Name="SuccessCheckmark" Text="&#xf058;" FontFamily="FontAwesomeSolid" FontSize="64"
+        <Label Grid.Row="1" x:Name="SuccessCheckmark" Text="&#xf058;" FontFamily="FontAwesomeSolid" FontSize="64"
                TextColor="{StaticResource ColorSuccess}" HorizontalOptions="Center" VerticalOptions="Center"
                Opacity="0" Scale="0.6" InputTransparent="True"/>
     </Grid>
