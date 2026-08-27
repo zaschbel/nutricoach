@@ -24,11 +24,9 @@
                 </Label>
             </Grid>
 
-            <!-- Datum -->
-            <VerticalStackLayout>
-                <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
-                <Label Text="Tagesübersicht" Style="{StaticResource HeadlineLabelStyle}"/>
-            </VerticalStackLayout>
+            <!-- Datum: nur noch kleine Kontext-Zeile, kein eigener Headline-Block mehr (MCI zeigt auf dem
+                 Dashboard gar kein Datum, wir behalten es minimal fuer die Orientierung). -->
+            <Label Text="{Binding SelectedDateLabel}" TextColor="{StaticResource ColorTextSecondary}" FontSize="13"/>
 
             <!-- Bento: Schritte + Kalorien -->
             <Label Text="GEWOHNHEITEN" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
@@ -105,13 +103,9 @@
             </Grid>
 
             <!-- KI-Optimierung: rein dekorativ, keine echte KI-Anbindung (das wäre ein eigenes Feature) -->
+            <Label Text="KI-OPTIMIERUNG" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="8">
-                    <HorizontalStackLayout Spacing="6">
-                        <Label Text="&#xe2ca;" FontFamily="FontAwesomeSolid" FontSize="14"/>
-                        <Label Text="KI-OPTIMIERUNG" FontFamily="InterBold" FontSize="11" TextColor="{StaticResource ColorAccent}"/>
-                    </HorizontalStackLayout>
-
                     <!-- Kein API-Key hinterlegt -->
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding HasAiApiKey, Converter={StaticResource InverseBoolConverter}}">
                         <Label Text="Für Ernährungs-Tipps von der KI wird ein eigener Google-Gemini-API-Key benötigt (kostenlos, keine Kreditkarte nötig)." FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
@@ -192,6 +186,7 @@
             </Frame>
 
             <!-- Heutiges Training laut Plan -->
+            <Label Text="TRAINING" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0" IsVisible="{Binding HasNoTodayTraining}"/>
             <Frame Style="{StaticResource CardStyle}" IsVisible="{Binding HasNoTodayTraining}">
                 <VerticalStackLayout Spacing="6">
                     <Label Text="{Binding TodayPlanLabel}" TextColor="{StaticResource ColorAccent}" FontFamily="InterSemiBold" FontSize="12"
@@ -206,9 +201,9 @@
             </Frame>
 
             <!-- Wöchentliche Aktivität -->
+            <Label Text="AKTIVITÄT" Style="{StaticResource SectionLabelStyle}" Margin="2,4,0,0"/>
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="6">
-                    <Label Text="Wöchentliche Aktivität" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" Margin="0,0,0,8"/>
                     <GraphicsView Drawable="{Binding WeeklyActivityDrawable}" HeightRequest="120"/>
                     <Label Text="{Binding AverageStepsThisWeek, StringFormat='Durchschnittliche Aktivität: {0:N0} Schritte/Tag'}"
                            FontSize="12" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center" Margin="0,8,0,0"/>

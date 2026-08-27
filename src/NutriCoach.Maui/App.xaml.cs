@@ -43,10 +43,12 @@ public partial class App : Application
 
         if (useDark)
         {
-            Resources["ColorBackground"] = Color.FromArgb("#121316");
-            Resources["ColorSurface"] = Color.FromArgb("#1E2024");
-            Resources["ColorSurfaceElevated"] = Color.FromArgb("#282B31");
-            Resources["ColorBorder"] = Color.FromArgb("#3A3D44");
+            // Näher an MCIs fast-schwarzem Canvas statt sichtbarem Dunkelgrau (2026-08-27, Nutzerwunsch:
+            // Frontend soll sich am Design von "MCI - Personal Training AI" orientieren).
+            Resources["ColorBackground"] = Color.FromArgb("#050505");
+            Resources["ColorSurface"] = Color.FromArgb("#161616");
+            Resources["ColorSurfaceElevated"] = Color.FromArgb("#212123");
+            Resources["ColorBorder"] = Color.FromArgb("#2C2C2E");
             Resources["ColorAccent"] = Color.FromArgb("#4C8DFF");
             Resources["ColorAccentHover"] = Color.FromArgb("#6BA1FF");
             Resources["ColorAccentPressed"] = Color.FromArgb("#3A6FD1");

@@ -37,7 +37,7 @@ public static class MauiProgram
         {
             WindowHandler.Mapper.AppendToMapping("DarkWindowBackgroundForRoundedCorners", (handler, _) =>
             {
-                handler.PlatformView.BackgroundColor = UIColor.FromRGB(0x12, 0x13, 0x16);
+                handler.PlatformView.BackgroundColor = UIColor.FromRGB(0x05, 0x05, 0x05);
             });
         });
 #endif
