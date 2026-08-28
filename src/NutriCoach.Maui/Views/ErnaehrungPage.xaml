@@ -231,7 +231,7 @@
             <Label Text="Heutige Mahlzeiten" FontFamily="InterSemiBold" FontSize="16" Margin="0,6,0,0"/>
 
             <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnBreakfastHeaderTapped"/>
                     </Grid.GestureRecognizers>
@@ -252,7 +252,7 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnLunchHeaderTapped"/>
                     </Grid.GestureRecognizers>
@@ -273,7 +273,7 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnDinnerHeaderTapped"/>
                     </Grid.GestureRecognizers>
@@ -294,7 +294,7 @@
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="6">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnSnackHeaderTapped"/>
                     </Grid.GestureRecognizers>
