@@ -53,22 +53,38 @@
 
                 <Frame Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="6">
-                        <Label FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="Über "/>
-                                    <Span Text="{Binding Name}"/>
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                        <Label Text="{Binding About}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleAboutCommand}"/>
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Über "/>
+                                        <Span Text="{Binding Name}"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                            <Label Grid.Column="1" Text="{Binding AboutChevron}" FontFamily="FontAwesomeSolid" FontSize="14"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </Grid>
+                        <Label Text="{Binding About}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"
+                               IsVisible="{Binding IsAboutExpanded}"/>
                     </VerticalStackLayout>
                 </Frame>
 
                 <Frame Style="{StaticResource CardStyle}">
                     <VerticalStackLayout Spacing="6">
-                        <Label Text="Wie wirkt es auf mich?" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="{Binding Effect}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
+                        <Grid ColumnDefinitions="*,Auto" BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleEffectCommand}"/>
+                            </Grid.GestureRecognizers>
+                            <Label Grid.Column="0" Text="Wie wirkt es auf mich?" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                            <Label Grid.Column="1" Text="{Binding EffectChevron}" FontFamily="FontAwesomeSolid" FontSize="14"
+                                   TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center"/>
+                        </Grid>
+                        <Label Text="{Binding Effect}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"
+                               IsVisible="{Binding IsEffectExpanded}"/>
                     </VerticalStackLayout>
                 </Frame>
 

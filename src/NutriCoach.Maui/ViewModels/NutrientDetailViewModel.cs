@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NutriCoach.App.Services;
 
 namespace NutriCoach.App.ViewModels;
@@ -7,9 +9,14 @@ namespace NutriCoach.App.ViewModels;
 public record NutrientSourceDisplay(string Name, double Kcal, double AmountGrams, double NutrientAmount, string Unit);
 
 /// <summary>Steuert das Ausklapp-Infofenster zu einem einzelnen Nährstoff (z. B. "Ballaststoffe"):
-/// heutige Quellen + allgemeine Erklärung, analog zur MCI-App-Vorlage.</summary>
-public class NutrientDetailViewModel
+/// heutige Quellen + allgemeine Erklärung, analog zur MCI-App-Vorlage. "Über X" und "Wie wirkt es auf
+/// mich?" sind einzeln auf-/zuklappbar, genau wie im Vorbild (Frage antippen, Antwort erscheint).</summary>
+public class NutrientDetailViewModel : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
     public string Name { get; }
     public string Unit { get; }
     public string About { get; }
@@ -18,8 +25,29 @@ public class NutrientDetailViewModel
     public bool HasSources => Sources.Count > 0;
     public string SourcesHeader => $"Heutige {Name}-Quellen ({Sources.Count})";
 
+    private bool _isAboutExpanded;
+    public bool IsAboutExpanded
+    {
+        get => _isAboutExpanded;
+        set { _isAboutExpanded = value; OnPropertyChanged(); OnPropertyChanged(nameof(AboutChevron)); }
+    }
+    public string AboutChevron => IsAboutExpanded ? "" : "";
+
+    private bool _isEffectExpanded;
+    public bool IsEffectExpanded
+    {
+        get => _isEffectExpanded;
+        set { _isEffectExpanded = value; OnPropertyChanged(); OnPropertyChanged(nameof(EffectChevron)); }
+    }
+    public string EffectChevron => IsEffectExpanded ? "" : "";
+
+    public RelayCommand ToggleAboutCommand { get; }
+    public RelayCommand ToggleEffectCommand { get; }
+
     public NutrientDetailViewModel(NutrientCardDisplay nutrient, IEnumerable<NutritionEntryDisplay> todaysEntries)
     {
+        ToggleAboutCommand = new RelayCommand(_ => IsAboutExpanded = !IsAboutExpanded);
+        ToggleEffectCommand = new RelayCommand(_ => IsEffectExpanded = !IsEffectExpanded);
         Name = nutrient.Name;
         Unit = nutrient.Unit;
         var info = NutrientInfoData.Get(nutrient.Name);

@@ -982,6 +982,11 @@ public class MainViewModel : INotifyPropertyChanged
         await RefreshDiaryAsync();
         await RefreshWeekAsync();
         await RefreshTodayAsync();
+
+        // Monatsraster schon beim Laden im Hintergrund vorbereiten statt erst beim ersten Aufklappen -
+        // das BindableLayout baut die ~35 Zellen dann schon, bevor der Nutzer ueberhaupt swipet, statt
+        // die teure erste Erstellung genau in dem Moment zu verursachen, in dem sie als Ruckler auffaellt.
+        _ = RefreshMonthAsync();
     }
 
     /// <summary>

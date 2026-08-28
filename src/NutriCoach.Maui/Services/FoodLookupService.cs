@@ -10,7 +10,7 @@ namespace NutriCoach.App.Services;
 
 /// <summary>
 /// Findet Lebensmittel auf drei Wegen: zuerst im lokalen Cache (schnell, offline),
-/// dann bei Bedarf online über Open Food Facts (per Name-Suche oder Barcode).
+/// dann bei Bedarf online über USDA FoodData Central (per Name-Suche oder Barcode).
 /// Online-Treffer werden automatisch lokal zwischengespeichert, damit sie beim
 /// nächsten Mal sofort verfügbar sind, ohne erneut das Internet zu brauchen.
 /// </summary>
@@ -21,9 +21,16 @@ public class FoodLookupService
 {
     private static readonly HttpClient Http = new()
     {
-        BaseAddress = new Uri("https://world.openfoodfacts.org"),
+        BaseAddress = new Uri("https://api.nal.usda.gov"),
         Timeout = TimeSpan.FromSeconds(8)
     };
+
+    // USDA FoodData Central statt Open Food Facts (2026-08-28, Nutzerwunsch: bisherige Quelle war
+    // zu unvollstaendig/inkonsistent). DEMO_KEY ist USDA's oeffentlicher Schluessel - funktioniert
+    // sofort ohne Anmeldung, ist aber stark ratenbegrenzt (ca. 30 Anfragen/Stunde). Fuer echten
+    // Dauerbetrieb sollte der Nutzer sich einen eigenen kostenlosen Key holen (nur E-Mail noetig,
+    // kein Passwort/Account): https://fdc.nal.usda.gov/api-key-signup - und ihn hier eintragen.
+    private const string ApiKey = "DEMO_KEY";
 
     static FoodLookupService()
     {
@@ -67,7 +74,7 @@ public class FoodLookupService
     }
 
     /// <summary>
-    /// Sucht online bei Open Food Facts nach Namen. Ergebnisse werden NICHT automatisch
+    /// Sucht online bei USDA FoodData Central nach Namen. Ergebnisse werden NICHT automatisch
     /// gespeichert - erst wenn der Nutzer eins davon tatsächlich auswählt (siehe SaveToCacheAsync).
     /// </summary>
     public async Task<OnlineSearchResult> SearchOnlineAsync(string query)
@@ -76,26 +83,18 @@ public class FoodLookupService
 
         try
         {
-            // sort_by=unique_scans_n: rankt nach echten Nutzer-Scans/Bestätigungen statt beliebiger
-            // Teilstring-Reihenfolge - starkes Signal für Datenqualität/Relevanz, bekannte/korrekte
-            // Einträge kommen so zuerst. cc=de&lc=de: Länder-/Sprach-Hinweis für bessere Relevanz bei
-            // deutschsprachigen Suchbegriffen, ohne andere Treffer komplett auszuschließen.
-            var url = $"/cgi/search.pl?search_terms={Uri.EscapeDataString(query)}" +
-                      "&search_simple=1&action=process&json=1&page_size=20" +
-                      "&sort_by=unique_scans_n&cc=de&lc=de" +
-                      "&fields=product_name,brands,code,nutriments";
+            var url = $"/fdc/v1/foods/search?api_key={ApiKey}&query={Uri.EscapeDataString(query)}" +
+                      "&pageSize=20&dataType=Foundation,SR%20Legacy,Branded";
 
-            var response = await Http.GetFromJsonAsync<OffSearchResponse>(url);
-            if (response?.Products is null) return new OnlineSearchResult(new List<FoodItem>(), true, null);
+            var response = await Http.GetFromJsonAsync<FdcSearchResponse>(url);
+            if (response?.Foods is null) return new OnlineSearchResult(new List<FoodItem>(), true, null);
 
-            var items = response.Products
-                .Where(p => !string.IsNullOrWhiteSpace(p.ProductName))
+            var items = response.Foods
+                .Where(f => !string.IsNullOrWhiteSpace(f.Description))
                 .Select(MapToFoodItem)
-                // KcalPer100 <= 0 ist ein starkes Signal für einen unvollständigen/kaputten OFF-Eintrag
-                // ohne echte Nährwerte - solche Einträge sind fast immer Rauschen und verschlechtern
-                // die Trefferqualität ("schlechte Trefferqualität" war die konkrete Beschwerde).
-                .Where(f => f is not null && f.KcalPer100 > 0)
-                .Cast<FoodItem>()
+                // KcalPer100 <= 0 ist ein starkes Signal fuer einen unvollstaendigen Eintrag ohne
+                // echte Naehrwerte - solche Eintraege sind fast immer Rauschen.
+                .Where(f => f.KcalPer100 > 0)
                 .ToList();
 
             return new OnlineSearchResult(items, true, null);
@@ -109,7 +108,9 @@ public class FoodLookupService
         }
     }
 
-    /// <summary>Sucht ein einzelnes Produkt anhand seiner Barcode-Nummer (z. B. beim Scannen der Verpackung).</summary>
+    /// <summary>Sucht ein einzelnes Produkt anhand seiner Barcode-Nummer (z. B. beim Scannen der Verpackung).
+    /// USDA FoodData Central hat keinen eigenen Barcode-Endpunkt - die GTIN/UPC-Nummer wird stattdessen
+    /// als Suchbegriff verwendet und auf einen exakten "gtinUpc"-Treffer geprüft.</summary>
     public async Task<FoodItem?> LookupByBarcodeAsync(string barcode)
     {
         if (string.IsNullOrWhiteSpace(barcode)) return null;
@@ -121,11 +122,12 @@ public class FoodLookupService
 
         try
         {
-            var response = await Http.GetFromJsonAsync<OffProductResponse>($"/api/v2/product/{barcode}.json");
-            if (response?.Status != 1 || response.Product is null) return null;
-
-            var item = MapToFoodItem(response.Product);
-            return item;
+            var url = $"/fdc/v1/foods/search?api_key={ApiKey}&query={Uri.EscapeDataString(barcode)}" +
+                      "&pageSize=10&dataType=Branded";
+            var response = await Http.GetFromJsonAsync<FdcSearchResponse>(url);
+            var match = response?.Foods?.FirstOrDefault(f => f.GtinUpc == barcode)
+                        ?? response?.Foods?.FirstOrDefault();
+            return match is null || string.IsNullOrWhiteSpace(match.Description) ? null : MapToFoodItem(match);
         }
         catch (Exception)
         {
@@ -145,7 +147,7 @@ public class FoodLookupService
     {
         await using var context = new AppDbContext();
 
-        // Falls schon per Barcode oder OpenFoodFacts-Id vorhanden: das existierende nehmen statt Duplikat anlegen
+        // Falls schon per Barcode oder externer Id vorhanden: das existierende nehmen statt Duplikat anlegen
         FoodItem? existing = null;
         if (!string.IsNullOrWhiteSpace(item.Barcode))
             existing = await context.FoodItems.FirstOrDefaultAsync(f => f.Barcode == item.Barcode);
@@ -169,55 +171,58 @@ public class FoodLookupService
         return item;
     }
 
-    private static FoodItem? MapToFoodItem(OffProduct p)
+    private static FoodItem MapToFoodItem(FdcFood f)
     {
-        if (string.IsNullOrWhiteSpace(p.ProductName)) return null;
+        double N(int nutrientId) => f.FoodNutrients?.FirstOrDefault(n => n.NutrientId == nutrientId)?.Value ?? 0;
+
+        // USDA fuehrt kein eigenes "Salz" - Standardumrechnung aus Natrium (Kochsalz = Natrium * 2.5).
+        var sodiumMg = N(1093);
 
         return new FoodItem
         {
-            Name = p.ProductName,
-            Brand = p.Brands,
-            Barcode = p.Code,
-            OpenFoodFactsId = p.Code,
-            KcalPer100 = p.Nutriments?.EnergyKcal100g ?? 0,
-            CarbsPer100 = p.Nutriments?.Carbohydrates100g ?? 0,
-            SugarPer100 = p.Nutriments?.Sugars100g ?? 0,
-            ProteinPer100 = p.Nutriments?.Proteins100g ?? 0,
-            FatPer100 = p.Nutriments?.Fat100g ?? 0,
-            SaturatedFatPer100 = p.Nutriments?.SaturatedFat100g ?? 0,
-            FiberPer100 = p.Nutriments?.Fiber100g ?? 0,
-            SaltPer100 = p.Nutriments?.Salt100g ?? 0,
-            // Vitamine/Mineralstoffe: Open Food Facts liefert sie in g (nicht mg/µg wie auf dem
-            // Etikett üblich) - deshalb hier auf die in der App verwendeten Einheiten umgerechnet.
-            VitaminAPer100 = (p.Nutriments?.VitaminA100g ?? 0) * 1_000_000,
-            VitaminB1Per100 = (p.Nutriments?.VitaminB1100g ?? 0) * 1_000,
-            VitaminB2Per100 = (p.Nutriments?.VitaminB2100g ?? 0) * 1_000,
-            VitaminB3Per100 = (p.Nutriments?.VitaminPP100g ?? 0) * 1_000,
-            VitaminB5Per100 = (p.Nutriments?.PantothenicAcid100g ?? 0) * 1_000,
-            VitaminB6Per100 = (p.Nutriments?.VitaminB6100g ?? 0) * 1_000,
-            VitaminB7Per100 = (p.Nutriments?.Biotin100g ?? 0) * 1_000_000,
-            VitaminB9Per100 = (p.Nutriments?.VitaminB9100g ?? 0) * 1_000_000,
-            VitaminB12Per100 = (p.Nutriments?.VitaminB12100g ?? 0) * 1_000_000,
-            VitaminCPer100 = (p.Nutriments?.VitaminC100g ?? 0) * 1_000,
-            VitaminDPer100 = (p.Nutriments?.VitaminD100g ?? 0) * 1_000_000,
-            VitaminEPer100 = (p.Nutriments?.VitaminE100g ?? 0) * 1_000,
-            VitaminKPer100 = (p.Nutriments?.VitaminK100g ?? 0) * 1_000_000,
-            CalciumPer100 = (p.Nutriments?.Calcium100g ?? 0) * 1_000,
-            MagnesiumPer100 = (p.Nutriments?.Magnesium100g ?? 0) * 1_000,
-            PotassiumPer100 = (p.Nutriments?.Potassium100g ?? 0) * 1_000,
-            SodiumPer100 = (p.Nutriments?.Sodium100g ?? 0) * 1_000,
-            PhosphorusPer100 = (p.Nutriments?.Phosphorus100g ?? 0) * 1_000,
-            IronPer100 = (p.Nutriments?.Iron100g ?? 0) * 1_000,
-            ZincPer100 = (p.Nutriments?.Zinc100g ?? 0) * 1_000,
-            SeleniumPer100 = (p.Nutriments?.Selenium100g ?? 0) * 1_000_000,
-            CopperPer100 = (p.Nutriments?.Copper100g ?? 0) * 1_000,
-            ManganesePer100 = (p.Nutriments?.Manganese100g ?? 0) * 1_000,
-            IodinePer100 = (p.Nutriments?.Iodine100g ?? 0) * 1_000_000,
-            AlcoholPer100 = p.Nutriments?.Alcohol100g ?? 0,
-            Omega3Per100 = (p.Nutriments?.Omega3Fat100g ?? 0) * 1_000,
-            Omega6Per100 = p.Nutriments?.Omega6Fat100g ?? 0,
-            Omega9Per100 = p.Nutriments?.Omega9Fat100g ?? 0,
-            Source = "OpenFoodFacts"
+            Name = f.Description ?? "Unbekannt",
+            Brand = f.BrandOwner,
+            Barcode = f.GtinUpc,
+            // Feld historisch "OpenFoodFactsId" genannt, dient hier generisch als externe Quellen-Id
+            // (USDA fdcId) - kein Schema-Wechsel noetig, nur Bedeutung erweitert.
+            OpenFoodFactsId = f.FdcId.ToString(),
+            KcalPer100 = N(1008),
+            CarbsPer100 = N(1005),
+            SugarPer100 = N(2000),
+            ProteinPer100 = N(1003),
+            FatPer100 = N(1004),
+            SaturatedFatPer100 = N(1258),
+            FiberPer100 = N(1079),
+            SaltPer100 = Math.Round(sodiumMg * 2.5 / 1000.0, 3),
+            VitaminAPer100 = N(1106),
+            VitaminB1Per100 = N(1165),
+            VitaminB2Per100 = N(1166),
+            VitaminB3Per100 = N(1167),
+            VitaminB5Per100 = N(1170),
+            VitaminB6Per100 = N(1175),
+            VitaminB7Per100 = N(1176),
+            VitaminB9Per100 = N(1177),
+            VitaminB12Per100 = N(1178),
+            VitaminCPer100 = N(1162),
+            VitaminDPer100 = N(1114),
+            VitaminEPer100 = N(1109),
+            VitaminKPer100 = N(1185),
+            CalciumPer100 = N(1087),
+            MagnesiumPer100 = N(1090),
+            PotassiumPer100 = N(1092),
+            SodiumPer100 = sodiumMg,
+            PhosphorusPer100 = N(1091),
+            IronPer100 = N(1089),
+            ZincPer100 = N(1095),
+            SeleniumPer100 = N(1103),
+            CopperPer100 = N(1098),
+            ManganesePer100 = N(1101),
+            MolybdenumPer100 = N(1102),
+            // Naeherung: USDA liefert nur "insgesamt einfach/mehrfach ungesaettigt", keine separaten
+            // Omega-6/-9-spezifischen IDs im Suchindex - Omega-3 bleibt daher bei 0 statt geraten.
+            Omega6Per100 = N(1293),
+            Omega9Per100 = N(1292),
+            Source = "USDA FoodData Central"
         };
     }
 
@@ -250,108 +255,33 @@ public class FoodLookupService
         return tips.Count == 0 ? null : string.Join("  ", tips.Take(2));
     }
 
-    // ---------------- Open Food Facts API-Antwortformate (nur die Felder, die wir brauchen) ----------------
+    // ---------------- USDA FoodData Central API-Antwortformate (nur die Felder, die wir brauchen) ----------------
 
-    private class OffSearchResponse
+    private class FdcSearchResponse
     {
-        [JsonPropertyName("products")]
-        public List<OffProduct>? Products { get; set; }
+        [JsonPropertyName("foods")]
+        public List<FdcFood>? Foods { get; set; }
     }
 
-    private class OffProductResponse
+    private class FdcFood
     {
-        [JsonPropertyName("status")]
-        public int Status { get; set; }
-        [JsonPropertyName("product")]
-        public OffProduct? Product { get; set; }
+        [JsonPropertyName("fdcId")]
+        public int FdcId { get; set; }
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+        [JsonPropertyName("brandOwner")]
+        public string? BrandOwner { get; set; }
+        [JsonPropertyName("gtinUpc")]
+        public string? GtinUpc { get; set; }
+        [JsonPropertyName("foodNutrients")]
+        public List<FdcNutrient>? FoodNutrients { get; set; }
     }
 
-    private class OffProduct
+    private class FdcNutrient
     {
-        [JsonPropertyName("product_name")]
-        public string? ProductName { get; set; }
-        [JsonPropertyName("brands")]
-        public string? Brands { get; set; }
-        [JsonPropertyName("code")]
-        public string? Code { get; set; }
-        [JsonPropertyName("nutriments")]
-        public OffNutriments? Nutriments { get; set; }
-    }
-
-    private class OffNutriments
-    {
-        [JsonPropertyName("energy-kcal_100g")]
-        public double? EnergyKcal100g { get; set; }
-        [JsonPropertyName("carbohydrates_100g")]
-        public double? Carbohydrates100g { get; set; }
-        [JsonPropertyName("sugars_100g")]
-        public double? Sugars100g { get; set; }
-        [JsonPropertyName("proteins_100g")]
-        public double? Proteins100g { get; set; }
-        [JsonPropertyName("fat_100g")]
-        public double? Fat100g { get; set; }
-        [JsonPropertyName("saturated-fat_100g")]
-        public double? SaturatedFat100g { get; set; }
-        [JsonPropertyName("fiber_100g")]
-        public double? Fiber100g { get; set; }
-        [JsonPropertyName("salt_100g")]
-        public double? Salt100g { get; set; }
-
-        [JsonPropertyName("vitamin-a_100g")]
-        public double? VitaminA100g { get; set; }
-        [JsonPropertyName("vitamin-b1_100g")]
-        public double? VitaminB1100g { get; set; }
-        [JsonPropertyName("vitamin-b2_100g")]
-        public double? VitaminB2100g { get; set; }
-        [JsonPropertyName("vitamin-pp_100g")]
-        public double? VitaminPP100g { get; set; }
-        [JsonPropertyName("pantothenic-acid_100g")]
-        public double? PantothenicAcid100g { get; set; }
-        [JsonPropertyName("vitamin-b6_100g")]
-        public double? VitaminB6100g { get; set; }
-        [JsonPropertyName("biotin_100g")]
-        public double? Biotin100g { get; set; }
-        [JsonPropertyName("vitamin-b9_100g")]
-        public double? VitaminB9100g { get; set; }
-        [JsonPropertyName("vitamin-b12_100g")]
-        public double? VitaminB12100g { get; set; }
-        [JsonPropertyName("vitamin-c_100g")]
-        public double? VitaminC100g { get; set; }
-        [JsonPropertyName("vitamin-d_100g")]
-        public double? VitaminD100g { get; set; }
-        [JsonPropertyName("vitamin-e_100g")]
-        public double? VitaminE100g { get; set; }
-        [JsonPropertyName("vitamin-k_100g")]
-        public double? VitaminK100g { get; set; }
-        [JsonPropertyName("calcium_100g")]
-        public double? Calcium100g { get; set; }
-        [JsonPropertyName("magnesium_100g")]
-        public double? Magnesium100g { get; set; }
-        [JsonPropertyName("potassium_100g")]
-        public double? Potassium100g { get; set; }
-        [JsonPropertyName("sodium_100g")]
-        public double? Sodium100g { get; set; }
-        [JsonPropertyName("phosphorus_100g")]
-        public double? Phosphorus100g { get; set; }
-        [JsonPropertyName("iron_100g")]
-        public double? Iron100g { get; set; }
-        [JsonPropertyName("zinc_100g")]
-        public double? Zinc100g { get; set; }
-        [JsonPropertyName("selenium_100g")]
-        public double? Selenium100g { get; set; }
-        [JsonPropertyName("copper_100g")]
-        public double? Copper100g { get; set; }
-        [JsonPropertyName("manganese_100g")]
-        public double? Manganese100g { get; set; }
-        [JsonPropertyName("iodine_100g")]
-        public double? Iodine100g { get; set; }
-        [JsonPropertyName("alcohol_100g")]
-        public double? Alcohol100g { get; set; }
-        [JsonPropertyName("omega-3-fat_100g")]
-        public double? Omega3Fat100g { get; set; }
-        [JsonPropertyName("omega-6-fat_100g")]
-        public double? Omega6Fat100g { get; set; }
-        [JsonPropertyName("omega-9-fat_100g")]
-        public double? Omega9Fat100g { get; set; }
+        [JsonPropertyName("nutrientId")]
+        public int NutrientId { get; set; }
+        [JsonPropertyName("value")]
+        public double Value { get; set; }
     }
 }

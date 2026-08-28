@@ -95,17 +95,25 @@
                     <RoundRectangle CornerRadius="0,0,24,24"/>
                 </Border.StrokeShape>
                 <Border.GestureRecognizers>
+                    <!-- Nur Hoch/Runter per Swipe (kollidiert nicht mit dem seitlichen Wischen zwischen
+                         den Reitern in MainTabsPage). Links/Rechts bewusst als Buttons statt Swipe, weil
+                         ein horizontaler Wisch hier sonst gleichzeitig den Reiter mitgewechselt hat. -->
                     <SwipeGestureRecognizer Direction="Down" Command="{Binding ToggleCalendarViewCommand}"/>
                     <SwipeGestureRecognizer Direction="Up" Command="{Binding ToggleCalendarViewCommand}"/>
-                    <SwipeGestureRecognizer Direction="Left" Command="{Binding SwipeCalendarLeftCommand}"/>
-                    <SwipeGestureRecognizer Direction="Right" Command="{Binding SwipeCalendarRightCommand}"/>
                 </Border.GestureRecognizers>
                 <VerticalStackLayout Spacing="8">
                     <Label Text="{Binding MonthLabel}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" IsVisible="{Binding IsMonthView}"/>
 
-                    <!-- Wochenansicht: eine Zeile, per Swipe links/rechts blaettert man um eine Woche -->
-                    <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="4"
-                                           BindableLayout.ItemsSource="{Binding WeekDays}" IsVisible="{Binding IsWeekView}">
+                    <!-- Wochenansicht: Vor/Zurueck als Buttons links/rechts der Tage (kein Swipe, s.o.) -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding IsWeekView}">
+                    <Label Grid.Column="0" Text="&#xf104;" FontFamily="FontAwesomeSolid" FontSize="16"
+                           TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center" Padding="10,6">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwipeCalendarRightCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" Spacing="4"
+                                           BindableLayout.ItemsSource="{Binding WeekDays}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="6,8" WidthRequest="42">
@@ -156,9 +164,23 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </HorizontalStackLayout>
+                    <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
+                           TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center" Padding="10,6">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwipeCalendarLeftCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    </Grid>
 
-                    <!-- Monatsansicht: 7-Spalten-Raster, per Swipe runter/hoch auf-/zuklappbar, wie bei MCI -->
-                    <FlexLayout Wrap="Wrap" Direction="Row" IsVisible="{Binding IsMonthView}"
+                    <!-- Monatsansicht: 7-Spalten-Raster, Vor/Zurueck ebenfalls als Buttons -->
+                    <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding IsMonthView}">
+                    <Label Grid.Column="0" Text="&#xf104;" FontFamily="FontAwesomeSolid" FontSize="16"
+                           TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center" Padding="10,6">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwipeCalendarRightCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <FlexLayout Grid.Column="1" Wrap="Wrap" Direction="Row"
                                 BindableLayout.ItemsSource="{Binding MonthDays}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
@@ -197,6 +219,13 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
+                    <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
+                           TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center" Padding="10,6">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SwipeCalendarLeftCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    </Grid>
                 </VerticalStackLayout>
             </Border>
         </VerticalStackLayout>
