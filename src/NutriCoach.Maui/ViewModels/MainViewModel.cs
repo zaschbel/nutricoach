@@ -153,10 +153,22 @@ public class MainViewModel : INotifyPropertyChanged
         Snacks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSnackEntries));
         PreviousWeekCommand = new RelayCommand(async _ => await ShiftWeekAsync(-7));
         NextWeekCommand = new RelayCommand(async _ => await ShiftWeekAsync(7));
-        SwipeCalendarLeftCommand = new RelayCommand(async _ => await (IsMonthView ? ShiftMonthAsync(1) : ShiftWeekAsync(7)));
-        SwipeCalendarRightCommand = new RelayCommand(async _ => await (IsMonthView ? ShiftMonthAsync(-1) : ShiftWeekAsync(-7)));
+        SwipeCalendarLeftCommand = new RelayCommand(async _ =>
+        {
+            if (!DebounceCalendarSwipe()) return;
+            await (IsMonthView ? ShiftMonthAsync(1) : ShiftWeekAsync(7));
+        });
+        SwipeCalendarRightCommand = new RelayCommand(async _ =>
+        {
+            if (!DebounceCalendarSwipe()) return;
+            await (IsMonthView ? ShiftMonthAsync(-1) : ShiftWeekAsync(-7));
+        });
         ToggleCalendarViewCommand = new RelayCommand(async _ =>
         {
+            // SwipeGestureRecognizer feuert auf iOS bei einer einzigen physischen Wischgeste manchmal
+            // mehrfach kurz hintereinander - ohne Sperre klappt die Ansicht dadurch sichtbar "hakelig"
+            // mehrfach auf/zu statt einmal sauber umzuschalten.
+            if (!DebounceCalendarSwipe()) return;
             IsMonthView = !IsMonthView;
             if (IsMonthView) await RefreshMonthAsync();
         });
@@ -245,6 +257,18 @@ public class MainViewModel : INotifyPropertyChanged
         set { _isMonthView = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsWeekView)); }
     }
     public bool IsWeekView => !IsMonthView;
+
+    private DateTime _lastCalendarSwipeAt = DateTime.MinValue;
+
+    /// <summary>Laesst nur eine Kalender-Swipe-Aktion pro 500ms durch - verhindert das "Hakeln" durch
+    /// mehrfach feuernde SwipeGestureRecognizer-Ereignisse fuer dieselbe physische Wischgeste.</summary>
+    private bool DebounceCalendarSwipe()
+    {
+        var now = DateTime.UtcNow;
+        if ((now - _lastCalendarSwipeAt).TotalMilliseconds < 500) return false;
+        _lastCalendarSwipeAt = now;
+        return true;
+    }
 
     private DateOnly _currentMonthAnchor;
     public ObservableCollection<DayInfo> MonthDays { get; } = new();

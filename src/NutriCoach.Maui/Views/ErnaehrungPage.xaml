@@ -45,6 +45,9 @@
         </DataTemplate>
         <DataTemplate x:Key="NutrientCardTemplate">
             <Frame Style="{StaticResource CardStyle}" Padding="14" Margin="0,0,0,12" WidthRequest="164" FlexLayout.Basis="48%">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNutrientCardTapped"/>
+                </Frame.GestureRecognizers>
                 <VerticalStackLayout Spacing="8">
                     <Label FontSize="13" LineBreakMode="TailTruncation">
                         <Label.FormattedText>
@@ -257,7 +260,7 @@
                             <Label Grid.Column="0" Text="Proteine" FontSize="12"/>
                             <Label Grid.Column="1" Text="{Binding ProteinLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding ProteinProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" HeightRequest="6"/>
+                        <ProgressBar Progress="{Binding ProteinProgressRatio}" ProgressColor="#4FB0AE" HeightRequest="6"/>
                     </VerticalStackLayout>
                     <VerticalStackLayout Spacing="4">
                         <Grid ColumnDefinitions="*,Auto">
@@ -271,7 +274,7 @@
                             <Label Grid.Column="0" Text="Fette" FontSize="12"/>
                             <Label Grid.Column="1" Text="{Binding FatLabel}" FontSize="12" TextColor="{StaticResource ColorTextSecondary}"/>
                         </Grid>
-                        <ProgressBar Progress="{Binding FatProgressRatio}" ProgressColor="{StaticResource ColorSuccess}" HeightRequest="6"/>
+                        <ProgressBar Progress="{Binding FatProgressRatio}" ProgressColor="#E0A458" HeightRequest="6"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
