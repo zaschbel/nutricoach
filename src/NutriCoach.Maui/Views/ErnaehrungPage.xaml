@@ -215,12 +215,15 @@
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="14">
 
-                    <!-- Kalorien-Bogen -->
-                    <Grid HeightRequest="185">
-                        <GraphicsView Drawable="{Binding CalorieGaugeDrawable}" HeightRequest="130" HorizontalOptions="Fill" VerticalOptions="Start"/>
+                    <!-- Kalorien-Bogen: bewusst kompakt und mittig statt kartenbreit, damit Gegessen/Ziel
+                         direkt neben den offenen Enden des Bogens sitzen - wie im MCI-Vorbild, nicht mit
+                         grossem Abstand darunter. -->
+                    <Grid HeightRequest="140">
+                        <GraphicsView Drawable="{Binding CalorieGaugeDrawable}" WidthRequest="230" HeightRequest="100"
+                                      HorizontalOptions="Center" VerticalOptions="Start"/>
 
-                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,40,0,0">
-                            <Label Text="{Binding RemainingKcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="30"
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Start" Margin="0,24,0,0">
+                            <Label Text="{Binding RemainingKcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
                                    TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
                             <Label FontSize="12" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center">
                                 <Label.Style>
@@ -236,7 +239,7 @@
                             </Label>
                         </VerticalStackLayout>
 
-                        <Grid ColumnDefinitions="*,*" VerticalOptions="End" Margin="4,0,4,12">
+                        <Grid ColumnDefinitions="*,*" VerticalOptions="Start" Margin="4,86,4,0">
                             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Start">
                                 <Label Text="{Binding Totals.Kcal, StringFormat='{0:0}'}" FontFamily="InterSemiBold" FontSize="16"/>
                                 <Label Text="Gegessen" FontSize="10" TextColor="{StaticResource ColorTextSecondary}"/>
