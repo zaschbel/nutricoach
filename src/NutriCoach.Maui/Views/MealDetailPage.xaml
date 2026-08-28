@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:NutriCoach.Maui"
+             x:Class="NutriCoach.Maui.Views.MealDetailPage"
+             BackgroundColor="{StaticResource ColorBackground}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Padding="16,56,16,12">
+            <Label Grid.Column="0" Text="&#xf053;" FontFamily="FontAwesomeSolid" FontSize="18" TextColor="{StaticResource ColorTextPrimary}" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <Label Grid.Column="1" Text="{Binding Title}" FontFamily="InterBold" FontSize="20" CharacterSpacing="0.5"
+                   TextColor="{StaticResource ColorTextPrimary}" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16,0,16,100" Spacing="18">
+
+                <Label Text="NÄHRWERTE" Style="{StaticResource SectionLabelStyle}"/>
+
+                <Grid HeightRequest="230">
+                    <GraphicsView Drawable="{Binding RingDrawable}" WidthRequest="180" HeightRequest="180"
+                                  HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="{Binding TotalKcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
+                               TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
+                        <Label Text="kcal" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="Start">
+                        <Label Text="{Binding TotalProtein, StringFormat='{0:0} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Proteine" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start">
+                        <Label Text="{Binding TotalCarbs, StringFormat='{0:0} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="End"/>
+                        <Label Text="Carbs" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="End"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="End">
+                        <Label Text="{Binding TotalFat, StringFormat='{0:0.#} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                        <Label Text="Fette" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Label Text="LEBENSMITTEL" Style="{StaticResource SectionLabelStyle}"/>
+
+                <VerticalStackLayout Spacing="0" BindableLayout.ItemsSource="{Binding Entries}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto" Padding="0,10">
+                                <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                                    <Label FontSize="12" TextColor="{StaticResource ColorTextSecondary}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Kcal, StringFormat='{0:0} kcal · '}"/>
+                                                <Span Text="{Binding AmountGrams, StringFormat='{0:0} g'}"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Border Grid.Column="1" WidthRequest="34" HeightRequest="34" StrokeThickness="1"
+                                        Stroke="{StaticResource ColorBorder}" BackgroundColor="Transparent" VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="17"/>
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Static local:AppState.MainViewModel}, Path=RemoveEntryCommand}"
+                                                               CommandParameter="{Binding}"/>
+                                    </Border.GestureRecognizers>
+                                    <Label Text="&#xf068;" FontFamily="FontAwesomeSolid" FontSize="12" TextColor="{StaticResource ColorTextPrimary}"
+                                           HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+                <Label Text="Noch nichts eingetragen" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"
+                       IsVisible="{Binding HasEntries, Converter={StaticResource InverseBoolConverter}}"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Border Grid.Row="1" VerticalOptions="End" BackgroundColor="White" Margin="16,0,16,24" Padding="0,14" StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="999"/>
+            </Border.StrokeShape>
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Source={x:Static local:AppState.MainViewModel}, Path=AddFoodCommand}"
+                                       CommandParameter="{Binding Meal}"/>
+            </Border.GestureRecognizers>
+            <Label Text="Lebensmittel hinzufügen" FontFamily="InterBold" FontSize="14" TextColor="Black" HorizontalTextAlignment="Center"/>
+        </Border>
+    </Grid>
+</ContentPage>

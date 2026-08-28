@@ -232,6 +232,9 @@
 
             <VerticalStackLayout Spacing="6">
                 <Grid ColumnDefinitions="*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBreakfastHeaderTapped"/>
+                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
                         <Label.FormattedText>
                             <FormattedString>
@@ -250,6 +253,9 @@
 
             <VerticalStackLayout Spacing="6">
                 <Grid ColumnDefinitions="*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnLunchHeaderTapped"/>
+                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
                         <Label.FormattedText>
                             <FormattedString>
@@ -268,6 +274,9 @@
 
             <VerticalStackLayout Spacing="6">
                 <Grid ColumnDefinitions="*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnDinnerHeaderTapped"/>
+                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
                         <Label.FormattedText>
                             <FormattedString>
@@ -286,6 +295,9 @@
 
             <VerticalStackLayout Spacing="6">
                 <Grid ColumnDefinitions="*,Auto">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSnackHeaderTapped"/>
+                    </Grid.GestureRecognizers>
                     <Label Grid.Column="0" FontFamily="InterSemiBold" FontSize="13" TextColor="{StaticResource ColorTextSecondary}">
                         <Label.FormattedText>
                             <FormattedString>
