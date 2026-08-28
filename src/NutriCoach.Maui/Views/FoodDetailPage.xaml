@@ -26,24 +26,32 @@
                 </Label>
             </Grid>
 
-            <!-- Makro-Verteilung -->
+            <!-- Makro-Verteilung: gleicher Donut-Ring mit Verbindungsstrichen wie in der Mahlzeit-Detailansicht -->
             <Frame Style="{StaticResource CardStyle}">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Verteilung der Makronährstoffe" FontFamily="InterSemiBold" FontSize="14"/>
+                    <Label Text="NÄHRWERTE" Style="{StaticResource SectionLabelStyle}"/>
 
-                    <GraphicsView Drawable="{Binding ChartDrawable}" HeightRequest="150" WidthRequest="150" HorizontalOptions="Center" Margin="0,6,0,10"/>
-
-                    <CollectionView ItemsSource="{Binding PieSlices}" ItemSizingStrategy="MeasureAllItems">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="14,*,Auto" Padding="0,4">
-                                    <BoxView Grid.Column="0" Color="{Binding Color}" CornerRadius="4" WidthRequest="14" HeightRequest="14"/>
-                                    <Label Grid.Column="1" Text="{Binding Label}" FontSize="13" Margin="8,0,0,0"/>
-                                    <Label Grid.Column="2" Text="{Binding Percent, StringFormat='{0:0}%'}" FontSize="13" TextColor="{StaticResource ColorTextSecondary}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <Grid HeightRequest="230">
+                        <GraphicsView Drawable="{Binding RingDrawable}" WidthRequest="220" HeightRequest="220"
+                                      HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="{Binding Kcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"
+                                   TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
+                            <Label Text="kcal" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="Start">
+                            <Label Text="{Binding Protein, StringFormat='{0:0.#} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                            <Label Text="Proteine" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start">
+                            <Label Text="{Binding Carbs, StringFormat='{0:0.#} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="End"/>
+                            <Label Text="Carbs" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="End"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="End">
+                            <Label Text="{Binding Fat, StringFormat='{0:0.#} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
+                            <Label Text="Fette" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
+                        </VerticalStackLayout>
+                    </Grid>
                 </VerticalStackLayout>
             </Frame>
 

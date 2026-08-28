@@ -24,7 +24,7 @@
                 <Label Text="NÄHRWERTE" Style="{StaticResource SectionLabelStyle}"/>
 
                 <Grid HeightRequest="230">
-                    <GraphicsView Drawable="{Binding RingDrawable}" WidthRequest="180" HeightRequest="180"
+                    <GraphicsView Drawable="{Binding RingDrawable}" WidthRequest="220" HeightRequest="220"
                                   HorizontalOptions="Center" VerticalOptions="Center"/>
                     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
                         <Label Text="{Binding TotalKcal, StringFormat='{0:0}'}" FontFamily="InterBold" FontSize="26"

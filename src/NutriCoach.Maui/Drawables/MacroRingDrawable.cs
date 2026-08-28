@@ -17,14 +17,23 @@ public class MacroRingDrawable : IDrawable
         _fatKcal = Math.Max(0, fatG) * 9;
     }
 
+    // Drei sichtlich unterschiedliche, aber zueinander passende ("harmonische") Farbtöne statt
+    // dreier sehr ähnlicher Grüntöne - je eine Farbe pro Makro, konsistent mit den Legenden-Punkten.
+    private static readonly Color ProteinColor = Color.FromArgb("#4FB0AE");   // Teal
+    private static readonly Color CarbsColor = Color.FromArgb("#7CB342");    // Grün (App-Akzent)
+    private static readonly Color FatColor = Color.FromArgb("#E0A458");      // Amber
+
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         var total = _proteinKcal + _carbsKcal + _fatKcal;
         var cx = dirtyRect.Width / 2f;
         var cy = dirtyRect.Height / 2f;
-        var radius = Math.Min(cx, cy) - 10f;
+        var maxRadius = Math.Min(cx, cy) - 6f;
+        // Ring bewusst kleiner als der verfuegbare Platz, damit rundum Raum fuer die kurzen
+        // Verbindungsstriche zu den Makro-Beschriftungen aussenrum bleibt (wie im Vorbild).
+        var radius = maxRadius * 0.62f;
 
-        canvas.StrokeSize = 18;
+        canvas.StrokeSize = 16;
         canvas.StrokeLineCap = LineCap.Round;
 
         if (total <= 0)
@@ -40,11 +49,32 @@ public class MacroRingDrawable : IDrawable
         var fatSweep = _fatKcal / total * 360.0;
 
         var start = -90.0;
-        DrawArc(canvas, cx, cy, radius, start, start + Math.Max(0, proteinSweep - gapDeg), Color.FromArgb("#B7C98A"));
+        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, proteinSweep, gapDeg, ProteinColor);
         start += proteinSweep;
-        DrawArc(canvas, cx, cy, radius, start, start + Math.Max(0, carbsSweep - gapDeg), Color.FromArgb("#7CB342"));
+        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, carbsSweep, gapDeg, CarbsColor);
         start += carbsSweep;
-        DrawArc(canvas, cx, cy, radius, start, start + Math.Max(0, fatSweep - gapDeg), Color.FromArgb("#4E5D2E"));
+        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, fatSweep, gapDeg, FatColor);
+    }
+
+    private static void DrawSegmentWithConnector(ICanvas canvas, float cx, float cy, float radius, float maxRadius,
+        double startDeg, double sweepDeg, double gapDeg, Color color)
+    {
+        if (sweepDeg <= 0) return;
+
+        DrawArc(canvas, cx, cy, radius, startDeg, startDeg + Math.Max(0, sweepDeg - gapDeg), color);
+
+        // Kurzer Verbindungsstrich von der Segmentmitte nach aussen, wo die Beschriftung sitzt.
+        var midDeg = startDeg + sweepDeg / 2.0;
+        var rad = Math.PI / 180.0 * midDeg;
+        var innerX = cx + (radius + 10) * (float)Math.Cos(rad);
+        var innerY = cy + (radius + 10) * (float)Math.Sin(rad);
+        var outerX = cx + maxRadius * (float)Math.Cos(rad);
+        var outerY = cy + maxRadius * (float)Math.Sin(rad);
+
+        canvas.StrokeSize = 2;
+        canvas.StrokeColor = color;
+        canvas.DrawLine(innerX, innerY, outerX, outerY);
+        canvas.StrokeSize = 16;
     }
 
     private static void DrawArc(ICanvas canvas, float cx, float cy, float radius, double startDeg, double endDeg, Color color)

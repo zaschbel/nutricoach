@@ -32,6 +32,7 @@ public class FoodDetailViewModel : INotifyPropertyChanged
 
     public ObservableCollection<PieSlice> PieSlices { get; } = new();
     public IDrawable ChartDrawable { get; private set; } = new PieChartDrawable(new List<(double, Color)>());
+    public IDrawable RingDrawable => new MacroRingDrawable(Protein, Carbs, Fat);
 
     public FoodDetailViewModel(FoodItem food, FitnessGoal goal, double? initialAmountGrams = null, bool isEditMode = false)
     {
@@ -69,6 +70,7 @@ public class FoodDetailViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(SaturatedFat));
             OnPropertyChanged(nameof(Fiber));
             OnPropertyChanged(nameof(Salt));
+            OnPropertyChanged(nameof(RingDrawable));
             UpdateAssessment();
         }
     }
