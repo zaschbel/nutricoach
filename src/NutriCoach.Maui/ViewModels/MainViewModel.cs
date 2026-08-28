@@ -153,9 +153,21 @@ public class MainViewModel : INotifyPropertyChanged
         Snacks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSnackEntries));
         PreviousWeekCommand = new RelayCommand(async _ => await ShiftWeekAsync(-7));
         NextWeekCommand = new RelayCommand(async _ => await ShiftWeekAsync(7));
+        SwipeCalendarLeftCommand = new RelayCommand(async _ => await (IsMonthView ? ShiftMonthAsync(1) : ShiftWeekAsync(7)));
+        SwipeCalendarRightCommand = new RelayCommand(async _ => await (IsMonthView ? ShiftMonthAsync(-1) : ShiftWeekAsync(-7)));
+        ToggleCalendarViewCommand = new RelayCommand(async _ =>
+        {
+            IsMonthView = !IsMonthView;
+            if (IsMonthView) await RefreshMonthAsync();
+        });
         SelectDayCommand = new RelayCommand(async param =>
         {
-            if (param is DayInfo day) await GoToDateAsync(day.Date);
+            if (param is DayInfo day)
+            {
+                if (day.IsBlank) return;
+                IsMonthView = false;
+                await GoToDateAsync(day.Date);
+            }
         });
         SelectTabCommand = new RelayCommand(param =>
         {
@@ -221,6 +233,56 @@ public class MainViewModel : INotifyPropertyChanged
     public RelayCommand PreviousWeekCommand { get; }
     public RelayCommand NextWeekCommand { get; }
     public RelayCommand SelectDayCommand { get; }
+    public RelayCommand SwipeCalendarLeftCommand { get; }
+    public RelayCommand SwipeCalendarRightCommand { get; }
+    public RelayCommand ToggleCalendarViewCommand { get; }
+
+    // ---------------- Monatsansicht des Kalenders (per Swipe hoch/runter aufklappbar) ----------------
+    private bool _isMonthView;
+    public bool IsMonthView
+    {
+        get => _isMonthView;
+        set { _isMonthView = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsWeekView)); }
+    }
+    public bool IsWeekView => !IsMonthView;
+
+    private DateOnly _currentMonthAnchor;
+    public ObservableCollection<DayInfo> MonthDays { get; } = new();
+    public string MonthLabel => _currentMonthAnchor.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
+
+    private async Task ShiftMonthAsync(int months)
+    {
+        _currentMonthAnchor = _currentMonthAnchor.AddMonths(months);
+        await RefreshMonthAsync();
+    }
+
+    private async Task RefreshMonthAsync()
+    {
+        if (_profile is null) return;
+
+        if (_currentMonthAnchor == default) _currentMonthAnchor = new DateOnly(SelectedDate.Year, SelectedDate.Month, 1);
+        var monthStart = new DateOnly(_currentMonthAnchor.Year, _currentMonthAnchor.Month, 1);
+        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+        OnPropertyChanged(nameof(MonthLabel));
+
+        var datesWithEntries = await _diaryService.GetDatesWithEntriesAsync(_profile.Id, monthStart, monthEnd);
+        var datesWithTraining = await _trainingService.GetDatesWithSessionsAsync(_profile.Id, monthStart, monthEnd);
+        datesWithEntries.UnionWith(datesWithTraining);
+        var restDays = await _trainingService.GetRestDaysAsync(_profile.Id, monthStart, monthEnd);
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        MonthDays.Clear();
+        // Leerzellen vor dem 1. des Monats, damit die Wochentags-Spalten (Mo-So) korrekt ausgerichtet sind.
+        var leadingBlanks = ((int)monthStart.DayOfWeek + 6) % 7;
+        for (var i = 0; i < leadingBlanks; i++)
+            MonthDays.Add(new DayInfo(monthStart, "", 0, false, false, false, false, IsBlank: true));
+
+        for (var date = monthStart; date <= monthEnd; date = date.AddDays(1))
+        {
+            MonthDays.Add(new DayInfo(date, DayAbbrevFor(date), date.Day, date == SelectedDate, date == today,
+                datesWithEntries.Contains(date), restDays.Contains(date)));
+        }
+    }
 
     /// <summary>Wochentags-Kürzel für ein Datum, unabhängig davon, an welchem Wochentag das rollierende Fenster beginnt.</summary>
     private static readonly string[] DayAbbrevsMondayFirst = { "Mo", "Di", "Mi", "Do", "Fr", "Sa", "So" };

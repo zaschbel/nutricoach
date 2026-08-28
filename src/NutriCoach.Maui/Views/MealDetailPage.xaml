@@ -31,18 +31,6 @@
                                TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="Center"/>
                         <Label Text="kcal" FontSize="13" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="Center"/>
                     </VerticalStackLayout>
-                    <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="Start">
-                        <Label Text="{Binding TotalProtein, StringFormat='{0:0} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="Proteine" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                    </VerticalStackLayout>
-                    <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start">
-                        <Label Text="{Binding TotalCarbs, StringFormat='{0:0} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}" HorizontalTextAlignment="End"/>
-                        <Label Text="Carbs" FontSize="11" TextColor="{StaticResource ColorTextSecondary}" HorizontalTextAlignment="End"/>
-                    </VerticalStackLayout>
-                    <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="End">
-                        <Label Text="{Binding TotalFat, StringFormat='{0:0.#} g'}" FontFamily="InterSemiBold" FontSize="15" TextColor="{StaticResource ColorTextPrimary}"/>
-                        <Label Text="Fette" FontSize="11" TextColor="{StaticResource ColorTextSecondary}"/>
-                    </VerticalStackLayout>
                 </Grid>
 
                 <Label Text="LEBENSMITTEL" Style="{StaticResource SectionLabelStyle}"/>

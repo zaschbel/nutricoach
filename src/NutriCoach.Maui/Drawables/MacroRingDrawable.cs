@@ -3,18 +3,28 @@ using Microsoft.Maui.Graphics;
 namespace NutriCoach.Maui.Drawables;
 
 /// <summary>Zeichnet einen vollen Ring aus drei Segmenten (Proteine/Kohlenhydrate/Fette), proportional
-/// zu ihrem jeweiligen Kalorienanteil - für die Mahlzeit-Detailansicht, analog zur MCI-App-Vorlage.</summary>
+/// zu ihrem jeweiligen Kalorienanteil, inkl. Anschluss-Linie ("Leader Line") mit Unterstreichung zu
+/// Wert+Bezeichnung je Segment - analog zur MCI-App-Vorlage. Wert und Linie werden hier bewusst auf
+/// derselben Zeichenfläche erzeugt (statt als separat positionierte XAML-Labels), damit die Linie
+/// IMMER exakt zur zugehörigen Beschriftung zeigt, auch wenn sich die Segment-Winkel durch andere
+/// Nährwert-Verhältnisse verschieben.</summary>
 public class MacroRingDrawable : IDrawable
 {
     private readonly double _proteinKcal;
     private readonly double _carbsKcal;
     private readonly double _fatKcal;
+    private readonly string _proteinValue;
+    private readonly string _carbsValue;
+    private readonly string _fatValue;
 
     public MacroRingDrawable(double proteinG, double carbsG, double fatG)
     {
         _proteinKcal = Math.Max(0, proteinG) * 4;
         _carbsKcal = Math.Max(0, carbsG) * 4;
         _fatKcal = Math.Max(0, fatG) * 9;
+        _proteinValue = $"{proteinG:0.#} g Proteine";
+        _carbsValue = $"{carbsG:0.#} g Carbs";
+        _fatValue = $"{fatG:0.#} g Fette";
     }
 
     // Drei sichtlich unterschiedliche, aber zueinander passende ("harmonische") Farbtöne statt
@@ -29,9 +39,9 @@ public class MacroRingDrawable : IDrawable
         var cx = dirtyRect.Width / 2f;
         var cy = dirtyRect.Height / 2f;
         var maxRadius = Math.Min(cx, cy) - 6f;
-        // Ring bewusst kleiner als der verfuegbare Platz, damit rundum Raum fuer die kurzen
-        // Verbindungsstriche zu den Makro-Beschriftungen aussenrum bleibt (wie im Vorbild).
-        var radius = maxRadius * 0.62f;
+        // Ring bewusst kleiner als der verfuegbare Platz, damit rundum Raum fuer die Anschluss-
+        // Linien zu den Makro-Beschriftungen aussenrum bleibt (wie im Vorbild).
+        var radius = maxRadius * 0.55f;
 
         canvas.StrokeSize = 16;
         canvas.StrokeLineCap = LineCap.Round;
@@ -49,31 +59,51 @@ public class MacroRingDrawable : IDrawable
         var fatSweep = _fatKcal / total * 360.0;
 
         var start = -90.0;
-        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, proteinSweep, gapDeg, ProteinColor);
+        DrawSegmentWithLeaderLine(canvas, cx, cy, radius, maxRadius, start, proteinSweep, gapDeg, ProteinColor, _proteinValue);
         start += proteinSweep;
-        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, carbsSweep, gapDeg, CarbsColor);
+        DrawSegmentWithLeaderLine(canvas, cx, cy, radius, maxRadius, start, carbsSweep, gapDeg, CarbsColor, _carbsValue);
         start += carbsSweep;
-        DrawSegmentWithConnector(canvas, cx, cy, radius, maxRadius, start, fatSweep, gapDeg, FatColor);
+        DrawSegmentWithLeaderLine(canvas, cx, cy, radius, maxRadius, start, fatSweep, gapDeg, FatColor, _fatValue);
     }
 
-    private static void DrawSegmentWithConnector(ICanvas canvas, float cx, float cy, float radius, float maxRadius,
-        double startDeg, double sweepDeg, double gapDeg, Color color)
+    /// <summary>Zeichnet ein Ring-Segment plus eine geknickte Anschluss-Linie: erst radial vom Ring
+    /// nach aussen, dann ein kurzes horizontales Stueck, das gleichzeitig als Unterstreichung für den
+    /// direkt darueber gesetzten Wert/Beschriftungs-Text dient - der Wert "sitzt" also sichtbar auf der Linie.</summary>
+    private static void DrawSegmentWithLeaderLine(ICanvas canvas, float cx, float cy, float radius, float maxRadius,
+        double startDeg, double sweepDeg, double gapDeg, Color color, string text)
     {
         if (sweepDeg <= 0) return;
 
         DrawArc(canvas, cx, cy, radius, startDeg, startDeg + Math.Max(0, sweepDeg - gapDeg), color);
 
-        // Kurzer Verbindungsstrich von der Segmentmitte nach aussen, wo die Beschriftung sitzt.
         var midDeg = startDeg + sweepDeg / 2.0;
         var rad = Math.PI / 180.0 * midDeg;
-        var innerX = cx + (radius + 10) * (float)Math.Cos(rad);
-        var innerY = cy + (radius + 10) * (float)Math.Sin(rad);
-        var outerX = cx + maxRadius * (float)Math.Cos(rad);
-        var outerY = cy + maxRadius * (float)Math.Sin(rad);
+        var cos = (float)Math.Cos(rad);
+        var sin = (float)Math.Sin(rad);
+
+        var innerX = cx + (radius + 10) * cos;
+        var innerY = cy + (radius + 10) * sin;
+
+        var elbowRadius = radius + (maxRadius - radius) * 0.7f;
+        var elbowX = cx + elbowRadius * cos;
+        var elbowY = cy + elbowRadius * sin;
+
+        const float underlineLength = 46f;
+        var dir = cos >= 0 ? 1f : -1f;
+        var endX = elbowX + dir * underlineLength;
 
         canvas.StrokeSize = 2;
         canvas.StrokeColor = color;
-        canvas.DrawLine(innerX, innerY, outerX, outerY);
+        canvas.DrawLine(innerX, innerY, elbowX, elbowY);
+        canvas.DrawLine(elbowX, elbowY, endX, elbowY);
+
+        var boxX = dir > 0 ? elbowX : endX;
+        var hAlign = dir > 0 ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+
+        canvas.FontColor = Color.FromArgb("#F0F1F3");
+        canvas.FontSize = 12;
+        canvas.DrawString(text, boxX, elbowY - 18, underlineLength + 4, 16, hAlign, VerticalAlignment.Bottom);
+
         canvas.StrokeSize = 16;
     }
 
