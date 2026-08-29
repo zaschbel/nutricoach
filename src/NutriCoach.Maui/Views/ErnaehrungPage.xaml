@@ -180,45 +180,53 @@
                             <TapGestureRecognizer Command="{Binding SwipeCalendarRightCommand}"/>
                         </Label.GestureRecognizers>
                     </Label>
-                    <FlexLayout Grid.Column="1" Wrap="Wrap" Direction="Row"
-                                BindableLayout.ItemsSource="{Binding MonthDays}">
+                    <VerticalStackLayout Grid.Column="1" Spacing="2"
+                                BindableLayout.ItemsSource="{Binding MonthWeeks}">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate>
-                                <Grid Padding="2,6" WidthRequest="48" FlexLayout.Basis="14.28%">
-                                    <Grid.Style>
-                                        <Style TargetType="Grid">
-                                            <Setter Property="BackgroundColor" Value="Transparent"/>
-                                            <Style.Triggers>
-                                                <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter Property="BackgroundColor" Value="{StaticResource ColorSuccess}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Grid.Style>
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding SelectDayCommand, Source={x:Static local:AppState.MainViewModel}}"
-                                                               CommandParameter="{Binding}"/>
-                                    </Grid.GestureRecognizers>
-                                    <VerticalStackLayout HorizontalOptions="Center" IsVisible="{Binding IsBlank, Converter={StaticResource InverseBoolConverter}}">
-                                        <Label Text="{Binding DayNumber}" FontSize="14" FontFamily="InterSemiBold" HorizontalTextAlignment="Center">
-                                            <Label.Style>
-                                                <Style TargetType="Label">
-                                                    <Setter Property="TextColor" Value="{StaticResource ColorTextPrimary}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="TextColor" Value="White"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Label.Style>
-                                        </Label>
-                                        <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
-                                                 Color="{StaticResource ColorSuccess}" IsVisible="{Binding HasEntries}"/>
-                                    </VerticalStackLayout>
-                                </Grid>
+                                <!-- Eine Wochenzeile - exakt dieselbe HorizontalStackLayout+BindableLayout-Struktur
+                                     wie die Wochenansicht, nur je Woche einmal statt FlexLayout mit allen Tagen auf einmal. -->
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" BindableLayout.ItemsSource="{Binding .}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Padding="4,6" WidthRequest="42" BackgroundColor="Transparent">
+                                                <Grid.Style>
+                                                    <Style TargetType="Grid">
+                                                        <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger TargetType="Grid" Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource ColorSuccess}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Grid.Style>
+                                                <Grid.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding SelectDayCommand, Source={x:Static local:AppState.MainViewModel}}"
+                                                                           CommandParameter="{Binding}"/>
+                                                </Grid.GestureRecognizers>
+                                                <VerticalStackLayout HorizontalOptions="Center" IsVisible="{Binding IsBlank, Converter={StaticResource InverseBoolConverter}}">
+                                                    <Label Text="{Binding DayNumber}" FontSize="14" FontFamily="InterSemiBold" HorizontalTextAlignment="Center">
+                                                        <Label.Style>
+                                                            <Style TargetType="Label">
+                                                                <Setter Property="TextColor" Value="{StaticResource ColorTextPrimary}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                                        <Setter Property="TextColor" Value="White"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Label.Style>
+                                                    </Label>
+                                                    <BoxView HeightRequest="4" WidthRequest="4" CornerRadius="2" HorizontalOptions="Center"
+                                                             Color="{StaticResource ColorSuccess}" IsVisible="{Binding HasEntries}"/>
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </HorizontalStackLayout>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
-                    </FlexLayout>
+                    </VerticalStackLayout>
                     <Label Grid.Column="2" Text="&#xf105;" FontFamily="FontAwesomeSolid" FontSize="16"
                            TextColor="{StaticResource ColorTextSecondary}" VerticalOptions="Center" Padding="10,6">
                         <Label.GestureRecognizers>

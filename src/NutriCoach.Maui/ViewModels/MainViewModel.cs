@@ -271,7 +271,12 @@ public class MainViewModel : INotifyPropertyChanged
     }
 
     private DateOnly _currentMonthAnchor;
-    public ObservableCollection<DayInfo> MonthDays { get; } = new();
+
+    // Als Liste von Wochenzeilen statt einem flachen FlexLayout-Raster - dieselbe simple Struktur
+    // wie die (nachweislich fluessige) Wochenansicht, nur sechsmal untereinander. FlexLayout mit
+    // ~35 Zellen auf einmal war vermutlich der eigentliche Grund fuer das starke Ruckeln beim
+    // Auf-/Zuklappen der Monatsansicht.
+    public ObservableCollection<List<DayInfo>> MonthWeeks { get; } = new();
     public string MonthLabel => _currentMonthAnchor.ToString("MMMM yyyy", System.Globalization.CultureInfo.GetCultureInfo("de-DE"));
 
     private async Task ShiftMonthAsync(int months)
@@ -295,17 +300,24 @@ public class MainViewModel : INotifyPropertyChanged
         var restDays = await _trainingService.GetRestDaysAsync(_profile.Id, monthStart, monthEnd);
         var today = DateOnly.FromDateTime(DateTime.Today);
 
-        MonthDays.Clear();
+        var flatDays = new List<DayInfo>();
         // Leerzellen vor dem 1. des Monats, damit die Wochentags-Spalten (Mo-So) korrekt ausgerichtet sind.
         var leadingBlanks = ((int)monthStart.DayOfWeek + 6) % 7;
         for (var i = 0; i < leadingBlanks; i++)
-            MonthDays.Add(new DayInfo(monthStart, "", 0, false, false, false, false, IsBlank: true));
+            flatDays.Add(new DayInfo(monthStart, "", 0, false, false, false, false, IsBlank: true));
 
         for (var date = monthStart; date <= monthEnd; date = date.AddDays(1))
         {
-            MonthDays.Add(new DayInfo(date, DayAbbrevFor(date), date.Day, date == SelectedDate, date == today,
+            flatDays.Add(new DayInfo(date, DayAbbrevFor(date), date.Day, date == SelectedDate, date == today,
                 datesWithEntries.Contains(date), restDays.Contains(date)));
         }
+        // Restliche Zellen der letzten Zeile auffuellen, damit jede Woche exakt 7 Spalten hat.
+        while (flatDays.Count % 7 != 0)
+            flatDays.Add(new DayInfo(monthEnd, "", 0, false, false, false, false, IsBlank: true));
+
+        MonthWeeks.Clear();
+        for (var i = 0; i < flatDays.Count; i += 7)
+            MonthWeeks.Add(flatDays.GetRange(i, 7));
     }
 
     /// <summary>Wochentags-Kürzel für ein Datum, unabhängig davon, an welchem Wochentag das rollierende Fenster beginnt.</summary>
